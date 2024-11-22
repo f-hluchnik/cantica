@@ -1,0 +1,20 @@
+[
+    {
+        "model": "songs.song",
+        "pk": 1,
+        "fields": {
+            "title": "Vždy žena budiž chválena",
+            "number": 845,
+            "feast_types": [1]
+        }
+    },
+    {
+        "model": "songs.song",
+        "pk": 2,
+        "fields": {
+            "title": "Prolití krve",
+            "number": 842,
+            "feast_types": [2]
+        }
+    }
+]

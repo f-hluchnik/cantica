@@ -1,0 +1,33 @@
+<!-- feasts/templates/feasts/home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Liturgical Songs</title>
+</head>
+<body>
+    <h1>Liturgical Songs for {{ date }}</h1>
+
+    {% if feast_songs %}
+        {% for item in feast_songs %}
+            <h2>{{ item.feast.name }}</h2>
+            <p>Degree: {{ item.feast.degrees }}</p>
+            <p>Colour: {{ item.feast.colour }}</p>
+            <p>Types: {{ item.feast.types.all|join:", " }}</p>
+
+            {% if item.songs %}
+                <h3>Recommended Songs:</h3>
+                <ul>
+                    {% for song in item.songs %}
+                        <li>{{ song.title }} (Section {{ song.section }})</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No specific song recommendations. Feel free to choose songs from the {{ item.feast.colour }} section.</p>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>No feasts today. You can play any song from the 500 section.</p>
+    {% endif %}
+</body>
+</html>
