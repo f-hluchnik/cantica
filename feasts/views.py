@@ -5,6 +5,7 @@ from .models import Feast
 from songs.models import Song
 from datetime import date
 from .serializers import FeastSerializer
+from .services.fetch_today import Command
 
 class FeastListView(ListAPIView):
     queryset = Feast.objects.all()
@@ -16,6 +17,11 @@ class HomePageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         today = date.today()
+
+        if not Feast.objects.filter(date=today).exists():
+            # Fetch feasts automatically if not present
+            cmd = Command()
+            cmd.handle()
 
         # Fetch today's feasts
         feasts = Feast.objects.filter(date=today)
