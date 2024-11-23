@@ -1,0 +1,126 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #F7F7F7; /* Neutral light background */
+    color: #4B3621; /* Dark brown text */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.container {
+    background: #FFFFFF; /* White container */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 95%;
+    margin: 20px auto;
+    box-sizing: border-box;
+}
+
+/* Header Styles */
+header {
+    text-align: center;
+    background-color: #DEB887; /* Light brown background */
+    padding: 20px;
+    border-bottom: 2px solid #D2B48C; /* Tan border */
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+h1 {
+    color: #4B3621; /* Dark brown */
+    font-size: 40px;
+    margin: 0;
+}
+
+h4 {
+    color: #6F4E37; /* Coffee brown */
+    font-size: 18px;
+    margin: 5px 0 0;
+}
+
+/* Feast Info and Song List */
+.feast-info {
+    background-color: #FDFBF6; /* Subtle light beige */
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #D2B48C;
+}
+
+.feast-info h3 {
+    margin-top: 0;
+    color: #4B3621;
+}
+
+.songs-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+/* Songs List */
+.songs-list li {
+    background-color: #FDFBF6; /* Subtle light beige */
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 16px;
+    display: flex;
+    justify-content: flex-start;
+    /* Removed border */
+}
+
+/* Song "Pod" for Number, Title, and Icon */
+.songs-list .song-pod {
+    display: flex;
+    align-items: center;
+    background-color: #E8D8C3; /* Slightly darker beige for contrast */
+    padding: 5px 15px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #4B3621;
+    gap: 8px; /* Add spacing between the icon and text */
+}
+
+/* Icon Styling */
+.songs-list .song-icon.square {
+    background-color: transparent;
+    content: "■";
+}
+.songs-list .song-icon.triangle {
+    background-color: transparent;
+    content: "▲";
+}
+.songs-list .song-icon.full-dot {
+    background-color: transparent;
+    content: "●";
+}
+
+/* Empty Message */
+.empty-message {
+    text-align: center;
+    font-size: 18px;
+    color: #6F4E37;
+    margin-top: 20px;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    font-size: 14px;
+    color: #6F4E37;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #D2B48C;
+}
