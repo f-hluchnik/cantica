@@ -32,11 +32,33 @@ class HomePageView(TemplateView):
 
         # Add to context
         context = {
-            "date": date.today(),
+            "date": self.get_czech_date(),
             "feast_songs": feast_songs,
             "default_songs": default_songs,
         }
         return context
+    
+    def get_czech_date(self):
+        czech_months = {
+            1: "ledna",
+            2: "února",
+            3: "března",
+            4: "dubna",
+            5: "května",
+            6: "června",
+            7: "července",
+            8: "srpna",
+            9: "září",
+            10: "října",
+            11: "listopadu",
+            12: "prosince"
+        }
+
+        # Get today's date
+        today = date.today()
+
+        # Format the date
+        return f"{today.day}. {czech_months[today.month]} {today.year}"
     
     def get_liturgical_season(self, feasts):
         """
