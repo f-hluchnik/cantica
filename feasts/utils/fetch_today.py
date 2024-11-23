@@ -54,18 +54,39 @@ class LiturgyAPIClient():
 
         print("Successfully fetched today's feast data.")
         return feast_slugs
-
+    
     def infer_types(self, title):
         """Infer feast types from title."""
+        title = title.lower()
+
+        priority_feast_types = {
+            "panny marie": "virgin mary",
+            "panna maria": "virgin mary",
+            "ježíše krista": "jesus christ",
+            "nejsvětějšího srdce ježíšova": "jesus christ",
+        }
+
+        other_feast_types = {
+            "mučednice": "martyr",
+            "mučedníka": "martyr",
+            "biskupa": "bishop",
+            "opata": "abbot",
+            "panny": "virgin",
+        }
+
+        feast_types = []
+        types, title = self.get_and_replace_type(title, priority_feast_types)
+        feast_types.extend(types)
+        types, title = self.get_and_replace_type(title, other_feast_types)
+        feast_types.extend(types)
+        return feast_types
+    
+    def get_and_replace_type(self, title, feast_types):
         types = []
-        if "mučednice" in title.lower() or "mučedníka" in title.lower():
-            types.append("martyr")
-        if "panny marie" in title.lower():
-            types.append("panny marie")
-        elif "panny" in title.lower():
-            types.append("virgin")
-        if "biskupa" in title.lower():
-            types.append("bishop")
-        if "opata" in title.lower():
-            types.append("abbot")
-        return types
+        for keyword, feast_type in feast_types.items():
+            if keyword in title:
+                types.append(feast_type)
+                title = title.replace(keyword, "")
+        return types, title
+
+
