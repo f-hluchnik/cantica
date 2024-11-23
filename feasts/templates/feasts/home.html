@@ -15,11 +15,22 @@
             <p>Colour: {{ item.feast.colour }}</p>
             <p>Types: {{ item.feast.types.all|join:", " }}</p>
 
-            {% if item.songs %}
-                <h3>Recommended Songs:</h3>
+            {% if item.specific_songs %}
+                <h3>Specific Songs:</h3>
                 <ul>
-                    {% for song in item.songs %}
-                        <li>{{ song.title }} (Section {{ song.section }})</li>
+                    {% for song in item.specific_songs %}
+                        <li>{{ song.title }} (No. {{ song.number }})</li>
+                    {% empty %}
+                        <li>No specific songs available.</li>
+                    {% endfor %}
+                </ul>
+            {% elif item.type_songs %}
+                <h3>Songs by Feast Type:</h3>
+                <ul>
+                    {% for song in item.type_songs %}
+                        <li>{{ song.title }} (No. {{ song.number }})</li>
+                    {% empty %}
+                        <li>No type-based songs available.</li>
                     {% endfor %}
                 </ul>
             {% else %}
@@ -28,6 +39,14 @@
         {% endfor %}
     {% else %}
         <p>No feasts today. You can play any song from the 500 section.</p>
+        <h2>Default Songs for {{ default_songs.0.liturgical_season|capfirst }}</h2>
+        <ul>
+            {% for song in default_songs %}
+                <li>{{ song.title }} (No. {{ song.number }})</li>
+            {% empty %}
+                <li>No default songs available.</li>
+            {% endfor %}
+        </ul>
     {% endif %}
 </body>
 </html>
