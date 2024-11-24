@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import Feast, FeastType
+from .models import Feast, FeastType, LiturgicalCalendar
+
+@admin.register(LiturgicalCalendar)
+class LiturgicalCalendarAdmin(admin.ModelAdmin):
+    list_display = ('date',)
 
 @admin.register(FeastType)
 class FeastTypeAdmin(admin.ModelAdmin):
@@ -7,5 +11,5 @@ class FeastTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Feast)
 class FeastAdmin(admin.ModelAdmin):
-    list_display = ('name', 'date', 'degree')
-    list_filter = ('degree', 'types')
+    list_display = ('name',)
+    list_filter = ('types',)

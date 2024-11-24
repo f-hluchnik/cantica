@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
-from feasts.utils.fetch_today import LiturgyAPIClient
+from feasts.utils.liturgy_api_client import LiturgyAPIClient
 from datetime import date, datetime, timedelta
-from feasts.models import Feast
+from feasts.models import Feast, LiturgicalCalendar
 from songs.models import Song
 
 class HomePageView(TemplateView):
@@ -16,8 +16,8 @@ class HomePageView(TemplateView):
         except ValueError:
             selected_date = datetime.now().strftime('%Y-%m-%d')
 
-        api_client = LiturgyAPIClient()
-        feast_slugs = api_client.fetch_today(day=selected_date)
+        liturgical_day = LiturgicalCalendar.objects.filter(date=date_str)
+        feast_slugs = liturgical_day.values_list('celebrations__slug', flat=True)
 
         feasts = Feast.objects.filter(slug__in=feast_slugs)
 
