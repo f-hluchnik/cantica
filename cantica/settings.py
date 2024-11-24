@@ -29,7 +29,12 @@ SECRET_KEY = 'django-insecure-$75!++!zk7aj6$=vsor)3w0d1u=-f^=t!6p*953@va+rsuw0au
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://cantica.fly.dev', 'cantica.hluchnikovi.cz']
+ALLOWED_HOSTS = ['cantica.fly.dev', 'cantica.hluchnikovi.cz']
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://your-app-name.fly.dev',
+    'https://cantica.hluchnikovi.cz',
+]
 
 
 
