@@ -91,17 +91,14 @@ WSGI_APPLICATION = 'cantica.wsgi.application'
 # }
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', 'postgres://USER:PASSWORD@HOST:PORT/DBNAME'),
-    ),
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': os.getenv('DB_NAME', 'postgres'),
-    #     'USER': os.getenv('DB_USER', 'postgres'),
-    #     'PASSWORD': os.getenv('DB_PASSWORD', ''),
-    #     'HOST': os.getenv('DB_HOST', '172.17.0.2'),
-    #     'PORT': os.getenv('DB_PORT', '5432'),
-    # }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'postgres'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', 'proud-grass-4284.flycast'),
+        'PORT': os.getenv('DB_PORT', '5432'),
+    }
 }
 
 
