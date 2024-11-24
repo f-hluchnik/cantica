@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 from feasts.utils.fetch_today import LiturgyAPIClient
-from datetime import date
+from datetime import date, datetime, timedelta
 from feasts.models import Feast
 from songs.models import Song
 
@@ -9,10 +9,15 @@ class HomePageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        today = date.today()
+        today = datetime.now()
+        date_str = self.request.GET.get('date', datetime.now().strftime('%Y-%m-%d'))
+        try:
+            selected_date = datetime.strptime(date_str, '%Y-%m-%d')
+        except ValueError:
+            selected_date = datetime.now().strftime('%Y-%m-%d')
 
         api_client = LiturgyAPIClient()
-        feast_slugs = api_client.fetch_today()
+        feast_slugs = api_client.fetch_today(day=selected_date)
 
         feasts = Feast.objects.filter(slug__in=feast_slugs)
 
@@ -21,10 +26,14 @@ class HomePageView(TemplateView):
         for feast in feasts:
             specific_songs = Song.objects.filter(feast=feast)
             type_songs = Song.objects.filter(feast_types__in=feast.types.all()).distinct()
+            is_jesus_christ_feast = "jesus christ" in [ft.name for ft in feast.types.all()]
+            is_virgin_mary_feast = "virgin mary" in [ft.name for ft in feast.types.all()]
             feast_songs.append({
                 "feast": feast,
                 "specific_songs": specific_songs,
                 "type_songs": type_songs,
+                "is_jesus_christ_feast": is_jesus_christ_feast,
+                "is_virgin_mary_feast": is_virgin_mary_feast,
             })
         # liturgical_season = self.get_liturgical_season(feasts)
         liturgical_season = 'ordinary'
@@ -32,33 +41,14 @@ class HomePageView(TemplateView):
 
         # Add to context
         context = {
-            "date": self.get_czech_date(),
             "feast_songs": feast_songs,
             "default_songs": default_songs,
+            "today": today,
+            "selected_date": selected_date,
+            "previous_date": selected_date - timedelta(days=1),
+            "next_date": selected_date + timedelta(days=1),
         }
         return context
-    
-    def get_czech_date(self):
-        czech_months = {
-            1: "ledna",
-            2: "února",
-            3: "března",
-            4: "dubna",
-            5: "května",
-            6: "června",
-            7: "července",
-            8: "srpna",
-            9: "září",
-            10: "října",
-            11: "listopadu",
-            12: "prosince"
-        }
-
-        # Get today's date
-        today = date.today()
-
-        # Format the date
-        return f"{today.day}. {czech_months[today.month]} {today.year}"
     
     def get_liturgical_season(self, feasts):
         """
