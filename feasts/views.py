@@ -24,7 +24,7 @@ class ClearCacheView(LoginRequiredMixin, View):
 class PreloadDataView(LoginRequiredMixin, View):
     def get(self, request, year, *args, **kwargs):
         client = LiturgyAPIClient()
-        for month in range(11, 12):
+        for month in range(1, 13):
             try:
                 client.fetch_month(year=year, month=month)
             except Exception:

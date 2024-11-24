@@ -31,7 +31,7 @@ DEBUG = os.getenv('DEBUG_VALUE', 'False') == 'True'
 ALLOWED_HOSTS = ['localhost', 'cantica.fly.dev', 'cantica.hluchnikovi.cz']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://your-app-name.fly.dev',
+    'https://cantica.fly.dev',
     'https://cantica.hluchnikovi.cz',
 ]
 
