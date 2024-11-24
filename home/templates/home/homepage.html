@@ -11,8 +11,16 @@
     <div class="container">
         <header>
             <h1>Cantica</h1>
-            <h4>direktář pro varhaníky</h4>
-            <div>Dnes je {{ date }}</div>
+            <h4>online direktář pro varhaníky</h4>
+            <div class="date-navigation"></div>
+            <div class="date-picker-form" class="date-navigation">
+                <a href="?date={{ previous_date|date:'Y-m-d' }}" class="calendar-arrow"><button>&#8592;</button></a>
+                <a href="?date={{ today|date:'Y-m-d' }}" class="calendar-today"><button>dnes</button></a>
+                <a href="?date={{ next_date|date:'Y-m-d' }}" class="calendar-arrow"><button>&#8594;</button></a>
+            </div>
+            <form method="get" class="date-picker-form" action="{% url 'home' %}">                
+                <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.submit();">
+            </form>
         </header>
         
         {% if feast_songs %}
@@ -20,24 +28,9 @@
                 <div class="feast-info">
                     <h3>{{ item.feast.name }}</h3>
                     
-                    {% if item.specific_songs %}
-                        <ul class="songs-list">
+                    <ul class="songs-list">
+                        {% if item.specific_songs %}
                             {% for song in item.specific_songs %}
-                                <li>
-                                    <div class="song-pod">
-                                        <div class="song-icon square">■</div>
-                                        {{ song.number }}: {{ song.title }}
-                                    </div>
-                                </li>
-                            {% empty %}
-                                <li>K tomuto státku není určena žádná píseň.</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-
-                    {% if item.type_songs %}
-                        <ul class="songs-list">
-                            {% for song in item.type_songs %}
                                 <li>
                                     <div class="song-pod">
                                         <div class="song-icon triangle">▲</div>
@@ -45,10 +38,39 @@
                                     </div>
                                 </li>
                             {% empty %}
-                                <li>K tomuto typu státku není určena žádná píseň.</li>
+                                <li>K tomuto státku není určena žádná píseň.</li>
                             {% endfor %}
-                        </ul>
-                    {% endif %}
+                        {% endif %}
+
+                        {% if item.type_songs %}
+                            {% if item.is_virgin_mary_feast %}
+                                <li>
+                                    <div class="song-pod">
+                                        <div class="song-icon square">■</div>
+                                        mariánské písně z oddílu 800
+                                    </div>
+                                </li>
+                            {% elif item.is_jesus_christ_feast %}
+                                <li>
+                                    <div class="song-pod">
+                                        <div class="song-icon square">■</div>
+                                        písně z oddílu 700
+                                    </div>
+                                </li>
+                            {% else %}
+                                {% for song in item.type_songs %}
+                                    <li>
+                                        <div class="song-pod">
+                                            <div class="song-icon square">■</div>
+                                            {{ song.number }}: {{ song.title }}
+                                        </div>
+                                    </li>
+                                {% empty %}
+                                    <li>K tomuto typu státku není určena žádná píseň.</li>
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                    </ul>
 
                     {% if not item.specific_songs and not item.type_songs %}
                         <p class="empty-message">Žádné konkrétní doporučení.</p>

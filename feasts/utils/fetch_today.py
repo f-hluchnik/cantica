@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 class LiturgyAPIClient():
     """Fetch today's liturgical calendar data and update database."""
 
-    API_URL = "http://calapi.inadiutorium.cz/api/v0/cs/calendars/czech/today"
+    API_URL = "http://calapi.inadiutorium.cz/api/v0/cs/calendars/czech/{}/{}/{}"
 
-    def fetch_today(self, *args, **kwargs):
+    def fetch_today(self, day, *args, **kwargs):
         today = datetime.now().date()
-        todays_feasts = cache.get('today_feasts')
-        if todays_feasts is not None:
-            return todays_feasts
-        response = requests.get(self.API_URL)
+        # todays_feasts = cache.get('today_feasts')
+        # if todays_feasts is not None:
+        #     return todays_feasts
+        response = requests.get(self.API_URL.format(day.year, day.month, day.day))
         response.raise_for_status()
         data = response.json()
         feast_slugs = self.update_database(data)
@@ -30,6 +30,7 @@ class LiturgyAPIClient():
 
         for celebration in data.get("celebrations", []):
             slug = slugify(celebration["title"])
+            print(slug)
             feast_slugs.append(slug)
 
             # Create or update FeastType(s)
@@ -42,12 +43,11 @@ class LiturgyAPIClient():
             # Create or update Feast
             feast, _ = Feast.objects.update_or_create(
                 slug=slug,
-                date=today,
-                name=celebration["title"],
-                degree=celebration["rank"],
-                # defaults={
-                #     "colour": celebration["colour"],
-                # }
+                defaults={
+                    'date': today,
+                    'name': celebration["title"],
+                    'degree': celebration["rank"],
+                }
             )
             feast.types.set(feast_types)
             feast.save()
