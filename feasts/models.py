@@ -3,7 +3,7 @@ from django.utils.text import slugify
 
 
 class FeastType(models.Model):
-    name = models.CharField(max_length=500, unique=True)
+    name = models.CharField(max_length=200, unique=True)
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -11,8 +11,8 @@ class FeastType(models.Model):
 
 
 class Feast(models.Model):
-    slug = models.SlugField(unique=True)
-    name = models.CharField(max_length=500)
+    slug = models.SlugField(unique=True, max_length=200)
+    name = models.CharField(max_length=200)
     types = models.ManyToManyField(FeastType, related_name='feasts')
 
     def save(self, *args, **kwargs):
@@ -25,7 +25,7 @@ class Feast(models.Model):
     
 class LiturgicalCalendar(models.Model):
     date = models.DateField(unique=True)
-    season = models.CharField(max_length=500)
+    season = models.CharField(max_length=100)
     celebrations = models.ManyToManyField(Feast, related_name='calendar_dates')
 
     def __str__(self):
