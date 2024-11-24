@@ -14,12 +14,6 @@ class Feast(models.Model):
     slug = models.SlugField(unique=True)
     name = models.CharField(max_length=200)
     types = models.ManyToManyField(FeastType, related_name='feasts')
-    degree = models.CharField(max_length=50, choices=[
-        ('mandatory', 'Mandatory'),
-        ('optional', 'Optional'),
-        ('recommended', 'Recommended')
-    ])
-    date = models.DateField()
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -28,3 +22,11 @@ class Feast(models.Model):
 
     def __str__(self):
         return f"{self.name} ({', '.join(t.name for t in self.types.all())})"
+    
+class LiturgicalCalendar(models.Model):
+    date = models.DateField(unique=True)
+    season = models.CharField(max_length=50)
+    celebrations = models.ManyToManyField(Feast, related_name='calendar_dates')
+
+    def __str__(self):
+        return f"{self.date} ({', '.join(c.slug for c in self.celebrations.all())})"

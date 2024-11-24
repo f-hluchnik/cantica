@@ -1,6 +1,7 @@
 
 from rest_framework.generics import ListAPIView
 from .models import Feast
+from .utils.liturgy_api_client import LiturgyAPIClient
 from .serializers import FeastSerializer
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -19,3 +20,14 @@ class ClearCacheView(LoginRequiredMixin, View):
         # Clear the cache
         cache.clear()
         return JsonResponse({"status": "Cache cleared successfully!"}, status=200)
+    
+class PreloadDataView(LoginRequiredMixin, View):
+    def get(self, request, year, *args, **kwargs):
+        client = LiturgyAPIClient()
+        for month in range(11, 12):
+            try:
+                client.fetch_month(year=year, month=month)
+            except Exception:
+                raise
+        return JsonResponse({"message": f"Data for {year} successfully preloaded."}, status=200)
+
