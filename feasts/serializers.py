@@ -11,4 +11,4 @@ class FeastSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feast
-        fields = ['id', 'name', 'types', 'degree', 'date']
+        fields = ['id', 'name', 'types']
