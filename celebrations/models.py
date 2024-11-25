@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 
 
-class FeastType(models.Model):
+class CelebrationType(models.Model):
     name = models.CharField(max_length=200, unique=True)
     description = models.TextField(blank=True)
 
@@ -10,10 +10,10 @@ class FeastType(models.Model):
         return self.name
 
 
-class Feast(models.Model):
+class Celebration(models.Model):
     slug = models.SlugField(unique=True, max_length=200)
     name = models.CharField(max_length=200)
-    types = models.ManyToManyField(FeastType, related_name='feasts')
+    types = models.ManyToManyField(CelebrationType, related_name='celebrations')
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -23,10 +23,10 @@ class Feast(models.Model):
     def __str__(self):
         return f"{self.name} ({', '.join(t.name for t in self.types.all())})"
     
-class LiturgicalCalendar(models.Model):
+class LiturgicalCalendarEvent(models.Model):
     date = models.DateField(unique=True)
-    season = models.CharField(max_length=100)
-    celebrations = models.ManyToManyField(Feast, related_name='calendar_dates')
+    season = models.CharField(max_length=50)
+    celebrations = models.ManyToManyField(Celebration, related_name='liturgical_calendar_events')
 
     def __str__(self):
-        return f"{self.date} ({', '.join(c.slug for c in self.celebrations.all())})"
+        return f"{self.date}, {self.season}, ({', '.join(c.slug for c in self.celebrations.all())})"

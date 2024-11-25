@@ -23,10 +23,10 @@
             </form>
         </header>
         
-        {% if feast_songs %}
-            {% for item in feast_songs %}
-                <div class="feast-info">
-                    <h3>{{ item.feast.name }}</h3>
+        {% if celebration_songs %}
+            {% for item in celebration_songs %}
+                <div class="celebration-info">
+                    <h3>{{ item.celebration.name }}</h3>
                     
                     <ul class="songs-list">
                         {% if item.specific_songs %}
@@ -43,14 +43,14 @@
                         {% endif %}
 
                         {% if item.type_songs %}
-                            {% if item.is_virgin_mary_feast %}
+                            {% if item.is_virgin_mary_celebration %}
                                 <li>
                                     <div class="song-pod">
                                         <div class="song-icon square">■</div>
                                         mariánské písně z oddílu 800
                                     </div>
                                 </li>
-                            {% elif item.is_jesus_christ_feast %}
+                            {% elif item.is_jesus_christ_celebration %}
                                 <li>
                                     <div class="song-pod">
                                         <div class="song-icon square">■</div>
@@ -66,36 +66,30 @@
                                         </div>
                                     </li>
                                 {% empty %}
-                                    <li>K tomuto typu státku není určena žádná píseň.</li>
+                                    <li>K tomuto typu svátku není určena žádná píseň.</li>
                                 {% endfor %}
                             {% endif %}
                         {% endif %}
+                        
+                        {% if not item.specific_songs and not item.type_songs %}
+                            <li>
+                                <div class="song-pod">
+                                    <div class="song-icon full_dot">●</div>
+                                    písně z oddílu {{ seasonal_songs_section }}
+                                </div>
+                            </li>
+                        {% endif %}
                     </ul>
-
-                    {% if not item.specific_songs and not item.type_songs %}
-                        <p class="empty-message">Žádné konkrétní doporučení.</p>
-                    {% endif %}
                 </div>
             {% endfor %}
         {% else %}
             <p class="empty-message">Dnes nejsou žádné dostupné události.</p>
-
-            <div class="default-songs">
-                <ul>
-                    {% for song in default_songs %}
-                        <li>
-                            <div class="song-pod">
-                                <div class="song-icon full-dot">●</div>
-                                {{ song.number }}: {{ song.title }}
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li>Žádné výchozí písně nejsou dostupné.</li>
-                    {% endfor %}
-                </ul>
-            </div>
         {% endif %}
-        
+        <div class="song-icons">
+            <div class="song-icon triangle">▲ píseň podle svátku</div>
+            <div class="song-icon square">■ píseň podle typu svátku</div>
+            <div class="song-icon full-dot">● píseň podle období</div>
+        </div>
         <div class="footer">
             <p>&copy; 2024 František Hluchník</p>
         </div>

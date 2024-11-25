@@ -1,8 +1,8 @@
 
 from rest_framework.generics import ListAPIView
-from .models import Feast
+from .models import Celebration
 from .utils.liturgy_api_client import LiturgyAPIClient
-from .serializers import FeastSerializer
+from .serializers import CelebrationSerializer
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -11,9 +11,9 @@ from django.core.cache import cache
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-class FeastListView(ListAPIView):
-    queryset = Feast.objects.all()
-    serializer_class = FeastSerializer
+class CelebrationListView(ListAPIView):
+    queryset = Celebration.objects.all()
+    serializer_class = CelebrationSerializer
 
 class ClearCacheView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
