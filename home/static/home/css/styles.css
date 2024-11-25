@@ -46,8 +46,8 @@ h4 {
     margin: 5px 0 0;
 }
 
-/* Feast Info and Song List */
-.feast-info {
+/* Celebration Info and Song List */
+.celebration-info {
     background-color: #FDFBF6; /* Subtle light beige */
     padding: 15px;
     border-radius: 8px;
@@ -57,7 +57,7 @@ h4 {
     border: 1px solid #D2B48C;
 }
 
-.feast-info h3 {
+.celebration-info h3 {
     margin-top: 0;
     color: #4B3621;
 }
@@ -155,6 +155,12 @@ h4 {
     background-color: #8c6748;
 }
 
+.song-icons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    font-size: 12px;
+}
 
 /* Footer */
 .footer {

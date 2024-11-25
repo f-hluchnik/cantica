@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import ClearCacheView, FeastListView, PreloadDataView
+from .views import ClearCacheView, CelebrationListView, PreloadDataView
 
 urlpatterns = [
-    path('', FeastListView.as_view(), name='feast-list'),
+    path('', CelebrationListView.as_view(), name='celebration_list'),
     path('clear-cache', ClearCacheView.as_view(), name='clear_cache'),
     path('preload-calendar/<int:year>/', PreloadDataView.as_view(), name='preload_calendar'),
 ]

@@ -1,5 +1,5 @@
 import requests
-from feasts.models import Feast, FeastType, LiturgicalCalendar
+from celebrations.models import Celebration, CelebrationType, LiturgicalCalendarEvent
 from datetime import datetime, date
 from typing import Dict, List, Optional, Tuple
 from django.utils.text import slugify
@@ -60,13 +60,13 @@ class LiturgyAPIClient:
             ],
             "weekday": "sunday"
         },
-        Creates entry for LiturgicalCalendar and adds Feasts and FeastTypes, which are infered from the feast title.
+        Creates entry for LiturgicalCalendarEvent and adds Celebrations and CelebrationTypes, which are infered from the celebration title.
         """
         date = data.get('date')
         season = data.get('season')
 
-        # Create or update LiturgicalCalendar entry
-        liturgical_calendar, _ = LiturgicalCalendar.objects.update_or_create(
+        # Create or update LiturgicalCalendarEvent entry
+        liturgical_calendar, _ = LiturgicalCalendarEvent.objects.update_or_create(
             date=date,
             defaults={
                 'season': season,
@@ -77,61 +77,65 @@ class LiturgyAPIClient:
         for celebration in data.get('celebrations', []):
             slug = slugify(celebration["title"])
 
-            # Create or update FeastType(s)
+            # Create or update CelebrationType(s)
             types = self.infer_types(celebration["title"])
-            feast_types = []
-            for feast_type_name in types:
-                feast_type, _ = FeastType.objects.get_or_create(name=feast_type_name)
-                feast_types.append(feast_type)
+            celebration_types = []
+            for celebration_type_name in types:
+                celebration_type, _ = CelebrationType.objects.get_or_create(name=celebration_type_name)
+                celebration_types.append(celebration_type)
 
-            # Create or update Feast
-            feast, _ = Feast.objects.update_or_create(
+            # Create or update Celebration
+            celebration, _ = Celebration.objects.update_or_create(
                 slug=slug,
                 defaults={
                     'name': celebration.get('title'),
                 }
             )
-            feast.types.set(feast_types)
-            feast.save()
+            celebration.types.set(celebration_types)
+            celebration.save()
 
-            # Add feast to the LiturgicalCalendar entry
-            liturgical_calendar.celebrations.add(feast)
+            # Add celebration to the LiturgicalCalendarEvent entry
+            liturgical_calendar.celebrations.add(celebration)
         logger.info("Day {day} and it's celebrations were successfully added to database".format(day=date))
     
     def infer_types(self, title: str) -> List[str]:
-        """Infer feast types from title."""
+        """Infer celebration types from title."""
         title = title.lower()
 
-        priority_feast_types = {
+        priority_celebration_types = {
             'panny marie': 'virgin mary',
             'panna maria': 'virgin mary',
             'ježíše krista': 'jesus christ',
             'nejsvětějšího srdce ježíšova': 'jesus christ',
         }
 
-        other_feast_types = {
+        other_celebration_types = {
             'mučednice': 'martyr',
             'mučedníka': 'martyr',
+            'mučedníků': 'martyr',
+            'sv': 'saint',
+            'papeže': 'pope',
             'biskupa': 'bishop',
             'opata': 'abbot',
             'kněze': 'priest',
+            'učitele církve': 'doctor of the church',
             'apoštola': 'apostle',
             'apoštolů': 'apostle',
             'panny': 'virgin',
         }
 
-        feast_types = []
-        types, title = self.get_and_replace_type(title, priority_feast_types)
-        feast_types.extend(types)
-        types, title = self.get_and_replace_type(title, other_feast_types)
-        feast_types.extend(types)
-        return feast_types
+        celebration_types = []
+        types, title = self.get_and_replace_type(title, priority_celebration_types)
+        celebration_types.extend(types)
+        types, title = self.get_and_replace_type(title, other_celebration_types)
+        celebration_types.extend(types)
+        return celebration_types
     
-    def get_and_replace_type(self, title: list, feast_types: Dict[str, str]) -> Tuple[List[str], str]:
+    def get_and_replace_type(self, title: list, celebration_types: Dict[str, str]) -> Tuple[List[str], str]:
         types = []
-        for keyword, feast_type in feast_types.items():
+        for keyword, celebration_type in celebration_types.items():
             if keyword in title:
-                types.append(feast_type)
+                types.append(celebration_type)
                 title = title.replace(keyword, '')
         return types, title
 
