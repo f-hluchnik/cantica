@@ -96,7 +96,7 @@ if ENVIRONMENT == 'production':
             'NAME': os.getenv('DB_NAME', 'postgres'),
             'USER': os.getenv('DB_USER', 'postgres'),
             'PASSWORD': os.getenv('DB_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', 'proud-grass-4284.flycast'),
+            'HOST': os.getenv('DB_HOST', 'cantica-db.flycast'),
             'PORT': os.getenv('DB_PORT', '5432'),
         }
     }
