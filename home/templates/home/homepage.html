@@ -6,90 +6,120 @@
     <title>Directus Cantica</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'home/css/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Directus Cantica</h1>
-            <h4>online direktář pro varhaníky</h4>
-            <div class="date-navigation"></div>
-            <div class="date-picker-form" class="date-navigation">
-                <a href="?date={{ previous_date|date:'Y-m-d' }}" class="calendar-arrow"><button>&#8592;</button></a>
-                <a href="?date={{ today|date:'Y-m-d' }}" class="calendar-today"><button>dnes</button></a>
-                <a href="?date={{ next_date|date:'Y-m-d' }}" class="calendar-arrow"><button>&#8594;</button></a>
-            </div>
-            <form method="get" class="date-picker-form" action="{% url 'home' %}">                
-                <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.submit();">
-            </form>
-        </header>
-        
-        {% if celebration_songs %}
-            {% for item in celebration_songs %}
-                <div class="celebration-info">
-                    <h3>{{ item.celebration.name }}</h3>
-                    
-                    <ul class="songs-list">
-                        {% if item.specific_songs %}
-                            {% for song in item.specific_songs %}
-                                <li>
-                                    <div class="song-pod">
-                                        <div class="song-icon triangle">▲</div>
-                                        {{ song.number }}: {{ song.title }}
-                                    </div>
-                                </li>
-                            {% empty %}
-                                <li>K tomuto státku není určena žádná píseň.</li>
-                            {% endfor %}
-                        {% endif %}
+        <nav class="navbar">
+            <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">domů</a>
+            <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">o aplikaci</a>
+        </nav>
 
-                        {% if item.type_songs %}
-                            {% if item.is_virgin_mary_celebration %}
-                                <li>
-                                    <div class="song-pod">
-                                        <div class="song-icon square">■</div>
-                                        mariánské písně z oddílu 800
-                                    </div>
-                                </li>
-                            {% elif item.is_jesus_christ_celebration %}
-                                <li>
-                                    <div class="song-pod">
-                                        <div class="song-icon square">■</div>
-                                        písně z oddílu 700
-                                    </div>
-                                </li>
-                            {% else %}
-                                {% for song in item.type_songs %}
+        {% if request.resolver_match.url_name == 'home' %}
+            <header>
+                <h1>Directus Cantica</h1>
+                <h4>online direktář pro varhaníky</h4>
+                <div class="date-navigation"></div>
+                <div class="date-picker-form" class="date-navigation">
+                    <a href="?date={{ previous_date|date:'Y-m-d' }}" class="calendar-arrow"><button>&#8592;</button></a>
+                    <a href="?date={{ today|date:'Y-m-d' }}" class="calendar-today"><button>dnes</button></a>
+                    <a href="?date={{ next_date|date:'Y-m-d' }}" class="calendar-arrow"><button>&#8594;</button></a>
+                </div>
+                <form method="get" class="date-picker-form" action="{% url 'home' %}">                
+                    <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.submit();">
+                </form>
+            </header>
+            
+            {% if celebration_songs %}
+                {% for item in celebration_songs %}
+                    <div class="celebration-info">
+                        <h3>{{ item.celebration.name }}</h3>
+                        
+                        <ul class="songs-list">
+                            {% if item.specific_songs %}
+                                {% for song in item.specific_songs %}
+                                    <li>
+                                        <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
+                                            <div class="song-pod linked">
+                                                <div class="song-icon triangle">▲</div>
+                                                    {{ song.number }}: {{ song.title }}
+                                            </div>
+                                        </a>
+                                    </li>
+                                {% empty %}
+                                    <li>K tomuto státku není určena žádná píseň.</li>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if item.type_songs %}
+                                {% if item.is_virgin_mary_celebration %}
                                     <li>
                                         <div class="song-pod">
                                             <div class="song-icon square">■</div>
-                                            {{ song.number }}: {{ song.title }}
+                                            mariánské písně z oddílu 800
                                         </div>
                                     </li>
-                                {% empty %}
-                                    <li>K tomuto typu svátku není určena žádná píseň.</li>
-                                {% endfor %}
+                                {% elif item.is_jesus_christ_celebration %}
+                                    <li>
+                                        <div class="song-pod">
+                                            <div class="song-icon square">■</div>
+                                            písně z oddílu 700
+                                        </div>
+                                    </li>
+                                {% else %}
+                                    {% for song in item.type_songs %}
+                                        <li>
+                                            <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
+                                                <div class="song-pod linked">
+                                                    <div class="song-icon square">■</div>
+                                                        {{ song.number }}: {{ song.title }}
+                                                </div>
+                                            </a>
+                                        </li>
+                                    {% empty %}
+                                        <li>K tomuto typu svátku není určena žádná píseň.</li>
+                                    {% endfor %}
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                        
-                        {% if not item.specific_songs and not item.type_songs %}
-                            <li>
-                                <div class="song-pod">
-                                    <div class="song-icon full_dot">●</div>
-                                    písně z oddílu {{ seasonal_songs_section }}
-                                </div>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="empty-message">Dnes nejsou žádné dostupné události.</p>
+                            
+                            {% if not item.specific_songs and not item.type_songs %}
+                                <li>
+                                    <div class="song-pod">
+                                        <div class="song-icon full_dot">●</div>
+                                        písně z oddílu {{ seasonal_songs_section }}
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-message">Dnes nejsou žádné dostupné události.</p>
+            {% endif %}
+            <div class="song-icons">
+                <div class="song-icon triangle">▲ píseň podle svátku</div>
+                <div class="song-icon square">■ píseň podle typu svátku</div>
+                <div class="song-icon full-dot">● píseň podle období</div>
+            </div>
         {% endif %}
-        <div class="song-icons">
-            <div class="song-icon triangle">▲ píseň podle svátku</div>
-            <div class="song-icon square">■ píseň podle typu svátku</div>
-            <div class="song-icon full-dot">● píseň podle období</div>
-        </div>
+
+        {% if request.resolver_match.url_name == 'about' %}
+            <section class="about">
+                <h1>O aplikaci</h1>
+                <p>
+                    Directus Cantica je online direktář vytvořený pro pomoc varhaníkům při výběru liturgických písní. 
+                    Umožňuje snadno najít vhodné písně podle konkrétních svátků, typu svátků a&nbsp;liturgického období.
+                </p>
+                <h3>Klíčové funkce:</h3>
+                <ul>
+                    <li>Výběr písní podle svátku nebo typu svátku</li>
+                    <li>Možnost zobrazit písně podle liturgického období</li>
+                </ul>
+                <p>Věříme, že tato aplikace usnadní vaši přípravu na liturgii a&nbsp;přispěje k&nbsp;obohacení liturgického slavení.</p>
+            </section>
+        {% endif %}
         <div class="footer">
             <p>&copy; 2024 František Hluchník</p>
         </div>

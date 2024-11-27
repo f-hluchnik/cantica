@@ -11,10 +11,9 @@ class HomePageView(TemplateView):
         context = super().get_context_data(**kwargs)
         today = datetime.now()
         date_str = self.request.GET.get('date', datetime.now().strftime('%Y-%m-%d'))
-        try:
-            selected_date = datetime.strptime(date_str, '%Y-%m-%d')
-        except ValueError:
-            selected_date = datetime.now().strftime('%Y-%m-%d')
+        if not date_str:
+            date_str = datetime.now().strftime('%Y-%m-%d')
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d')
 
         liturgical_day = LiturgicalCalendarEvent.objects.filter(date=date_str)
         celebration_slugs = liturgical_day.values_list('celebrations__slug', flat=True)
@@ -65,4 +64,8 @@ class HomePageView(TemplateView):
             'occasional': '900',
         }
         return song_sections.get(liturgical_season, '')
+    
+class AboutView(TemplateView):
+    template_name = 'home/homepage.html'
+
         
