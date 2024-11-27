@@ -107,13 +107,15 @@ class LiturgyAPIClient:
             'panna maria': 'virgin mary',
             'ježíše krista': 'jesus christ',
             'nejsvětějšího srdce ježíšova': 'jesus christ',
+            'nejsvětějšího jména ježíš': 'jesus christ',
+            'nejsvětější trojice': 'jesus christ',
         }
 
         other_celebration_types = {
             'mučednice': 'martyr',
             'mučedníka': 'martyr',
             'mučedníků': 'martyr',
-            'sv': 'saint',
+            'sv.': 'saint',
             'papeže': 'pope',
             'biskupa': 'bishop',
             'opata': 'abbot',
@@ -121,6 +123,7 @@ class LiturgyAPIClient:
             'učitele církve': 'doctor of the church',
             'apoštola': 'apostle',
             'apoštolů': 'apostle',
+            'evangelisty': 'evangelist',
             'panny': 'virgin',
         }
 
