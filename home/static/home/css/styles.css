@@ -1,7 +1,21 @@
+/* Define color variables */
+:root {
+    --primary-color: #4B3621;
+    --secondary-color: #6F4E37;
+    --highlight-color: #E8D8C3;
+    --bg-color-light: #F7F7F7;
+    --bg-color-dark: #FDFBF6;
+    --border-color: #D2B48C;
+    --btn-bg-color: #6B4E31;
+    --btn-bg-hover: #8C6748;
+    --header-bg-color: #DEB887;
+}
+
+/* Global Styles */
 body {
     font-family: 'Fira Sans', 'Helvetica', sans-serif;
-    background-color: #F7F7F7;
-    color: #4B3621;
+    background-color: var(--bg-color-light);
+    color: var(--primary-color);
     margin: 0;
     padding: 0;
     display: flex;
@@ -13,7 +27,7 @@ body {
 }
 
 .container {
-    background: #FFFFFF;
+    background: #fff;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -23,69 +37,67 @@ body {
     box-sizing: border-box;
 }
 
+/* Navbar */
 .navbar {
     display: flex;
     justify-content: center;
-    padding: 10px 10px;
+    padding: 10px;
     border-bottom: 1px solid #ddd;
 }
 
 .nav-link {
     margin: 0 15px;
     text-decoration: none;
-    color: #4B3621;
+    color: var(--primary-color);
     font-weight: bold;
     padding: 8px 16px;
     border-radius: 4px;
-    /* transition: background-color 0.3s, color 0.3s; */
 }
 
-.nav-link:hover {
-    background-color: #E8D8C3;
-    color: #4B3621;
+.nav-link:hover, .nav-link.active {
+    background-color: var(--highlight-color);
+    color: var(--primary-color);
 }
 
-.nav-link.active {
-    background-color: #E8D8C3;
-    color: #4B3621;
-}
-
+/* Header */
 header {
     text-align: center;
-    background-color: #DEB887;
+    background-color: var(--header-bg-color);
     padding: 20px;
-    border-bottom: 2px solid #D2B48C;
+    border-bottom: 2px solid var(--border-color);
     margin-bottom: 20px;
     border-radius: 8px;
 }
 
 h1 {
-    color: #4B3621;
+    color: var(--primary-color);
     font-size: 40px;
     margin: 0;
 }
 
 h4 {
-    color: #6F4E37;
+    color: var(--secondary-color);
     font-size: 18px;
     margin: 5px 0 0;
 }
 
+/* Celebration Info */
 .celebration-info {
-    background-color: #FDFBF6;
+    background-color: var(--bg-color-light);
     padding: 15px;
     border-radius: 8px;
     margin-top: 15px;
     font-size: 16px;
     margin-bottom: 20px;
-    border: 1px solid #D2B48C;
+    border: 1px solid var(--border-color);
 }
 
 .celebration-info h3 {
     margin-top: 0;
-    color: #4B3621;
+    color: var(--primary-color);
 }
 
+/* Songs List */
 .songs-list {
     list-style-type: none;
     padding: 0;
@@ -96,7 +108,7 @@ h4 {
 }
 
 .songs-list li {
-    background-color: #FDFBF6;
+    background-color: var(--bg-color-light);
     margin: 5px 0;
     padding: 10px;
     border-radius: 4px;
@@ -109,12 +121,12 @@ h4 {
 .songs-list .song-pod {
     display: flex;
     align-items: center;
-    background-color: #E8D8C3;
+    background-color: var(--highlight-color);
     padding: 5px 15px;
     border-radius: 12px;
     font-size: 14px;
     font-weight: bold;
-    color: #4B3621;
+    color: var(--primary-color);
     gap: 8px;
 }
 
@@ -122,22 +134,26 @@ h4 {
     background-color: transparent;
     content: "■";
 }
+
 .songs-list .song-icon.triangle {
     background-color: transparent;
     content: "▲";
 }
+
 .songs-list .song-icon.full-dot {
     background-color: transparent;
     content: "●";
 }
 
+/* Empty Message */
 .empty-message {
     text-align: center;
     font-size: 18px;
-    color: #6F4E37;
+    color: var(--secondary-color);
     margin-top: 20px;
 }
 
+/* Date Navigation */
 .date-navigation {
     display: flex;
     justify-content: center;
@@ -146,6 +162,7 @@ h4 {
     font-size: 18px;
 }
 
+/* Date Picker Form */
 .date-picker-form {
     display: flex;
     justify-content: center;
@@ -174,7 +191,7 @@ h4 {
 
 .date-picker-form button {
     padding: 5px 19px;
-    background-color: #6b4e31;
+    background-color: var(--btn-bg-color);
     color: white;
     border: none;
     border-radius: 3px;
@@ -182,9 +199,10 @@ h4 {
 }
 
 .date-picker-form button:hover {
-    background-color: #8c6748;
+    background-color: var(--btn-bg-hover);
 }
 
+/* Song Icons */
 .song-icons {
     display: flex;
     justify-content: flex-start;
@@ -199,10 +217,11 @@ h4 {
 }
 
 .linked:hover {
-    background-color: #8c6748;
+    background-color: var(--btn-bg-hover);
     color: white;
 }
 
+/* About Section */
 .about {
     padding: 20px;
     max-width: 800px;
@@ -232,13 +251,12 @@ h4 {
     margin-bottom: 8px;
 }
 
-
 /* Footer */
 .footer {
     text-align: center;
     font-size: 14px;
-    color: #6F4E37;
+    color: var(--secondary-color);
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 2px solid #D2B48C;
+    border-top: 2px solid var(--border-color);
 }
