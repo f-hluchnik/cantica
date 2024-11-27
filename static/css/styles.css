@@ -1,8 +1,21 @@
-/* General Styles */
+/* Define color variables */
+:root {
+    --primary-color: #4B3621;
+    --secondary-color: #6F4E37;
+    --highlight-color: #E8D8C3;
+    --bg-color-light: #F7F7F7;
+    --bg-color-dark: #FDFBF6;
+    --border-color: #D2B48C;
+    --btn-bg-color: #6B4E31;
+    --btn-bg-hover: #8C6748;
+    --header-bg-color: #DEB887;
+}
+
+/* Global Styles */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #F7F7F7; /* Neutral light background */
-    color: #4B3621; /* Dark brown text */
+    font-family: 'Fira Sans', 'Helvetica', sans-serif;
+    background-color: var(--bg-color-light);
+    color: var(--primary-color);
     margin: 0;
     padding: 0;
     display: flex;
@@ -14,7 +27,7 @@ body {
 }
 
 .container {
-    background: #FFFFFF; /* White container */
+    background: #fff;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -24,87 +37,109 @@ body {
     box-sizing: border-box;
 }
 
-/* Header Styles */
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.nav-link {
+    margin: 0 15px;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: var(--highlight-color);
+    color: var(--primary-color);
+}
+
+/* Header */
 header {
     text-align: center;
-    background-color: #DEB887; /* Light brown background */
+    background-color: var(--header-bg-color);
     padding: 20px;
-    border-bottom: 2px solid #D2B48C; /* Tan border */
+    border-bottom: 2px solid var(--border-color);
     margin-bottom: 20px;
     border-radius: 8px;
 }
 
 h1 {
-    color: #4B3621; /* Dark brown */
+    color: var(--primary-color);
     font-size: 40px;
     margin: 0;
 }
 
 h4 {
-    color: #6F4E37; /* Coffee brown */
+    color: var(--secondary-color);
     font-size: 18px;
     margin: 5px 0 0;
 }
 
-/* Celebration Info and Song List */
+/* Celebration Info */
 .celebration-info {
-    background-color: #FDFBF6; /* Subtle light beige */
+    background-color: var(--bg-color-light);
     padding: 15px;
     border-radius: 8px;
     margin-top: 15px;
     font-size: 16px;
     margin-bottom: 20px;
-    border: 1px solid #D2B48C;
+    border: 1px solid var(--border-color);
 }
 
 .celebration-info h3 {
     margin-top: 0;
-    color: #4B3621;
+    color: var(--primary-color);
 }
 
+/* Songs List */
 .songs-list {
     list-style-type: none;
     padding: 0;
     margin-top: 15px;
     display: flex;
-    flex-wrap: wrap; /* This allows items to wrap to the next line if needed */
-    gap: 10px; /* Adds space between the items */
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-/* Songs List */
 .songs-list li {
-    background-color: #FDFBF6; /* Subtle light beige */
+    background-color: var(--bg-color-light);
     margin: 5px 0;
     padding: 10px;
     border-radius: 4px;
     font-size: 16px;
     display: flex;
     justify-content: flex-start;
-    align-items: center; /* Vertically aligns items in the song pod */
+    align-items: center;
 }
 
-/* Song "Pod" for Number, Title, and Icon */
 .songs-list .song-pod {
     display: flex;
     align-items: center;
-    background-color: #E8D8C3; /* Slightly darker beige for contrast */
+    background-color: var(--highlight-color);
     padding: 5px 15px;
     border-radius: 12px;
     font-size: 14px;
     font-weight: bold;
-    color: #4B3621;
-    gap: 8px; /* Add spacing between the icon and text */
+    color: var(--primary-color);
+    gap: 8px;
 }
 
-/* Icon Styling */
 .songs-list .song-icon.square {
     background-color: transparent;
     content: "■";
 }
+
 .songs-list .song-icon.triangle {
     background-color: transparent;
     content: "▲";
 }
+
 .songs-list .song-icon.full-dot {
     background-color: transparent;
     content: "●";
@@ -114,10 +149,11 @@ h4 {
 .empty-message {
     text-align: center;
     font-size: 18px;
-    color: #6F4E37;
+    color: var(--secondary-color);
     margin-top: 20px;
 }
 
+/* Date Navigation */
 .date-navigation {
     display: flex;
     justify-content: center;
@@ -126,6 +162,7 @@ h4 {
     font-size: 18px;
 }
 
+/* Date Picker Form */
 .date-picker-form {
     display: flex;
     justify-content: center;
@@ -135,16 +172,26 @@ h4 {
 }
 
 .date-picker-form input[type="date"] {
-    padding: 5px;
-    font-size: 16px;
-    border: none;
-    border-radius: 3px;
     cursor: pointer;
+    padding: 5px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #333;
+    transition: all 0.3s ease;
+    width: 180px;
+}
+
+.date-picker-form input[type="date"]:focus {
+    border-color: #333;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .date-picker-form button {
-    padding: 5px 10px;
-    background-color: #6b4e31;
+    padding: 5px 19px;
+    background-color: var(--btn-bg-color);
     color: white;
     border: none;
     border-radius: 3px;
@@ -152,9 +199,10 @@ h4 {
 }
 
 .date-picker-form button:hover {
-    background-color: #8c6748;
+    background-color: var(--btn-bg-hover);
 }
 
+/* Song Icons */
 .song-icons {
     display: flex;
     justify-content: flex-start;
@@ -162,12 +210,53 @@ h4 {
     font-size: 12px;
 }
 
+.song-pod-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.linked:hover {
+    background-color: var(--btn-bg-hover);
+    color: white;
+}
+
+/* About Section */
+.about {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+}
+
+.about h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.about p, .about ul {
+    font-size: 1rem;
+    color: #555;
+}
+
+.about ul {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+.about ul li {
+    margin-bottom: 8px;
+}
+
 /* Footer */
 .footer {
     text-align: center;
     font-size: 14px;
-    color: #6F4E37;
+    color: var(--secondary-color);
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 2px solid #D2B48C;
+    border-top: 2px solid var(--border-color);
 }
