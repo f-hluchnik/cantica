@@ -17,7 +17,6 @@ class CelebrationListView(ListAPIView):
 
 class ClearCacheView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        # Clear the cache
         cache.clear()
         return JsonResponse({"status": "Cache cleared successfully!"}, status=200)
     
@@ -30,4 +29,13 @@ class PreloadDataView(LoginRequiredMixin, View):
             except Exception:
                 raise
         return JsonResponse({"message": f"Data for {year} successfully preloaded."}, status=200)
+    
+class PreloadMonthDataView(LoginRequiredMixin, View):
+    def get(self, request, year, month, *args, **kwargs):
+        client = LiturgyAPIClient()
+        try:
+            client.fetch_month(year=year, month=month)
+        except Exception:
+            raise
+        return JsonResponse({"message": f"Data for {year}-{month} successfully preloaded."}, status=200)
 
