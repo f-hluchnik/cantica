@@ -1,4 +1,5 @@
 
+from datetime import date
 from rest_framework.generics import ListAPIView
 from .models import Celebration
 from .utils.liturgy_api_client import LiturgyAPIClient
@@ -38,4 +39,14 @@ class PreloadMonthDataView(LoginRequiredMixin, View):
         except Exception:
             raise
         return JsonResponse({"message": f"Data for {year}-{month} successfully preloaded."}, status=200)
+    
+class PreloadDayDataView(LoginRequiredMixin, View):
+    def get(self, request, year, month, day, *args, **kwargs):
+        client = LiturgyAPIClient()
+        requested_day = date(year, month, day)
+        try:
+            client.fetch_day(day=requested_day)
+        except Exception:
+            raise
+        return JsonResponse({"message": f"Data for {year}-{month}-{day} successfully preloaded."}, status=200)
 
