@@ -66,7 +66,7 @@ class LiturgyAPIClient:
         season = data.get('season')
 
         # Create or update LiturgicalCalendarEvent entry
-        liturgical_calendar, _ = LiturgicalCalendarEvent.objects.update_or_create(
+        liturgical_calendar_event, _ = LiturgicalCalendarEvent.objects.update_or_create(
             date=date,
             defaults={
                 'season': season,
@@ -95,7 +95,7 @@ class LiturgyAPIClient:
             celebration.save()
 
             # Add celebration to the LiturgicalCalendarEvent entry
-            liturgical_calendar.celebrations.add(celebration)
+            liturgical_calendar_event.celebrations.add(celebration)
         logger.info("Day {day} and it's celebrations were successfully added to database".format(day=date))
     
     def infer_types(self, title: str) -> List[str]:
