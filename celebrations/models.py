@@ -15,6 +15,9 @@ class Celebration(models.Model):
     name = models.CharField(max_length=200)
     types = models.ManyToManyField(CelebrationType, related_name='celebrations')
 
+    class Meta:
+        ordering = ['name']  # Sort alphabetically by 'name'
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
