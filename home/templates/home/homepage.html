@@ -32,14 +32,14 @@
                 </form>
             </header>
             
-            {% if celebration_songs %}
-                {% for item in celebration_songs %}
+            {% if celebrations_with_songs %}
+                {% for item in celebrations_with_songs %}
                     <div class="celebration-info">
                         <h3>{{ item.celebration.name }}</h3>
                         
                         <ul class="songs-list">
-                            {% if item.specific_songs %}
-                                {% for song in item.specific_songs %}
+                            {% if item.recommended_songs.specific %}
+                                {% for song in item.recommended_songs.specific %}
                                     <li>
                                         <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
                                             <div class="song-pod linked">
@@ -48,47 +48,27 @@
                                             </div>
                                         </a>
                                     </li>
-                                {% empty %}
-                                    <li>K tomuto státku není určena žádná píseň.</li>
                                 {% endfor %}
                             {% endif %}
 
-                            {% if item.type_songs %}
-                                {% if item.is_virgin_mary_celebration %}
+                            {% if item.recommended_songs.typical %}
+                                {% for song in item.recommended_songs.typical %}
                                     <li>
-                                        <div class="song-pod">
-                                            <div class="song-icon square">■</div>
-                                            mariánské písně z oddílu 800
-                                        </div>
+                                        <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
+                                            <div class="song-pod linked">
+                                                <div class="song-icon square">■</div>
+                                                    {{ song.number }}: {{ song.title }}
+                                            </div>
+                                        </a>
                                     </li>
-                                {% elif item.is_jesus_christ_celebration %}
-                                    <li>
-                                        <div class="song-pod">
-                                            <div class="song-icon square">■</div>
-                                            písně z oddílu 700
-                                        </div>
-                                    </li>
-                                {% else %}
-                                    {% for song in item.type_songs %}
-                                        <li>
-                                            <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
-                                                <div class="song-pod linked">
-                                                    <div class="song-icon square">■</div>
-                                                        {{ song.number }}: {{ song.title }}
-                                                </div>
-                                            </a>
-                                        </li>
-                                    {% empty %}
-                                        <li>K tomuto typu svátku není určena žádná píseň.</li>
-                                    {% endfor %}
-                                {% endif %}
+                                {% endfor %}
                             {% endif %}
-                            
-                            {% if not item.specific_songs and not item.type_songs %}
+
+                            {% if item.recommended_songs.seasonal %}
                                 <li>
                                     <div class="song-pod">
                                         <div class="song-icon full_dot">●</div>
-                                        písně z oddílu {{ seasonal_songs_section }}
+                                        {{ item.recommended_songs.seasonal }}
                                     </div>
                                 </li>
                             {% endif %}
