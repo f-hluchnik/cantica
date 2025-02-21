@@ -76,6 +76,7 @@ class SongRecommender:
         self.handle_virgin_mary_celebrations(celebration=celebration, recommended_songs=recommended_songs)
         self.handle_advent_before_christmas(date_to_check=day, recommended_songs=recommended_songs)
         self.handle_christmas_octave_precedence(date_to_check=day, recommended_songs=recommended_songs)
+        self.handle_week_of_prayer_for_christian_unity(date_to_check=day, recommended_songs=recommended_songs)
         
         return recommended_songs
     
@@ -109,13 +110,27 @@ class SongRecommender:
         Check if date is in christmas octave. If so, overload the typical songs.
         The function compares tuples of (month, day) to be year-agnostic.
         """
-        octave_start_date = (12, 25)
-        octave_end_date = (12, 31)
+        NARODIL_SE_KRISTUS_PAN = 201
+        start_date = (12, 25)
+        end_date = (12, 31)
         date_to_check_yearless = (date_to_check.month, date_to_check.day)
-        if octave_start_date <= date_to_check_yearless <= octave_end_date:
+        if start_date <= date_to_check_yearless <= end_date:
             recommended_songs.typical = []
             section = self.get_song_section_for_liturgical_season(LiturgicalSeason.CHRISTMAS)
             recommended_songs.seasonal = 'písně z oddílu {}'.format(section)
+            recommended_songs.specific = Song.objects.filter(number=NARODIL_SE_KRISTUS_PAN)
+
+    def handle_week_of_prayer_for_christian_unity(self, date_to_check: date, recommended_songs: RecommendedSongs):
+        """
+        Check if the date falls between January 18 and January 25.
+        The function compares tuples of (month, day) to be year-agnostic.
+        """
+        JEDEN_PAN = 910
+        start_date = (1, 18)
+        end_date = (1, 25)
+        date_to_check_yearless = (date_to_check.month, date_to_check.day)
+        if start_date <= date_to_check_yearless <= end_date:
+            recommended_songs.specific = Song.objects.filter(number=JEDEN_PAN)
     
     @staticmethod
     def get_song_section_for_liturgical_season(liturgical_season: LiturgicalSeason) -> str:
