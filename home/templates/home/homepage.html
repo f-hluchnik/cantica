@@ -76,14 +76,16 @@
                         <button class="toggle-details">➕ zobrazit detaily</button>
                         <div class="celebration-details">
                             <ul class="songs-list detailed">
-                                {% for category, song in item.detailed_recommended_songs.items %}
-                                    {% if song %}
-                                        <li><strong>{{ category }}:&nbsp;</strong> 
-                                            <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
-                                                <div class="song-pod linked">
+                                {% for part in item.detailed_recommended_songs.values %}
+                                    {% if part.songs %}
+                                        <li><strong>{{ part.name }}:&nbsp;</strong>
+                                            {% for song in part.songs %}
+                                                <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
+                                                    <div class="song-pod linked">
                                                         {{ song.number }}: {{ song.title }}
-                                                </div>
-                                            </a>
+                                                    </div>
+                                                </a>
+                                            {% endfor %}
                                         </li>
                                     {% endif %}
                                 {% endfor %}

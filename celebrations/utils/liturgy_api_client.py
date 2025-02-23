@@ -7,6 +7,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class LiturgyAPIClient:
     """Fetch today's liturgical calendar data and update database."""
 
@@ -26,7 +27,7 @@ class LiturgyAPIClient:
         response.raise_for_status()
         data = response.json()
         self.update_database(data)
-    
+
     def fetch_month(self, year: int, month: int) -> None:
         """
         Fetch data for provided month and year.
@@ -41,7 +42,7 @@ class LiturgyAPIClient:
         data = response.json()
         for day in data:
             self.update_database(day)
-        
+
     def update_database(self, data: Dict) -> None:
         """
         Update database with provided data.
@@ -97,7 +98,7 @@ class LiturgyAPIClient:
             # Add celebration to the LiturgicalCalendarEvent entry
             liturgical_calendar_event.celebrations.add(celebration)
         logger.info("Day {day} and it's celebrations were successfully added to database".format(day=date))
-    
+
     def infer_types(self, title: str) -> List[str]:
         """Infer celebration types from title."""
         title = title.lower()
@@ -133,7 +134,7 @@ class LiturgyAPIClient:
         types, title = self.get_and_replace_type(title, other_celebration_types)
         celebration_types.extend(types)
         return celebration_types
-    
+
     def get_and_replace_type(self, title: list, celebration_types: Dict[str, str]) -> Tuple[List[str], str]:
         types = []
         for keyword, celebration_type in celebration_types.items():
@@ -141,5 +142,3 @@ class LiturgyAPIClient:
                 types.append(celebration_type)
                 title = title.replace(keyword, '')
         return types, title
-
-
