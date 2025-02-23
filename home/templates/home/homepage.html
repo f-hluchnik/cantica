@@ -36,7 +36,6 @@
                 {% for item in celebrations_with_songs %}
                     <div class="celebration-info">
                         <h3>{{ item.celebration.name }}</h3>
-                        
                         <ul class="songs-list">
                             {% if item.recommended_songs.specific %}
                                 {% for song in item.recommended_songs.specific %}
@@ -73,6 +72,25 @@
                                 </li>
                             {% endif %}
                         </ul>
+
+                        <button class="toggle-details">➕ zobrazit detaily</button>
+                        <div class="celebration-details">
+                            <ul class="songs-list detailed">
+                                {% for part in item.detailed_recommended_songs.values %}
+                                    {% if part.songs %}
+                                        <li><strong>{{ part.name }}:&nbsp;</strong>
+                                            {% for song in part.songs %}
+                                                <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
+                                                    <div class="song-pod linked">
+                                                        {{ song.number }}: {{ song.title }}
+                                                    </div>
+                                                </a>
+                                            {% endfor %}
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
@@ -104,5 +122,6 @@
             <p>&copy; 2024 František Hluchník</p>
         </div>
     </div>
+    <script src="{% static 'home/js/scripts.js' %}"></script>
 </body>
 </html>

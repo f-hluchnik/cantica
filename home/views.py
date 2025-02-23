@@ -1,9 +1,9 @@
 from django.views.generic import TemplateView
-from celebrations.utils.liturgy_api_client import LiturgyAPIClient
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from celebrations.models import Celebration, LiturgicalCalendarEvent
 from songs.utils.song_recommender import SongRecommender
-from songs.models import Song
+from songs.utils.liturgical_season import LiturgicalSeasonEnum
+
 
 class HomePageView(TemplateView):
     template_name = 'home/homepage.html'
@@ -19,6 +19,7 @@ class HomePageView(TemplateView):
         liturgical_day = LiturgicalCalendarEvent.objects.filter(date=date_str)
         celebration_slugs = liturgical_day.values_list('celebrations__slug', flat=True)
         liturgical_season = liturgical_day.values_list('season', flat=True).first()
+        season = LiturgicalSeasonEnum.from_string(liturgical_season)
 
         celebrations = Celebration.objects.filter(slug__in=celebration_slugs)
 
@@ -26,14 +27,21 @@ class HomePageView(TemplateView):
         recommender = SongRecommender()
         celebrations_with_songs = []
         for celebration in celebrations:
-            recommended_songs = recommender.recommmend_song(
+            recommended_songs = recommender.recommmend_songs(
                 day=selected_date,
                 celebration=celebration,
-                season=liturgical_season
+                season=season
             )
+
+            detailed_recommended_songs = recommender.recommend_song_for_mass_parts(
+                already_recommended_songs=recommended_songs,
+                season=season
+            )
+
             celebrations_with_songs.append({
                 'celebration': celebration,
-                'recommended_songs': recommended_songs
+                'recommended_songs': recommended_songs,
+                'detailed_recommended_songs': detailed_recommended_songs
             })
 
         # Add to context
@@ -45,10 +53,7 @@ class HomePageView(TemplateView):
             'next_date': selected_date + timedelta(days=1),
         }
         return context
-    
-    
-    
+
+
 class AboutView(TemplateView):
     template_name = 'home/homepage.html'
-
-        
