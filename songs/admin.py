@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.db import models
 
-from .models import Song, LiturgicalSeason, Occasion, Keyword, Celebration
+from .models import Song, LiturgicalSeason, Occasion, Keyword
+
 
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
@@ -12,13 +13,16 @@ class SongAdmin(admin.ModelAdmin):
         models.ManyToManyField: {'widget': FilteredSelectMultiple('Related Models', is_stacked=False)},
     }
 
+
 @admin.register(LiturgicalSeason)
 class LiturgicalSeasonAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
+
 @admin.register(Occasion)
 class OccasionAdmin(admin.ModelAdmin):
     list_display = ('name',)
+
 
 @admin.register(Keyword)
 class KeywordAdmin(admin.ModelAdmin):
