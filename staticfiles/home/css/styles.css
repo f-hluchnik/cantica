@@ -97,6 +97,39 @@ h4 {
     color: var(--primary-color);
 }
 
+/* Celebration Details */
+.celebration-details {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    border-left: 3px solid #ccc;
+    transition: max-height 0.3s ease-out;
+}
+
+.celebration-details ul {
+    list-style: none;
+    padding: 0;
+}
+
+.celebration-details li {
+    padding: 5px 0;
+}
+
+.toggle-details {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.toggle-details:hover {
+    text-decoration: underline;
+}
+
+
 /* Songs List */
 .songs-list {
     list-style-type: none;
