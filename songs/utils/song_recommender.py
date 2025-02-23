@@ -151,7 +151,6 @@ class SongRecommender:
         self.try_assign_songs(detailed_recommended_songs, already_recommended_songs.typical, season=season)
         if not detailed_recommended_songs['main'].songs:
             detailed_recommended_songs['main'].songs = [self.select_song(season, 'main')]
-        print(detailed_recommended_songs)
         filtered_dict = {key: value for key, value in detailed_recommended_songs.items() if value}
         return filtered_dict
 
@@ -166,7 +165,6 @@ class SongRecommender:
                 for occasion in song.occasions.all():
                     if occasion.name != 'main':  # Skip the main song check
                         detailed_recommended_songs[occasion.name].songs.append(song)
-                        print(detailed_recommended_songs)
 
     @staticmethod
     def can_be_main_song(song: Song, liturgical_season: LiturgicalSeasonEnum) -> bool:
