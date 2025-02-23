@@ -26,14 +26,18 @@ class HomePageView(TemplateView):
         recommender = SongRecommender()
         celebrations_with_songs = []
         for celebration in celebrations:
-            recommended_songs = recommender.recommmend_song(
+            recommended_songs = recommender.recommmend_songs(
                 day=selected_date,
                 celebration=celebration,
                 season=liturgical_season
             )
+
+            detailed_recommended_songs = recommender.recommend_song_for_mass_parts(already_recommended_songs=recommended_songs)
+
             celebrations_with_songs.append({
                 'celebration': celebration,
-                'recommended_songs': recommended_songs
+                'recommended_songs': recommended_songs,
+                'detailed_recommended_songs': detailed_recommended_songs
             })
 
         # Add to context

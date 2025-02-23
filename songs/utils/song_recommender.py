@@ -48,12 +48,13 @@ class RecommendedSongs():
         self.specific = specific
         self.typical = typical
         self.seasonal = seasonal
+        self.recommended_songs = None
 
 class SongRecommender:
     def __init__(self):
         self.today = date.today()
 
-    def recommmend_song(
+    def recommmend_songs(
         self,
         day: date,
         celebration: Celebration,
@@ -78,6 +79,7 @@ class SongRecommender:
         self.handle_christmas_octave_precedence(date_to_check=day, recommended_songs=recommended_songs)
         self.handle_week_of_prayer_for_christian_unity(date_to_check=day, recommended_songs=recommended_songs)
         
+        self.recommended_songs = recommended_songs
         return recommended_songs
     
     def handle_jesus_christ_celebrations(self, celebration: Celebration, recommended_songs: RecommendedSongs) -> None:
@@ -131,6 +133,38 @@ class SongRecommender:
         date_to_check_yearless = (date_to_check.month, date_to_check.day)
         if start_date <= date_to_check_yearless <= end_date:
             recommended_songs.specific = Song.objects.filter(number=JEDEN_PAN)
+    
+    def recommend_song_for_mass_parts(self, already_recommended_songs: Dict) -> Dict:
+        """
+        Recommend song foreach part of the mass.
+        """
+        detailed_recommended_songs = {
+            'vstup': None,
+            'evangelium': None,
+            'obětování': None,
+            'přijímání': None,
+            'závěr': None,
+        }
+
+        def assign_song_to_category(category, songs):
+            for song in songs:
+                if not detailed_recommended_songs[category]:
+                    detailed_recommended_songs[category] = song
+                    break
+
+        for category in detailed_recommended_songs:
+            if not detailed_recommended_songs[category]:
+                assign_song_to_category(category, self.recommended_songs.specific)
+
+        for category in detailed_recommended_songs:
+            if not detailed_recommended_songs[category]:
+                assign_song_to_category(category, already_recommended_songs.typical)
+
+        for category in detailed_recommended_songs:
+            if not detailed_recommended_songs[category]:
+                assign_song_to_category(category, already_recommended_songs.seasonal)
+
+        return detailed_recommended_songs
     
     @staticmethod
     def get_song_section_for_liturgical_season(liturgical_season: LiturgicalSeason) -> str:
