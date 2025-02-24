@@ -31,4 +31,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Updated!
-CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "website.wsgi"]
+CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "cantica.wsgi"]
