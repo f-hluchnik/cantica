@@ -1,34 +1,33 @@
-ARG PYTHON_VERSION=3.10-slim-buster
+# Use official Python image as base
+FROM python:3.11-slim
 
-FROM python:${PYTHON_VERSION}
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Set work directory
+WORKDIR /app
 
-RUN mkdir -p /code
-
-WORKDIR /code
-
-# install psycopg2 dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*  # <-- Updated!
+    libpq-dev gcc curl && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /tmp/requirements.txt
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN set -ex && \
-    pip install --upgrade pip && \
-    pip install -r /tmp/requirements.txt && \
-    rm -rf /root/.cache/
+# Copy project files
+COPY . .
 
-COPY . /code/
+# Set permissions for security
+RUN chmod -R 755 /app
 
-# Set SECRET_KEY for building purposes
-# ENV SECRET_KEY "non-secret-key-for-building-purposes"  # <-- Updated!
-RUN python manage.py collectstatic --noinput
-
+# Expose port 8000 (Gunicorn default)
 EXPOSE 8000
 
-# Updated!
-CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "cantica.wsgi"]
+# Run collectstatic at runtime, before Gunicorn starts
+CMD ["sh", "-c", "python manage.py collectstatic --noinput --clear && gunicorn --bind 0.0.0.0:8000 cantica.wsgi:application"]
