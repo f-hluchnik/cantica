@@ -155,7 +155,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 WHITENOISE_KEEP_ONLY_HASHED_FILES = False
-WHITENOISE_AUTOREFRESH = True
+WHITENOISE_AUTOREFRESH = False
 
 
 # Default primary key field type
