@@ -11,14 +11,14 @@ class HomePageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         today = datetime.now()
-        date_str = self.request.GET.get('date', datetime.now().strftime('%Y-%m-%d'))
+        date_str = self.request.GET.get('date', datetime.now().strftime('%Y-%m-%d'))  # noqa E501
         if not date_str:
             date_str = datetime.now().strftime('%Y-%m-%d')
-        selected_date = datetime.strptime(date_str, '%Y-%m-%d')
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
         liturgical_day = LiturgicalCalendarEvent.objects.filter(date=date_str)
-        celebration_slugs = liturgical_day.values_list('celebrations__slug', flat=True)
-        liturgical_season = liturgical_day.values_list('season', flat=True).first()
+        celebration_slugs = liturgical_day.values_list('celebrations__slug', flat=True)  # noqa E501
+        liturgical_season = liturgical_day.values_list('season', flat=True).first()  # noqa E501
         season = LiturgicalSeasonEnum.from_string(liturgical_season)
 
         celebrations = Celebration.objects.filter(slug__in=celebration_slugs)
@@ -33,7 +33,7 @@ class HomePageView(TemplateView):
                 season=season
             )
 
-            detailed_recommended_songs = recommender.recommend_song_for_mass_parts(
+            detailed_recommended_songs = recommender.recommend_song_for_mass_parts(  # noqa E501
                 already_recommended_songs=recommended_songs,
                 season=season
             )
