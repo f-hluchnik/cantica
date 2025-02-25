@@ -21,7 +21,10 @@ class CelebrationListView(ListAPIView):
 class ClearCacheView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         cache.clear()
-        return JsonResponse({"status": "Cache cleared successfully!"}, status=200)
+        return JsonResponse(
+            {"status": "Cache cleared successfully!"},
+            status=200
+        )
 
 
 class PreloadDataView(LoginRequiredMixin, View):
@@ -32,7 +35,10 @@ class PreloadDataView(LoginRequiredMixin, View):
                 client.fetch_month(year=year, month=month)
             except Exception:
                 raise
-        return JsonResponse({"message": f"Data for {year} successfully preloaded."}, status=200)
+        return JsonResponse(
+            {"message": f"Data for {year} successfully preloaded."},
+            status=200
+        )
 
 
 class PreloadMonthDataView(LoginRequiredMixin, View):
@@ -42,7 +48,10 @@ class PreloadMonthDataView(LoginRequiredMixin, View):
             client.fetch_month(year=year, month=month)
         except Exception:
             raise
-        return JsonResponse({"message": f"Data for {year}-{month} successfully preloaded."}, status=200)
+        return JsonResponse(
+            {"message": f"Data for {year}-{month} successfully preloaded."},
+            status=200
+        )
 
 
 class PreloadDayDataView(LoginRequiredMixin, View):
@@ -53,4 +62,7 @@ class PreloadDayDataView(LoginRequiredMixin, View):
             client.fetch_day(day=requested_day)
         except Exception:
             raise
-        return JsonResponse({"message": f"Data for {year}-{month}-{day} successfully preloaded."}, status=200)
+        return JsonResponse(
+            {"message": f"Data for {year}-{month}-{day} successfully preloaded."},
+            status=200
+        )

@@ -8,6 +8,7 @@ from typing import Dict, List, Optional
 from celebrations.models import Celebration
 from songs.models import Song, LiturgicalSeason, Occasion
 from songs.utils.liturgical_season import LiturgicalSeasonEnum
+from songs.utils.helpers import get_easter_date, get_pentecost_date
 
 
 class SongSection(Enum):
@@ -53,7 +54,7 @@ class SongRecommender:
         day: date,
         celebration: Celebration,
         season: LiturgicalSeasonEnum,
-    ) -> Dict:
+    ) -> RecommendedSongs:
         """
         Recommend song based on several criteria.
         """
@@ -72,6 +73,8 @@ class SongRecommender:
         self.handle_advent_before_christmas(date_to_check=day, recommended_songs=recommended_songs)
         self.handle_christmas_octave_precedence(date_to_check=day, recommended_songs=recommended_songs)
         self.handle_week_of_prayer_for_christian_unity(date_to_check=day, recommended_songs=recommended_songs)
+        self.handle_easter(date_to_check=day, recommended_songs=recommended_songs)
+        self.handle_days_before_pentecost(date_to_check=day, recommended_songs=recommended_songs)
 
         return recommended_songs
 
@@ -89,7 +92,7 @@ class SongRecommender:
             section = self.get_song_section_for_liturgical_season(LiturgicalSeasonEnum.VIRGIN_MARY)
             recommended_songs.seasonal = 'mariánské písně z oddílu {}'.format(section)
 
-    def handle_advent_before_christmas(self, date_to_check: date, recommended_songs: RecommendedSongs):
+    def handle_advent_before_christmas(self, date_to_check: date, recommended_songs: RecommendedSongs) -> None:
         """
         In the last week before christmas, specific seasonal songs are recommended.
         """
@@ -100,7 +103,7 @@ class SongRecommender:
             section = self.get_song_section_for_liturgical_season(LiturgicalSeasonEnum.ADVENT)
             recommended_songs.seasonal = 'písně z oddílu {}, zvláště 122, 124, 130'.format(section)
 
-    def handle_christmas_octave_precedence(self, date_to_check: date, recommended_songs: RecommendedSongs):
+    def handle_christmas_octave_precedence(self, date_to_check: date, recommended_songs: RecommendedSongs) -> None:
         """
         Check if date is in christmas octave. If so, overload the typical songs.
         The function compares tuples of (month, day) to be year-agnostic.
@@ -113,9 +116,9 @@ class SongRecommender:
             recommended_songs.typical = []
             section = self.get_song_section_for_liturgical_season(LiturgicalSeasonEnum.CHRISTMAS)
             recommended_songs.seasonal = 'písně z oddílu {}'.format(section)
-            recommended_songs.specific = Song.objects.filter(number=NARODIL_SE_KRISTUS_PAN)
+            recommended_songs.specific |= Song.objects.filter(number=NARODIL_SE_KRISTUS_PAN)
 
-    def handle_week_of_prayer_for_christian_unity(self, date_to_check: date, recommended_songs: RecommendedSongs):
+    def handle_week_of_prayer_for_christian_unity(self, date_to_check: date, recommended_songs: RecommendedSongs) -> None:
         """
         Check if the date falls between January 18 and January 25.
         The function compares tuples of (month, day) to be year-agnostic.
@@ -125,11 +128,48 @@ class SongRecommender:
         end_date = (1, 25)
         date_to_check_yearless = (date_to_check.month, date_to_check.day)
         if start_date <= date_to_check_yearless <= end_date:
-            recommended_songs.specific = Song.objects.filter(number=JEDEN_PAN)
+            recommended_songs.specific |= Song.objects.filter(number=JEDEN_PAN)
 
+    def handle_easter(self, date_to_check: date, recommended_songs: RecommendedSongs) -> None:
+        """
+        In the easter time, add 407 to specific songs.
+        """
+        VESEL_SE_NEBES_KRALOVNO = 407
+
+        easter = get_easter_date(date_to_check.year)
+
+        days_after_easter = (date_to_check - easter).days
+
+        vesel_se_nebes_kralovno = (Song.objects.filter(number=VESEL_SE_NEBES_KRALOVNO)).distinct()
+
+        if 0 <= days_after_easter <= 40:
+            recommended_songs.typical |= vesel_se_nebes_kralovno
+        if days_after_easter == 50:
+            recommended_songs.typical |= vesel_se_nebes_kralovno
+    
+    def handle_days_before_pentecost(self, date_to_check: date, recommended_songs: RecommendedSongs) -> None:
+        """
+        Check if the date is nine or less days before pentecost.
+        """
+        PRIJD_O_DUCHU_PRESVATY = 422
+        PRIJD_TVURCE_DUCHU_SVATY = 423
+        VSTOUPIL_PAN_V_SLAVU_NEBESKOU = 415
+        pentecost = get_pentecost_date(date_to_check.year)
+
+        days_until_pentecost = (pentecost - date_to_check).days
+
+        song_numbers = [PRIJD_O_DUCHU_PRESVATY, PRIJD_TVURCE_DUCHU_SVATY]
+        hymns_to_holy_spirit = Song.objects.filter(number__in=song_numbers)
+
+        if 0 < days_until_pentecost <= 9:
+            recommended_songs.typical |= (Song.objects.filter(number=VSTOUPIL_PAN_V_SLAVU_NEBESKOU)).distinct()
+            recommended_songs.typical |= hymns_to_holy_spirit.distinct()
+
+    
+    
     def recommend_song_for_mass_parts(
         self,
-        already_recommended_songs: Optional[RecommendedSongs],
+        already_recommended_songs: RecommendedSongs,
         season: LiturgicalSeasonEnum,
     ) -> Dict:
         """
@@ -138,33 +178,43 @@ class SongRecommender:
         detailed_recommended_songs = {
             'main': MassPart(name='mešní píseň', songs=[]),
             'entrance': MassPart(name='vstup', songs=[]),
+            'asperges': MassPart(name='', songs=[]),
             'ordinarium': MassPart(name='ordinárium', songs=[]),
             'psalm': MassPart(name='žalm', songs=[]),
+            'sequence': MassPart(name='sekvence', songs=[]),
             'aleluia': MassPart(name='aleluja', songs=[]),
             'gospel': MassPart(name='evangelium', songs=[]),
+            'imposition of ashes': MassPart(name='udělování popelce', songs=[]),
             'offertory': MassPart(name='obětování', songs=[]),
             'communion': MassPart(name='přijímání', songs=[]),
             'recessional': MassPart(name='závěr', songs=[]),
         }
 
-        self.try_assign_songs(detailed_recommended_songs, already_recommended_songs.specific, season=season)
+        self.try_assign_songs(detailed_recommended_songs, already_recommended_songs.specific, season=season, sequence_allowed=True)
         self.try_assign_songs(detailed_recommended_songs, already_recommended_songs.typical, season=season)
         if not detailed_recommended_songs['main'].songs:
             detailed_recommended_songs['main'].songs = [self.select_song(season, 'main')]
         filtered_dict = {key: value for key, value in detailed_recommended_songs.items() if value}
         return filtered_dict
 
-    def try_assign_songs(self, detailed_recommended_songs: Dict, songs: List, season: LiturgicalSeasonEnum):
+    def try_assign_songs(self, detailed_recommended_songs: Dict, songs: List, season: LiturgicalSeasonEnum, sequence_allowed: bool = False):
         """
         Try assign songs to the mass parts.
         """
         for song in songs:
             if self.can_be_main_song(song=song, liturgical_season=season):
                 detailed_recommended_songs['main'].songs.append(song)
-            else:
-                for occasion in song.occasions.all():
-                    if occasion.name != 'main':  # Skip the main song check
-                        detailed_recommended_songs[occasion.name].songs.append(song)
+                continue
+
+            for occasion in song.occasions.all():
+                if occasion.name == 'main':
+                    continue
+                
+                if occasion.name == 'sequence' and not sequence_allowed:
+                    break
+                
+                detailed_recommended_songs[occasion.name].songs.append(song)
+
 
     @staticmethod
     def can_be_main_song(song: Song, liturgical_season: LiturgicalSeasonEnum) -> bool:
@@ -210,10 +260,6 @@ class SongRecommender:
             occasion_instance = Occasion.objects.get(name=occasion)
         except Occasion.DoesNotExist:
             return None
-        # songs = Song.objects.filter(
-        #     models.Q(liturgical_season=liturgical_season_instance) | models.Q(liturgical_season__isnull=True),
-        #     models.Q(occasions__in=[occasion_instance]) | models.Q(occasions__isnull=True)
-        # )
         songs = Song.objects.filter(
             models.Q(liturgical_season=liturgical_season_instance),
             models.Q(occasions__in=[occasion_instance])
