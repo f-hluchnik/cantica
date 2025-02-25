@@ -8,14 +8,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Expand the section
                 details.style.maxHeight = "500px"; // Automatically adjust to content height
                 details.style.visibility = 'visible'
-                button.textContent = "➖ skrýt detaily";
                 this.classList.add("expanded");
+                button.textContent = "➖ skrýt detailní doporučení";
             } else {
                 // Collapse the section
-                details.style.maxHeight = "";
-                details.style.visibility = 'hidden'
-                button.textContent = "➕ zobrazit detaily";
+                details.style.maxHeight = "0px";
+                details.style.visibility = 'hidden';
                 this.classList.remove("expanded");
+                button.textContent = "➕ zobrazit detailní doporučení";
             }
         });
     });

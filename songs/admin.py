@@ -8,9 +8,19 @@ from .models import Song, LiturgicalSeason, Occasion, Keyword
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
     list_display = ('title', 'number',)
-    list_filter = ('celebration_types', 'liturgical_season', 'occasions', 'keywords')
+    list_filter = (
+        'celebration_types',
+        'liturgical_season',
+        'occasions',
+        'keywords',
+    )
     formfield_overrides = {
-        models.ManyToManyField: {'widget': FilteredSelectMultiple('Related Models', is_stacked=False)},
+        models.ManyToManyField: {
+            'widget': FilteredSelectMultiple(
+                'Related Models',
+                is_stacked=False,
+            ),
+        },
     }
 
 
