@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 
 class LiturgicalSeasonEnum(Enum):
@@ -13,7 +14,7 @@ class LiturgicalSeasonEnum(Enum):
     OCCASIONAL = 'occasional'
 
     @classmethod
-    def from_string(cls, value: str):
+    def from_string(cls, value: Optional[str]) -> Optional['LiturgicalSeasonEnum']:
         """
         Get the LiturgicalSeason instance corresponding to the given string value.
         Returns None if the value does not match any enum member.
