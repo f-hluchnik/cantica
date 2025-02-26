@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from django.db import models
 from django.utils.text import slugify
 
@@ -6,7 +8,7 @@ class CelebrationType(models.Model):
     name = models.CharField(max_length=200, unique=True)
     description = models.TextField(blank=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -19,14 +21,14 @@ class Celebration(models.Model):
     )
 
     class Meta:
-        ordering = ['name']  # Sort alphabetically by 'name'
+        ordering: ClassVar = ['name']  # Sort alphabetically by 'name'
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({', '.join(t.name for t in self.types.all())})"
 
 
@@ -38,5 +40,5 @@ class LiturgicalCalendarEvent(models.Model):
         related_name='liturgical_calendar_events',
     )
 
-    def __str__(self):
-        return f"{self.date}, {self.season}, ({', '.join(c.slug for c in self.celebrations.all())})"  # noqa E501
+    def __str__(self) -> str:
+        return f"{self.date}, {self.season}, ({', '.join(c.slug for c in self.celebrations.all())})"

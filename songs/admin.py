@@ -1,20 +1,22 @@
+from typing import ClassVar
+
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.db import models
 
-from .models import Song, LiturgicalSeason, Occasion, Keyword
+from .models import Keyword, LiturgicalSeason, Occasion, Song
 
 
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
-    list_display = ('title', 'number',)
+    list_display = ('title', 'number')
     list_filter = (
         'celebration_types',
         'liturgical_season',
         'occasions',
         'keywords',
     )
-    formfield_overrides = {
+    formfield_overrides: ClassVar = {
         models.ManyToManyField: {
             'widget': FilteredSelectMultiple(
                 'Related Models',
