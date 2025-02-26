@@ -1,11 +1,14 @@
+from typing import ClassVar
+
 from rest_framework import serializers
+
 from .models import Celebration, CelebrationType
 
 
 class CelebrationTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CelebrationType
-        fields = ['id', 'name']
+        fields: ClassVar = ['id', 'name']
 
 
 class CelebrationSerializer(serializers.ModelSerializer):
@@ -13,4 +16,4 @@ class CelebrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Celebration
-        fields = ['id', 'name', 'types']
+        fields: ClassVar = ['id', 'name', 'types']

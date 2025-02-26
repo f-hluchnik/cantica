@@ -1,0 +1,49 @@
+line-length = 120
+indent-width = 4
+
+# target version Python3.11
+target-version = "py311"
+
+# Awailable rule-sets https://docs.astral.sh/ruff/rules/#legend
+[lint]
+select = [
+    # Pyflakes (F)
+    "F",
+
+    # isort
+    "I",
+
+    # pep8-naming
+    "N",
+
+    # cyclomatic complexity
+    "C90",
+
+    # flake 8
+    "YTT", "COM", "A", "C4", "ANN",
+
+    # security
+    "S",
+
+    # https://pypi.org/project/flake8-bugbear/
+    "B",
+    "E",
+
+    # quotes
+    "Q",
+    "RUF",
+]
+
+exclude = [
+    "tests/*",
+    "*/migrations/*"
+]
+
+ignore = [
+    "ANN002",  # Missing type annotation for `*args`
+    "ANN003",  # Missing type annotation for `**kwargs`
+    "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed in `execute`
+]
+
+[lint.flake8-quotes]
+inline-quotes = "single"
