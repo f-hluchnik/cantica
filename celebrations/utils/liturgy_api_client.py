@@ -1,9 +1,12 @@
-import requests
-from celebrations.models import Celebration, CelebrationType, LiturgicalCalendarEvent
-from datetime import datetime, date
-from typing import Dict, List, Optional, Tuple
-from django.utils.text import slugify
 import logging
+from datetime import date, datetime
+from typing import Dict, List, Optional, Tuple
+
+import requests
+from django.utils.text import slugify
+
+from celebrations.models import Celebration, CelebrationType, LiturgicalCalendarEvent
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -23,7 +26,7 @@ class LiturgyAPIClient:
         """
         day = day or datetime.now().date()
         logger.info('Fetching data for day {day}'.format(day=date))
-        response = requests.get(self.API_URL_DAY.format(year=day.year, month=day.month, day=day.day))
+        response = requests.get(self.API_URL_DAY.format(year=day.year, month=day.month, day=day.day), timeout=300)
         response.raise_for_status()
         data = response.json()
         self.update_database(data)
@@ -37,7 +40,7 @@ class LiturgyAPIClient:
             month:
         """
         logger.info('Fetching data for month {year}-{month}'.format(year=year, month=month))
-        response = requests.get(self.API_URL_MONTH.format(year=year, month=month))
+        response = requests.get(self.API_URL_MONTH.format(year=year, month=month), timeout=300)
         response.raise_for_status()
         data = response.json()
         for day in data:
@@ -61,7 +64,8 @@ class LiturgyAPIClient:
             ],
             "weekday": "sunday"
         },
-        Creates entry for LiturgicalCalendarEvent and adds Celebrations and CelebrationTypes, which are infered from the celebration title.
+        Creates entry for LiturgicalCalendarEvent and adds Celebrations and CelebrationTypes,
+        which are infered from the celebration title.
         """
         date = data.get('date')
         season = data.get('season')
@@ -71,15 +75,15 @@ class LiturgyAPIClient:
             date=date,
             defaults={
                 'season': season,
-            }
+            },
         )
 
         # Process celebrations
         for celebration in data.get('celebrations', []):
-            slug = slugify(celebration["title"])
+            slug = slugify(celebration['title'])
 
             # Create or update CelebrationType(s)
-            types = self.infer_types(celebration["title"])
+            types = self.infer_types(celebration['title'])
             celebration_types = []
             for celebration_type_name in types:
                 celebration_type, _ = CelebrationType.objects.get_or_create(name=celebration_type_name)
@@ -90,7 +94,7 @@ class LiturgyAPIClient:
                 slug=slug,
                 defaults={
                     'name': celebration.get('title'),
-                }
+                },
             )
             celebration.types.set(celebration_types)
             celebration.save()
@@ -135,7 +139,7 @@ class LiturgyAPIClient:
         celebration_types.extend(types)
         return celebration_types
 
-    def get_and_replace_type(self, title: list, celebration_types: Dict[str, str]) -> Tuple[List[str], str]:
+    def get_and_replace_type(self, title: str, celebration_types: Dict[str, str]) -> Tuple[List[str], str]:
         types = []
         for keyword, celebration_type in celebration_types.items():
             if keyword in title:
