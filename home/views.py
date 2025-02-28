@@ -38,6 +38,7 @@ class HomePageView(TemplateView):
 
             detailed_recommended_songs = recommender.recommend_song_for_mass_parts(
                 already_recommended_songs=recommended_songs,
+                celebration=celebration,
                 season=season,
             )
 
