@@ -8,7 +8,7 @@ from django.db.models import QuerySet
 
 from celebrations.models import Celebration
 from songs.models import LiturgicalSeason, Occasion, Song
-from songs.utils.helpers import get_easter_date, get_pentecost_date
+from songs.utils.helpers import get_easter_date, get_pentecost_date, season_match
 from songs.utils.liturgical_season import LiturgicalSeasonEnum
 
 
@@ -118,10 +118,10 @@ class SongRecommender:
         end_date = (12, 31)
         date_to_check_yearless = (date_to_check.month, date_to_check.day)
         if start_date <= date_to_check_yearless <= end_date:
+            recommended_songs.specific |= Song.objects.filter(number=NARODIL_SE_KRISTUS_PAN)
             recommended_songs.typical = recommended_songs.typical.none()
             section = self.get_song_section_for_liturgical_season(LiturgicalSeasonEnum.CHRISTMAS)
             recommended_songs.seasonal = 'písně z oddílu {}'.format(section)
-            recommended_songs.specific |= Song.objects.filter(number=NARODIL_SE_KRISTUS_PAN)
 
     def handle_week_of_prayer_for_christian_unity(
         self,
@@ -177,6 +177,7 @@ class SongRecommender:
     def recommend_song_for_mass_parts(
         self,
         already_recommended_songs: RecommendedSongs,
+        celebration: Optional[Celebration],
         season: Optional[LiturgicalSeasonEnum],
     ) -> Dict:
         """
@@ -209,6 +210,16 @@ class SongRecommender:
             season=season,
         )
         if not detailed_recommended_songs['main'].songs:
+            is_virgin_mary_celebration = 'virgin mary' in [
+                celebration_type.name for celebration_type in celebration.types.all()
+            ]
+            if is_virgin_mary_celebration:
+                season = LiturgicalSeasonEnum.VIRGIN_MARY
+            is_jesus_christ_celebration = 'jesus christ' in [
+                celebration_type.name for celebration_type in celebration.types.all()
+            ]
+            if is_jesus_christ_celebration:
+                season = LiturgicalSeasonEnum.VIRGIN_MARY
             detailed_recommended_songs['main'].songs = [self.select_song(season, 'main')]
         filtered_dict = {key: value for key, value in detailed_recommended_songs.items() if value}
         return filtered_dict
@@ -244,7 +255,7 @@ class SongRecommender:
         Criteria: It must match the liturgical season and occasion.
         """
         # Check if the song's liturgical time is suitable or not specified (None)
-        if song.liturgical_season and song.liturgical_season.name != liturgical_season.value:
+        if song.liturgical_season and not season_match(song.liturgical_season.name, liturgical_season.value):
             return False
 
         # Check if the song's occasion is suitable or not specified (None)
@@ -272,15 +283,15 @@ class SongRecommender:
 
         return mapping.get(liturgical_season, '')
 
-    def select_song(self, liturgical_season: Optional[LiturgicalSeasonEnum], occasion: str) -> Optional[Song]:
+    def select_song(self, liturgical_season: Optional[LiturgicalSeasonEnum], occasion: str) -> Song:
         try:
             liturgical_season_instance = LiturgicalSeason.objects.get(name=liturgical_season.value)
         except LiturgicalSeason.DoesNotExist:
-            return None
+            return Song.objects.none()
         try:
             occasion_instance = Occasion.objects.get(name=occasion)
         except Occasion.DoesNotExist:
-            return None
+            return Song.objects.none()
         songs = Song.objects.filter(
             models.Q(liturgical_season=liturgical_season_instance),
             models.Q(occasions__in=[occasion_instance]),
