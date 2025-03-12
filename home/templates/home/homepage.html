@@ -40,7 +40,7 @@
                         <ul class="songs-list">
                             {% if item.recommended_songs.specific %}
                                 {% for song in item.recommended_songs.specific %}
-                                    <li>
+                                    <li class="songs-list">
                                         <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
                                             <div class="song-pod linked">
                                                 <div class="song-icon triangle">▲</div>
@@ -53,7 +53,7 @@
 
                             {% if item.recommended_songs.typical %}
                                 {% for song in item.recommended_songs.typical %}
-                                    <li>
+                                    <li class="songs-list">
                                         <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
                                             <div class="song-pod linked">
                                                 <div class="song-icon square">■</div>
@@ -77,7 +77,7 @@
                         <button class="toggle-details">➕ zobrazit detailní doporučení</button>
                         <div class="celebration-details">
                             <ul class="songs-list detailed">
-                                {% for part in item.detailed_recommended_songs.values %}
+                                {% for part in item.recommended_songs.detailed.values %}
                                     {% if part.songs %}
                                         <li class="songs-list"><strong>{{ part.name }}:&nbsp;</strong>
                                             {% for song in part.songs %}
@@ -118,6 +118,13 @@
                 </ul>
                 <p>Věříme, že tato aplikace usnadní vaši přípravu na liturgii a&nbsp;přispěje k&nbsp;obohacení liturgického slavení.</p>
                 <p>V současnosti jsou písně doporučovány náhodně z předvybrané množiny vhoných písní pro daný den či období. Na lepším způsobu doporučování pracujeme.</p>
+                <div class="buy-me-a-coffee-button">
+                    <a href="https://www.buymeacoffee.com/f.hluchnik" target="_blank">
+                        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+                             alt="Buy Me a Coffee" 
+                             style="height: 50px; width: auto;">
+                    </a>
+                </div>
             </section>
         {% endif %}
         <div class="footer">
