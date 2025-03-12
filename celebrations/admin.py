@@ -17,3 +17,4 @@ class CelebrationTypeAdmin(admin.ModelAdmin):
 class CelebrationAdmin(admin.ModelAdmin):
     list_display = ('name',)
     list_filter = ('types',)
+    search_fields = ('name',)
