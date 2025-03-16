@@ -1,8 +1,11 @@
 from typing import ClassVar, List
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.db import models
+from django.db.models import QuerySet
+from django.forms import ModelForm
+from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.html import format_html
 
@@ -74,3 +77,30 @@ class SongRuleAdmin(admin.ModelAdmin):
     form = SongRuleForm
     autocomplete_fields: ClassVar[List] = ['song']
     list_display = ('song', 'condition_type', 'condition_value', 'mass_part', 'priority', 'exclusive', 'can_be_main')
+    list_filter = ('song', 'condition_type', 'mass_part', 'priority', 'exclusive', 'can_be_main')
+    search_fields = ('song__title', 'condition_type__name')
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[models.Model]:
+        return super().get_queryset(request).select_related('song', 'condition_type', 'mass_part', 'content_type')
+
+    def save_model(
+        self,
+        request: HttpRequest,
+        obj: SongRule,
+        form: ModelForm,
+        change: bool,
+    ) -> None:
+        if SongRule.objects.filter(
+            song=obj.song,
+            condition_type=obj.condition_type,
+            content_type=obj.content_type,
+            object_id=obj.object_id,
+            mass_part=obj.mass_part,
+            priority=obj.priority,
+            exclusive=obj.exclusive,
+            can_be_main=obj.can_be_main,
+        ).exists():
+            messages.error(request, 'This rule already exists.')
+            return  # Prevent saving and stay on the same page
+        super().save_model(request, obj, form, change)
+        messages.success(request, 'The rule was successfully added.')

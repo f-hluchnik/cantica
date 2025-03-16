@@ -4,7 +4,7 @@ from datetime import date
 from typing import Dict, List, Optional
 
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 
 from celebrations.models import Celebration, CelebrationType
 from songs.models import LiturgicalSeason, LiturgicalSubSeason, Song, SongRule
@@ -128,7 +128,7 @@ class SongRecommender:
         rules = self.get_song_rules(day, celebration, liturgical_season)
         section = get_song_section_for_liturgical_season(liturgical_season)
         seasonal_songs = 'písně z oddílu {section}'.format(section=section)
-        detailed_recommendation = self.get_detailed_recommendation(rules)
+        detailed_recommendation = self.get_detailed_recommendation(rules=rules, liturgical_season=liturgical_season)
 
         return RecommendedSongs(
             specific=[rule.song for rule in rules['specific_rules']],
@@ -137,28 +137,86 @@ class SongRecommender:
             detailed=detailed_recommendation,
         )
 
-    def get_detailed_recommendation(self, rules: Dict[str, List[SongRule]]) -> Dict[str, MassPartSelector]:
+    def get_detailed_recommendation(
+        self,
+        rules: Dict[str, List[SongRule]],
+        liturgical_season: LiturgicalSeasonEnum,
+    ) -> Dict[str, MassPartSelector]:
         """
-        Recommend songs for different mass parts.
+        Recommend songs for different mass parts, prioritizing specific songs over typical and seasonal.
         """
-        available_main_songs = []
         detailed_song_recommendations = defaultdict(lambda: MassPartSelector(name='', songs=[]))
 
-        # Collect main song candidates & build mass part recommendations
-        for rules_list in rules.values():
+        # Priority order: specific > typical > seasonal
+        priority_order = ['specific_rules', 'typical_rules', 'seasonal_rules']
+
+        available_main_songs = None  # None means we haven't found a main song yet
+
+        for category in priority_order:
+            if category not in rules:
+                continue
+
+            rules_list = rules[category]
+
+            if not available_main_songs:
+                available_main_songs = [rule.song for rule in rules_list if rule.can_be_main]
+
             for rule in rules_list:
-                if rule.can_be_main:
-                    available_main_songs.append(rule.song)
+                mass_part_name = rule.mass_part.name
+                if mass_part_name not in detailed_song_recommendations:
+                    detailed_song_recommendations[mass_part_name] = MassPartSelector(name=mass_part_name, songs=[])
 
-                detailed_song_recommendations.setdefault(
-                    rule.mass_part.name, MassPartSelector(name=rule.mass_part.name, songs=[]),
-                ).songs.append(rule.song)
+                # Only add songs from the first non-empty category
+                if not detailed_song_recommendations[mass_part_name].songs:
+                    detailed_song_recommendations[mass_part_name].songs = [rule.song]
 
-        # Select a main song randomly if available
+            # Stop if we already have a recommendation from this category
+            if available_main_songs:
+                break
+
+        # Pick a main song if available
         main_song = random.choice(available_main_songs) if available_main_songs else None  # noqa S311
         detailed_song_recommendations['main'] = MassPartSelector('main', [main_song])
 
+        changeable_mass_parts = {
+            'communion': (
+                'has_communion_verse',
+                [liturgical_season, LiturgicalSeasonEnum.JESUS_CHRIST],
+            ),
+            'recessional': (
+                'has_recessional_verse',
+                [liturgical_season, LiturgicalSeasonEnum.JESUS_CHRIST, LiturgicalSeasonEnum.VIRGIN_MARY],
+            ),
+        }
+
+        for part, (verse_attr, seasons) in changeable_mass_parts.items():
+            if not getattr(main_song, verse_attr, False) and not detailed_song_recommendations[part].songs:
+                song = self.get_song_for_mass_part(mass_part=part, liturgical_seasons=seasons)
+                if song:
+                    detailed_song_recommendations[part] = MassPartSelector(part, [song])
+
         return dict(detailed_song_recommendations)
+
+    def get_song_for_mass_part(
+        self,
+        mass_part: str,
+        liturgical_seasons: List[LiturgicalSeasonEnum],
+    ) -> str:
+        season_content_type = ContentType.objects.get_for_model(LiturgicalSeason)
+
+        season_names = [season.value for season in liturgical_seasons]
+        seasons = LiturgicalSeason.objects.filter(name__in=season_names)
+
+        if not seasons.exists():
+            return None
+
+        conditions = Q(content_type=season_content_type) & Q(mass_part__name=mass_part)
+        conditions &= Q(object_id__in=seasons.values_list('id', flat=True))
+
+        song_rule_qs = SongRule.objects.filter(conditions)
+
+        selected_rule = song_rule_qs.order_by('?').first()
+        return selected_rule.song if selected_rule else None
 
     def get_current_subseasons(self, current_date: date) -> set:
         """

@@ -37,6 +37,8 @@ class Keyword(models.Model):
 class Song(models.Model):
     title = models.CharField(max_length=200)
     number = models.PositiveIntegerField()
+    has_communion_verse = models.BooleanField(default=False)
+    has_recessional_verse = models.BooleanField(default=False)
     keywords = models.ManyToManyField(Keyword, blank=True, related_name='songs')
 
     def __str__(self) -> str:
