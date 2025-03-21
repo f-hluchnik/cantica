@@ -42,6 +42,9 @@ class MassPartSelector():
         self.name = translations.get(name, name)
         self.songs = songs
 
+    def __str__(self) -> None:
+        return '{}: {}'.format(self.name, self.songs)
+
 
 class RecommendedSongs():
     def __init__(
@@ -146,11 +149,11 @@ class SongRecommender:
         Recommend songs for different mass parts, prioritizing specific songs over typical and seasonal.
         """
         detailed_song_recommendations = defaultdict(lambda: MassPartSelector(name='', songs=[]))
-
-        # Priority order: specific > typical > seasonal
         priority_order = ['specific_rules', 'typical_rules', 'seasonal_rules']
+        basic_mass_parts = {'entrance', 'gospel', 'offertory', 'communion', 'recessional'}
 
-        available_main_songs = None  # None means we haven't found a main song yet
+        available_main_songs = None
+        main_song = None
 
         for category in priority_order:
             if category not in rules:
@@ -158,26 +161,52 @@ class SongRecommender:
 
             rules_list = rules[category]
 
-            if not available_main_songs:
-                available_main_songs = [rule.song for rule in rules_list if rule.can_be_main]
+            if category == 'seasonal_rules' and main_song is None:
+                first_song_rule = random.choice(rules_list)  # noqa S311
 
+                if first_song_rule.can_be_main:
+                    main_song = first_song_rule.song
+                else:
+                    mass_part_name = first_song_rule.mass_part.name
+                    remaining_parts = basic_mass_parts - {mass_part_name}
+
+                    detailed_song_recommendations.setdefault(mass_part_name, MassPartSelector(mass_part_name, []))
+                    if not detailed_song_recommendations[mass_part_name].songs:
+                        detailed_song_recommendations[mass_part_name].songs = [first_song_rule.song]
+
+                    rules_dict = {rule.mass_part.name: rule for rule in rules_list}
+                    for part in remaining_parts:
+                        if part not in rules_dict:
+                            continue
+
+                        detailed_song_recommendations.setdefault(part, MassPartSelector(part, []))
+                        if not detailed_song_recommendations[part].songs:
+                            detailed_song_recommendations[part].songs = [rules_dict[part].song]
+            else:
+                if available_main_songs is None:
+                    available_main_songs = [rule.song for rule in rules_list if rule.can_be_main]
+
+                if available_main_songs and main_song is None:
+                    main_song = random.choice(available_main_songs)  # noqa S311
+
+            # suplement missing songs
             for rule in rules_list:
                 mass_part_name = rule.mass_part.name
-                if mass_part_name not in detailed_song_recommendations:
-                    detailed_song_recommendations[mass_part_name] = MassPartSelector(name=mass_part_name, songs=[])
 
-                # Only add songs from the first non-empty category
+                if mass_part_name == 'main':
+                    if all(detailed_song_recommendations[part].songs for part in basic_mass_parts) or main_song:
+                        continue
+                elif main_song and rule.priority < 1:
+                    continue
+
+                detailed_song_recommendations.setdefault(mass_part_name, MassPartSelector(mass_part_name, []))
                 if not detailed_song_recommendations[mass_part_name].songs:
                     detailed_song_recommendations[mass_part_name].songs = [rule.song]
 
-            # Stop if we already have a recommendation from this category
-            if available_main_songs:
-                break
+        if main_song:
+            detailed_song_recommendations['main'] = MassPartSelector('main', [main_song])
 
-        # Pick a main song if available
-        main_song = random.choice(available_main_songs) if available_main_songs else None  # noqa S311
-        detailed_song_recommendations['main'] = MassPartSelector('main', [main_song])
-
+        # Handle conditional mass parts
         changeable_mass_parts = {
             'communion': (
                 'has_communion_verse',
@@ -195,7 +224,27 @@ class SongRecommender:
                 if song:
                     detailed_song_recommendations[part] = MassPartSelector(part, [song])
 
+        detailed_song_recommendations = self.get_ordered_recommendations(detailed_song_recommendations)
+
         return dict(detailed_song_recommendations)
+
+    def get_ordered_recommendations(
+        self,
+        detailed_song_recommendations: Dict[str, MassPartSelector],
+    ) -> Dict[str, MassPartSelector]:
+        """
+        Orders the song recommendations based on a predefined order.
+        Main song should come first, followed by the specific mass parts in a set order.
+        """
+        mass_part_order = ['main', 'entrance', 'sequence', 'gospel', 'offertory', 'communion', 'recessional']
+
+        ordered_recommendations = {}
+
+        for part in mass_part_order:
+            if part in detailed_song_recommendations:
+                ordered_recommendations[part] = detailed_song_recommendations[part]
+
+        return ordered_recommendations
 
     def get_song_for_mass_part(
         self,
