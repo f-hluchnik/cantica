@@ -1,13 +1,16 @@
-# fly.toml app configuration file generated for cantica on 2024-11-23T21:38:37Z
+# fly.toml app configuration file generated for directus-cantica on 2025-03-23T11:07:55+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'cantica'
-primary_region = 'ams'
+app = 'directus-cantica'
+primary_region = 'fra'
 console_command = '/code/manage.py shell'
 
 [build]
+
+[deploy]
+  release_command = 'python manage.py migrate --noinput'
 
 [env]
   PORT = '8000'
@@ -24,7 +27,6 @@ console_command = '/code/manage.py shell'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
-  memory_mb = 1024
 
 [[statics]]
   guest_path = '/code/static'
