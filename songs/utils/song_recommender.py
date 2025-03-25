@@ -161,6 +161,9 @@ class SongRecommender:
 
             rules_list = rules[category]
 
+            if len(rules_list) < 1:
+                continue
+
             if category == 'seasonal_rules' and main_song is None:
                 first_song_rule = random.choice(rules_list)  # noqa S311
 
