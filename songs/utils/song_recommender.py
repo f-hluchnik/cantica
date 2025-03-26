@@ -202,6 +202,8 @@ class SongRecommender:
 
         main_song_ = recommendations.get('main')
         main_song = main_song_.songs[0] if main_song_ is not None else None
+        if main_song is None:
+            return recommendations
         for part, (verse_attr, seasons) in changeable_mass_parts.items():
             if not getattr(main_song, verse_attr, False) and not recommendations[part].songs:
                 song = self.get_song_for_mass_part(mass_part=part, liturgical_seasons=seasons)
@@ -214,16 +216,27 @@ class SongRecommender:
         song_rule: SongRule,
         recommendations: Dict[str, MassPartSelector],
     ) -> Dict[str, MassPartSelector]:
+        """
+        Assign song to mass part based on provided rule.
+        """
         if song_rule.can_be_main:
-            if all(recommendations.get(key) is None for key in ('main', 'gospel', 'offertory')):
+            if not any(recommendations.get(part) for part in ('main', 'gospel', 'offertory')):
                 recommendations.setdefault('main', MassPartSelector('main', [song_rule.song]))
-        else:
-            mass_part_name = song_rule.mass_part.name
-            if recommendations.get(mass_part_name) is None:
-                basic_mass_parts = {'entrance', 'gospel', 'offertory'}
-                if recommendations.get('main') is not None and mass_part_name in basic_mass_parts:
-                    return recommendations
-                recommendations.setdefault(mass_part_name, MassPartSelector(mass_part_name, [song_rule.song]))
+            return recommendations
+
+        mass_part_name = song_rule.mass_part.name
+        if recommendations.get(mass_part_name) is not None:
+            return recommendations
+
+        if recommendations.get('main') is not None:
+            if mass_part_name in {'entrance', 'gospel', 'offertory'}:
+                return recommendations
+            if mass_part_name == 'communion' and recommendations['main'].songs[0].has_communion_verse:
+                return recommendations
+            if mass_part_name == 'recessional' and recommendations['main'].songs[0].has_recessional_verse:
+                return recommendations
+
+        recommendations.setdefault(mass_part_name, MassPartSelector(mass_part_name, [song_rule.song]))
         return recommendations
 
     def get_ordered_recommendations(
