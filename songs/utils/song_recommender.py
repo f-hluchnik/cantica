@@ -93,6 +93,7 @@ class SongRecommender:
         tmp_seasonal_rules = SongRule.objects.filter(
             content_type=season_content_type, object_id=current_season.id,
         )
+        # TODO: Don't merge seasonal and subseasonal rules.
         seasonal_rules = list(tmp_seasonal_rules) + list(subseason_rules)
 
         celebration_type_ct = ContentType.objects.get_for_model(CelebrationType)
@@ -220,7 +221,8 @@ class SongRecommender:
         Assign song to mass part based on provided rule.
         """
         if song_rule.can_be_main:
-            if not any(recommendations.get(part) for part in ('main', 'gospel', 'offertory')):
+            # TODO: remove the 'any' method
+            if not any(recommendations.get(part) for part in ('main')):
                 recommendations.setdefault('main', MassPartSelector('main', [song_rule.song]))
             return recommendations
 

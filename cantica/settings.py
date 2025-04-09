@@ -37,6 +37,7 @@ ALLOWED_HOSTS = [
     'cantica.hluchnikovi.cz',
     'directuscantica.cz',
     'directus-cantica.fly.dev',
+    'test.directuscantica.cz',
 ]
 
 CSRF_TRUSTED_ORIGINS = [

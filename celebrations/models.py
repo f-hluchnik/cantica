@@ -19,6 +19,7 @@ class Celebration(models.Model):
         CelebrationType,
         related_name='celebrations',
     )
+    description = models.TextField(blank=True)
 
     class Meta:
         ordering: ClassVar = ['name']  # Sort alphabetically by 'name'
