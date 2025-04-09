@@ -98,6 +98,11 @@ h4 {
     color: var(--primary-color);
 }
 
+.description-text {
+    font-size: 0.9em;
+    margin-bottom: 1em;
+}
+
 /* Celebration Details */
 .celebration-details {
     margin-top: 10px;
