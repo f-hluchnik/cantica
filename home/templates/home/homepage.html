@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'home/css/styles.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -37,10 +38,11 @@
                 {% for item in celebrations_with_songs %}
                     <div class="celebration-info">
                         <h3>{{ item.celebration.name }}</h3>
+                        <div class="description-text">{{ item.celebration.description|linebreaksbr }}</div>
                         <ul class="songs-list">
                             {% if item.recommended_songs.specific %}
                                 {% for song in item.recommended_songs.specific %}
-                                    <li>
+                                    <li class="songs-list">
                                         <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
                                             <div class="song-pod linked">
                                                 <div class="song-icon triangle">▲</div>
@@ -53,7 +55,7 @@
 
                             {% if item.recommended_songs.typical %}
                                 {% for song in item.recommended_songs.typical %}
-                                    <li>
+                                    <li class="songs-list">
                                         <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
                                             <div class="song-pod linked">
                                                 <div class="song-icon square">■</div>
@@ -73,25 +75,26 @@
                                 </li>
                             {% endif %}
                         </ul>
-
-                        <button class="toggle-details">➕ zobrazit detailní doporučení</button>
-                        <div class="celebration-details">
-                            <ul class="songs-list detailed">
-                                {% for part in item.detailed_recommended_songs.values %}
-                                    {% if part.songs %}
-                                        <li class="songs-list"><strong>{{ part.name }}:&nbsp;</strong>
-                                            {% for song in part.songs %}
-                                                <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
-                                                    <div class="song-pod linked">
-                                                        {{ song.number }}: {{ song.title }}
-                                                    </div>
-                                                </a>
-                                            {% endfor %}
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
+                        {% if item.recommended_songs.detailed %}
+                            <button class="toggle-details">➕ zobrazit detailní doporučení</button>
+                            <div class="celebration-details">
+                                <ul class="songs-list detailed">
+                                    {% for part in item.recommended_songs.detailed.values %}
+                                        {% if part.songs %}
+                                            <li class="songs-list"><strong>{{ part.name }}:&nbsp;</strong>
+                                                {% for song in part.songs %}
+                                                    <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
+                                                        <div class="song-pod linked">
+                                                            {{ song.number }}: {{ song.title }}
+                                                        </div>
+                                                    </a>
+                                                {% endfor %}
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             {% else %}
@@ -100,7 +103,7 @@
             <div class="song-icons">
                 <div class="song-icon triangle">▲ píseň podle svátku</div>
                 <div class="song-icon square">■ píseň podle typu svátku</div>
-                <div class="song-icon full-dot">● píseň podle období</div>
+                <div class="song-icon full-dot">● obecné doporučení</div>
             </div>
         {% endif %}
 
@@ -109,15 +112,16 @@
                 <h1>O aplikaci</h1>
                 <p>
                     Directus Cantica je online direktář vytvořený pro pomoc varhaníkům při výběru liturgických písní. 
-                    Umožňuje snadno najít vhodné písně podle konkrétních svátků, typu svátků a&nbsp;liturgického období.
+                    Doporučuje vhodné písně podle konkrétních svátků, typu svátků a&nbsp;liturgického období.
                 </p>
-                <h3>Klíčové funkce:</h3>
-                <ul>
-                    <li>Výběr písní podle svátku nebo typu svátku</li>
-                    <li>Možnost zobrazit písně podle liturgického období</li>
-                </ul>
                 <p>Věříme, že tato aplikace usnadní vaši přípravu na liturgii a&nbsp;přispěje k&nbsp;obohacení liturgického slavení.</p>
-                <p>V současnosti jsou písně doporučovány náhodně z předvybrané množiny vhoných písní pro daný den či období. Na lepším způsobu doporučování pracujeme.</p>
+                <div class="buy-me-a-coffee-button">
+                    <a href="https://www.buymeacoffee.com/f.hluchnik" target="_blank">
+                        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+                             alt="Buy Me a Coffee" 
+                             style="height: 50px; width: auto;">
+                    </a>
+                </div>
             </section>
         {% endif %}
         <div class="footer">

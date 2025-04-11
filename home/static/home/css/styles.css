@@ -98,6 +98,11 @@ h4 {
     color: var(--primary-color);
 }
 
+.description-text {
+    font-size: 0.9em;
+    margin-bottom: 1em;
+}
+
 /* Celebration Details */
 .celebration-details {
     margin-top: 10px;
@@ -145,7 +150,7 @@ h4 {
 .songs-list {
     list-style-type: none;
     padding: 0;
-    margin-top: 15px;
+    margin-top: 0px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -153,8 +158,7 @@ h4 {
 
 .songs-list li {
     background-color: var(--bg-color-light);
-    margin: 5px 0;
-    padding: 10px;
+    margin: 0px;
     border-radius: 4px;
     font-size: 16px;
     display: flex;
@@ -167,6 +171,7 @@ h4 {
 }
 
 .songs-list .detailed li {
+    padding: 15 px;
     display: block;
 }
 
@@ -301,6 +306,13 @@ h4 {
 
 .about ul li {
     margin-bottom: 8px;
+}
+
+.buy-me-a-coffee-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
 }
 
 /* Footer */
