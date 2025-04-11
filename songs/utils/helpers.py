@@ -60,6 +60,19 @@ def is_late_lent(date_to_check: date) -> bool:
     return False
 
 
+def is_good_friday(date_to_check: date) -> bool:
+    easter_date = get_easter_date(date_to_check.year)
+    return date_to_check == (easter_date - timedelta(days=2))
+
+
+def is_easter_triduum(date_to_check: date) -> bool:
+    easter_date = get_easter_date(date_to_check.year)
+    days_before_easter = (easter_date - date_to_check).days
+    if 1 <= days_before_easter <= 3:
+        return True
+    return False
+
+
 def is_pentecost_novena(date_to_check: date) -> bool:
     pentecost_date = get_pentecost_date(date_to_check.year)
     days_until_pentecost = (pentecost_date - date_to_check).days

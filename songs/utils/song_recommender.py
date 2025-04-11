@@ -11,6 +11,8 @@ from songs.models import LiturgicalSeason, LiturgicalSubSeason, Song, SongRule
 from songs.utils.helpers import (
     get_song_section_for_liturgical_season,
     is_christmas_octave,
+    is_easter_triduum,
+    is_good_friday,
     is_late_advent,
     is_late_lent,
     is_pentecost_novena,
@@ -79,10 +81,10 @@ class SongRecommender:
             current_season = None
 
         current_subseasons = self.get_current_subseasons(day)
-        subseason_rules = SongRule.objects.none()
+        subseasonal_rules = SongRule.objects.none()
         if current_subseasons:
             subseason_content_type = ContentType.objects.get_for_model(LiturgicalSubSeason)
-            subseason_rules = SongRule.objects.filter(
+            subseasonal_rules = SongRule.objects.filter(
                 content_type=subseason_content_type,
                 object_id__in=LiturgicalSubSeason.objects.filter(
                     name__in=current_subseasons,
@@ -90,11 +92,9 @@ class SongRecommender:
             )
 
         season_content_type = ContentType.objects.get_for_model(LiturgicalSeason)
-        tmp_seasonal_rules = SongRule.objects.filter(
+        seasonal_rules = SongRule.objects.filter(
             content_type=season_content_type, object_id=current_season.id,
         )
-        # TODO: Don't merge seasonal and subseasonal rules.
-        seasonal_rules = list(tmp_seasonal_rules) + list(subseason_rules)
 
         celebration_type_ct = ContentType.objects.get_for_model(CelebrationType)
         typical_rules = SongRule.objects.filter(
@@ -117,6 +117,7 @@ class SongRecommender:
         return {
             'specific_rules': specific_filtered,
             'typical_rules': typical_filtered,
+            'subseasonal_rules': subseasonal_rules,
             'seasonal_rules': seasonal_filtered,
         }
 
@@ -129,10 +130,25 @@ class SongRecommender:
         """
         Recommend songs based on liturgical criteria.
         """
+        if is_good_friday(day):
+            return RecommendedSongs(
+                specific=[],
+                typical=[],
+                seasonal='',
+                detailed={},
+            )
+
         rules = self.get_song_rules(day, celebration, liturgical_season)
         section = get_song_section_for_liturgical_season(liturgical_season)
-        seasonal_songs = 'písně z oddílu {section}'.format(section=section)
-        detailed_recommendation = self.get_detailed_recommendation(rules=rules, liturgical_season=liturgical_season)
+        if is_easter_triduum(day):
+            seasonal_songs = ''
+        else:
+            seasonal_songs = 'písně z oddílu {section}'.format(section=section)
+        detailed_recommendation = self.get_detailed_recommendation(
+            rules=rules,
+            day=day,
+            liturgical_season=liturgical_season,
+        )
 
         return RecommendedSongs(
             specific=[rule.song for rule in rules['specific_rules']],
@@ -144,6 +160,7 @@ class SongRecommender:
     def get_detailed_recommendation(
         self,
         rules: Dict[str, List[SongRule]],
+        day: date,
         liturgical_season: LiturgicalSeasonEnum,
     ) -> Dict[str, MassPartSelector]:
         """
@@ -153,13 +170,14 @@ class SongRecommender:
             mandatory -> default
         """
         detailed_song_recommendations = defaultdict(lambda: MassPartSelector(name='', songs=[]))
-        rules_categories = ['specific_rules', 'typical_rules', 'seasonal_rules']
+        rules_categories = ['specific_rules', 'typical_rules', 'subseasonal_rules', 'seasonal_rules']
         priorities = [3, 2, 1, 0]  # ['mandatory', 'strongly preferred', 'preferred', 'default']
 
         for rules_category in rules_categories:
             for priority in priorities:
                 current_rules = self.get_rules_by_priority(rules_list=rules.get(rules_category, []), priority=priority)
-                random.shuffle(current_rules)
+                seed = day.toordinal()
+                random.Random(seed).shuffle(current_rules)  # noqa: S311
                 for rule in current_rules:
                     detailed_song_recommendations = self.assign_song(
                         song_rule=rule,
@@ -221,8 +239,7 @@ class SongRecommender:
         Assign song to mass part based on provided rule.
         """
         if song_rule.can_be_main:
-            # TODO: remove the 'any' method
-            if not any(recommendations.get(part) for part in ('main')):
+            if not recommendations.get('main'):
                 recommendations.setdefault('main', MassPartSelector('main', [song_rule.song]))
             return recommendations
 
@@ -276,7 +293,7 @@ class SongRecommender:
         self,
         mass_part: str,
         liturgical_seasons: List[LiturgicalSeasonEnum],
-    ) -> str:
+    ) -> Optional[Song]:
         season_content_type = ContentType.objects.get_for_model(LiturgicalSeason)
 
         season_names = [season.value for season in liturgical_seasons]
