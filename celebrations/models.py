@@ -18,6 +18,7 @@ class Celebration(models.Model):
     types = models.ManyToManyField(
         CelebrationType,
         related_name='celebrations',
+        blank=True,
     )
     description = models.TextField(blank=True)
 

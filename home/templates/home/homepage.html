@@ -75,25 +75,26 @@
                                 </li>
                             {% endif %}
                         </ul>
-
-                        <button class="toggle-details">➕ zobrazit detailní doporučení</button>
-                        <div class="celebration-details">
-                            <ul class="songs-list detailed">
-                                {% for part in item.recommended_songs.detailed.values %}
-                                    {% if part.songs %}
-                                        <li class="songs-list"><strong>{{ part.name }}:&nbsp;</strong>
-                                            {% for song in part.songs %}
-                                                <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
-                                                    <div class="song-pod linked">
-                                                        {{ song.number }}: {{ song.title }}
-                                                    </div>
-                                                </a>
-                                            {% endfor %}
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
+                        {% if item.recommended_songs.detailed %}
+                            <button class="toggle-details">➕ zobrazit detailní doporučení</button>
+                            <div class="celebration-details">
+                                <ul class="songs-list detailed">
+                                    {% for part in item.recommended_songs.detailed.values %}
+                                        {% if part.songs %}
+                                            <li class="songs-list"><strong>{{ part.name }}:&nbsp;</strong>
+                                                {% for song in part.songs %}
+                                                    <a href="https://kancional.cz/{{ song.number }}" class="song-pod-link" target="_blank">
+                                                        <div class="song-pod linked">
+                                                            {{ song.number }}: {{ song.title }}
+                                                        </div>
+                                                    </a>
+                                                {% endfor %}
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             {% else %}
