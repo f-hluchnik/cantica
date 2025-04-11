@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+from urllib.request import Request
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
@@ -30,7 +31,7 @@ class ClearCacheView(LoginRequiredMixin, View):
 
 
 class PreloadDataView(LoginRequiredMixin, View):
-    def get(self, year: int, *args, **kwargs) -> JsonResponse:
+    def get(self, request: Request, year: int, *args, **kwargs) -> JsonResponse:
         client = LiturgyAPIClient()
         for month in range(1, 13):
             try:
@@ -44,7 +45,7 @@ class PreloadDataView(LoginRequiredMixin, View):
 
 
 class PreloadMonthDataView(LoginRequiredMixin, View):
-    def get(self, year: int, month: int, *args, **kwargs) -> JsonResponse:
+    def get(self, request: Request, year: int, month: int, *args, **kwargs) -> JsonResponse:
         client = LiturgyAPIClient()
         try:
             client.fetch_month(year=year, month=month)
@@ -57,7 +58,7 @@ class PreloadMonthDataView(LoginRequiredMixin, View):
 
 
 class PreloadDayDataView(LoginRequiredMixin, View):
-    def get(self, year: int, month: int, day: int, *args, **kwargs) -> JsonResponse:
+    def get(self, request: Request, year: int, month: int, day: int, *args, **kwargs) -> JsonResponse:
         client = LiturgyAPIClient()
         requested_day = date(year, month, day)
         try:

@@ -36,17 +36,22 @@ ALLOWED_HOSTS = [
     'cantica.fly.dev',
     'cantica.hluchnikovi.cz',
     'directuscantica.cz',
+    'directus-cantica.fly.dev',
+    'test.directuscantica.cz',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://cantica.fly.dev',
     'https://cantica.hluchnikovi.cz',
     'https://directuscantica.cz',
+    'https://directus-cantica.fly.dev',
 ]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'dal',
+    'dal_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

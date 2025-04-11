@@ -5,7 +5,7 @@ from django.utils.text import slugify
 
 
 class CelebrationType(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(db_index=True, max_length=200, unique=True)
     description = models.TextField(blank=True)
 
     def __str__(self) -> str:
@@ -13,12 +13,14 @@ class CelebrationType(models.Model):
 
 
 class Celebration(models.Model):
-    slug = models.SlugField(unique=True, max_length=200)
-    name = models.CharField(max_length=200)
+    slug = models.SlugField(db_index=True, max_length=200, unique=True)
+    name = models.CharField(db_index=True, max_length=200)
     types = models.ManyToManyField(
         CelebrationType,
         related_name='celebrations',
+        blank=True,
     )
+    description = models.TextField(blank=True)
 
     class Meta:
         ordering: ClassVar = ['name']  # Sort alphabetically by 'name'
