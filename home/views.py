@@ -4,6 +4,7 @@ from typing import Any, Dict
 from django.views.generic import TemplateView
 
 from celebrations.models import Celebration, LiturgicalCalendarEvent
+from songs.models import LiturgicalSeason, LiturgicalSubSeason
 from songs.utils.liturgical_season import LiturgicalSeasonEnum
 from songs.utils.song_recommender import SongRecommender
 
@@ -23,22 +24,35 @@ class HomePageView(TemplateView):
         celebration_slugs = liturgical_day.values_list('celebrations__slug', flat=True)
         liturgical_season = liturgical_day.values_list('season', flat=True).first()
         season = LiturgicalSeasonEnum.from_string(liturgical_season)
+        ls = LiturgicalSeason.objects.filter(name=liturgical_season).first()
+
+        recommender = SongRecommender()
+
+        subseasons = recommender.get_current_subseasons(current_date=selected_date)
+        liturgical_subseasons = LiturgicalSubSeason.objects.filter(name__in=subseasons)
+        subseasons_descriptions = ''
+        for subseason in liturgical_subseasons:
+            subseasons_descriptions += subseason.description
 
         celebrations = Celebration.objects.filter(slug__in=celebration_slugs)
-
-        # Fetch song recommendations for each celebration
-        recommender = SongRecommender()
         celebrations_with_songs = []
         for celebration in celebrations:
             recommended_songs = recommender.recommend_songs(
                 day=selected_date,
                 celebration=celebration,
                 liturgical_season=season,
+                liturgical_subseasons=liturgical_subseasons,
             )
+            description = '\n'.join(filter(None, [
+                celebration.description,
+                ls.description,
+                subseasons_descriptions,
+            ]))
 
             celebrations_with_songs.append({
                 'celebration': celebration,
                 'recommended_songs': recommended_songs,
+                'description': description,
             })
 
         # Add to context

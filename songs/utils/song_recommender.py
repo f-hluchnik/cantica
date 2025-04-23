@@ -11,6 +11,7 @@ from songs.models import LiturgicalSeason, LiturgicalSubSeason, Song, SongRule
 from songs.utils.helpers import (
     get_song_section_for_liturgical_season,
     is_christmas_octave,
+    is_easter_octave,
     is_easter_triduum,
     is_good_friday,
     is_late_advent,
@@ -71,6 +72,7 @@ class SongRecommender:
         day: date,
         celebration: Optional[Celebration],
         season: Optional[LiturgicalSeasonEnum],
+        subseasons: List[LiturgicalSubSeason],
     ) -> Dict[str, List[SongRule]]:
         """
         Retrieve song rules based on season, subseason, and celebration.
@@ -80,14 +82,14 @@ class SongRecommender:
         except LiturgicalSeason.DoesNotExist:
             current_season = None
 
-        current_subseasons = self.get_current_subseasons(day)
         subseasonal_rules = SongRule.objects.none()
-        if current_subseasons:
+        subseasons_names = [subseason.name for subseason in subseasons]
+        if subseasons_names:
             subseason_content_type = ContentType.objects.get_for_model(LiturgicalSubSeason)
             subseasonal_rules = SongRule.objects.filter(
                 content_type=subseason_content_type,
                 object_id__in=LiturgicalSubSeason.objects.filter(
-                    name__in=current_subseasons,
+                    name__in=subseasons,
                 ).values_list('id', flat=True),
             )
 
@@ -126,6 +128,7 @@ class SongRecommender:
         day: date,
         celebration: Celebration,
         liturgical_season: LiturgicalSeasonEnum,
+        liturgical_subseasons: List[LiturgicalSubSeason],
     ) -> RecommendedSongs:
         """
         Recommend songs based on liturgical criteria.
@@ -138,7 +141,12 @@ class SongRecommender:
                 detailed={},
             )
 
-        rules = self.get_song_rules(day, celebration, liturgical_season)
+        rules = self.get_song_rules(
+            day=day,
+            celebration=celebration,
+            season=liturgical_season,
+            subseasons=liturgical_subseasons,
+        )
         section = get_song_section_for_liturgical_season(liturgical_season)
         if is_easter_triduum(day):
             seasonal_songs = ''
@@ -319,6 +327,7 @@ class SongRecommender:
             'christmas_octave': is_christmas_octave,
             'week_of_prayer_for_christian_unity': is_week_of_prayer_for_christian_unity,
             'late_lent': is_late_lent,
+            'easter_octave': is_easter_octave,
             'pentecost_novena': is_pentecost_novena,
         }
 
