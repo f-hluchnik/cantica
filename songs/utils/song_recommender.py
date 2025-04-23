@@ -89,7 +89,7 @@ class SongRecommender:
             subseasonal_rules = SongRule.objects.filter(
                 content_type=subseason_content_type,
                 object_id__in=LiturgicalSubSeason.objects.filter(
-                    name__in=subseasons,
+                    name__in=subseasons_names,
                 ).values_list('id', flat=True),
             )
 
