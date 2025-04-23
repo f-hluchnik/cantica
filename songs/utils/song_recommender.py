@@ -83,7 +83,7 @@ class SongRecommender:
             current_season = None
 
         subseasonal_rules = SongRule.objects.none()
-        subseasons_names = [subseason.name for subseason in subseasons]
+        subseasons_names = {subseason.name for subseason in subseasons}
         if subseasons_names:
             subseason_content_type = ContentType.objects.get_for_model(LiturgicalSubSeason)
             subseasonal_rules = SongRule.objects.filter(
