@@ -28,7 +28,7 @@ class HomePageView(TemplateView):
 
         recommender = SongRecommender()
 
-        subseasons = recommender.get_current_subseasons(current_date=selected_date)
+        subseasons = list(recommender.get_current_subseasons(current_date=selected_date))
         liturgical_subseasons = LiturgicalSubSeason.objects.filter(name__in=subseasons)
         subseasons_descriptions = ''
         for subseason in liturgical_subseasons:
