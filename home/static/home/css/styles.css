@@ -324,3 +324,18 @@ h4 {
     padding-top: 20px;
     border-top: 2px solid var(--border-color);
 }
+
+.footer-contact {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.footer-contact a {
+    color: #666;
+    text-decoration: none;
+  }
+  
+.footer-contact a:hover {
+text-decoration: underline;
+color: #444;
+}
