@@ -72,6 +72,13 @@ def is_easter_triduum(date_to_check: date) -> bool:
         return True
     return False
 
+def is_easter_octave(date_to_check: date) -> bool:
+    easter_date = get_easter_date(date_to_check.year)
+    days_after_easter = (date_to_check - easter_date).days
+    if 0 <= days_after_easter <= 7:
+        return True
+    return False
+
 
 def is_pentecost_novena(date_to_check: date) -> bool:
     pentecost_date = get_pentecost_date(date_to_check.year)

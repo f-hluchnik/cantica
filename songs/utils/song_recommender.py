@@ -11,6 +11,7 @@ from songs.models import LiturgicalSeason, LiturgicalSubSeason, Song, SongRule
 from songs.utils.helpers import (
     get_song_section_for_liturgical_season,
     is_christmas_octave,
+    is_easter_octave,
     is_easter_triduum,
     is_good_friday,
     is_late_advent,
@@ -319,6 +320,7 @@ class SongRecommender:
             'christmas_octave': is_christmas_octave,
             'week_of_prayer_for_christian_unity': is_week_of_prayer_for_christian_unity,
             'late_lent': is_late_lent,
+            'easter_octave': is_easter_octave,
             'pentecost_novena': is_pentecost_novena,
         }
 
