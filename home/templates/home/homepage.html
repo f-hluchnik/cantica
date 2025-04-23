@@ -38,7 +38,7 @@
                 {% for item in celebrations_with_songs %}
                     <div class="celebration-info">
                         <h3>{{ item.celebration.name }}</h3>
-                        <div class="description-text">{{ item.celebration.description|linebreaksbr }}</div>
+                        <div class="description-text">{{ item.description|linebreaksbr }}</div>
                         <ul class="songs-list">
                             {% if item.recommended_songs.specific %}
                                 {% for song in item.recommended_songs.specific %}
@@ -113,8 +113,10 @@
                 <p>
                     Directus Cantica je online direktář vytvořený pro pomoc varhaníkům při výběru liturgických písní. 
                     Doporučuje vhodné písně podle konkrétních svátků, typu svátků a&nbsp;liturgického období.
+                    V současnosti jsou písně vybírány podle pravidel uvedených v Direktáři pro varhaníky. Na výběru písně podle litugických textů pracujeme.
                 </p>
                 <p>Věříme, že tato aplikace usnadní vaši přípravu na liturgii a&nbsp;přispěje k&nbsp;obohacení liturgického slavení.</p>
+                <p>Pokud se vám aplikace líbí a pomáhá vám, budu rád, když podpoříte její vývoj a provoz prostřednictvím služby Buy Me a Coffee.</p>
                 <div class="buy-me-a-coffee-button">
                     <a href="https://www.buymeacoffee.com/f.hluchnik" target="_blank">
                         <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
@@ -125,6 +127,8 @@
             </section>
         {% endif %}
         <div class="footer">
+            <p>Aplikace je stále ve vývoji, a proto se mohou objevit nesrovnalosti – děkujeme za pochopení.<br> Berte prosím v potaz, že doporučení aplikace nejsou závazná; konečné slovo ohledně výběru zpěvů má vždy kněz sloužící mši.</p>
+            <p class="footer-contact">Máte-li jakékoli dotazy nebo připomínky, neváhejte se ozvat na <a href="mailto:frantahluchnik@gmail.com">frantahluchnik@gmail.com</a>.</p>
             <p>&copy; 2025 František Hluchník</p>
         </div>
     </div>
