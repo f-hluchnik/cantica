@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 
 from celebrations.models import Celebration, LiturgicalCalendarEvent
 from songs.models import LiturgicalSeason, LiturgicalSubSeason
+from songs.utils.helpers import is_may
 from songs.utils.liturgical_season import LiturgicalSeasonEnum
 from songs.utils.song_recommender import SongRecommender
 
@@ -25,6 +26,10 @@ class HomePageView(TemplateView):
         liturgical_season = liturgical_day.values_list('season', flat=True).first()
         season = LiturgicalSeasonEnum.from_string(liturgical_season)
         ls = LiturgicalSeason.objects.filter(name=liturgical_season).first()
+        custom_description = ''
+        if is_may(selected_date):
+            custom_description = 'Měsíc květen je v lidové zbožnosti věnován úctě Panny Marie. Vyjma mší o Panně' \
+                'Marii, však mariánské písně ke mši nehrajeme - ty se mohou hrát po mši nebo při májových pobožnostech.'
 
         recommender = SongRecommender()
 
@@ -46,6 +51,7 @@ class HomePageView(TemplateView):
             description = '\n'.join(filter(None, [
                 celebration.description,
                 ls.description,
+                custom_description,
                 subseasons_descriptions,
             ]))
 

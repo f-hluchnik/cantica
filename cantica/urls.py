@@ -14,12 +14,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from urllib.request import Request
+
 from django.contrib import admin
 from django.urls import include, path
+
+
+def trigger_error(request: Request.Request) -> None:
+    division_by_zero = 1 / 0  # noqa F841
+
 
 urlpatterns = [
     path('db/', admin.site.urls),
     path('api/songs/', include('songs.urls')),
     path('api/celebrations/', include('celebrations.urls')),
     path('', include('home.urls')),
+    path('sentry-debug/', trigger_error),
 ]
