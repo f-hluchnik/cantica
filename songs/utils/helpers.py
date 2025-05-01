@@ -89,6 +89,10 @@ def is_pentecost_novena(date_to_check: date) -> bool:
     return False
 
 
+def is_may(date_to_check: date) -> bool:
+    return date_to_check.month == 5
+
+
 class SongSection(Enum):
     ADVENT = '100'
     CHRISTMAS = '200'
