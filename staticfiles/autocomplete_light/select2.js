@@ -42,7 +42,6 @@ document.addEventListener('dal-init-function', function () {
             } else {
                 return result_template(item);
             }
-            return
         }
 
         var ajax = null;
