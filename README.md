@@ -5,7 +5,7 @@
 - the `\q`
 - then import in local DB:
 ```
-pg_restore \                                                                     8m 51s 15:30:42
+pg_restore \
   --clean \
   --no-owner \
   --no-privileges \
