@@ -24,6 +24,7 @@ body {
     height: 100vh;
     overflow-y: auto;
     box-sizing: border-box;
+    overflow-y: scroll; /* Always show vertical scrollbar */
 }
 
 .container {
@@ -97,14 +98,28 @@ h4 {
     color: var(--primary-color);
 }
 
+.description-text {
+    font-size: 0.9em;
+    margin-bottom: 1em;
+}
+
 /* Celebration Details */
 .celebration-details {
-    display: none;
     margin-top: 10px;
     padding: 10px;
     border-left: 3px solid #ccc;
-    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+    max-height: 0px;
+    visibility: hidden;
+    transition: max-height 0.5s ease-out, visibility 0.5s;
 }
+
+.celebration-details.expanded {
+    visibility: visible;
+    max-height: 500px;
+    transition: max-height 0.5s ease-out, visibility 0.5s;
+}
+
 
 .celebration-details ul {
     list-style: none;
@@ -116,17 +131,18 @@ h4 {
 }
 
 .toggle-details {
-    background: none;
+    background-color: var(--btn-bg-color);
+    color: white;
     border: none;
-    color: #007bff;
-    font-size: 14px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 5px;
     cursor: pointer;
-    padding: 5px;
-    margin-top: 5px;
+    transition: background-color 0.2s ease;
 }
 
 .toggle-details:hover {
-    text-decoration: underline;
+    background-color: var(--btn-bg-hover);
 }
 
 
@@ -134,7 +150,7 @@ h4 {
 .songs-list {
     list-style-type: none;
     padding: 0;
-    margin-top: 15px;
+    margin-top: 0px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -142,13 +158,21 @@ h4 {
 
 .songs-list li {
     background-color: var(--bg-color-light);
-    margin: 5px 0;
-    padding: 10px;
+    margin: 0px;
     border-radius: 4px;
     font-size: 16px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
+}
+
+.songs-list.detailed {
+    display: block; /* Ensure block display for detailed list */
+}
+
+.songs-list .detailed li {
+    padding: 15 px;
+    display: block;
 }
 
 .songs-list .song-pod {
@@ -284,6 +308,13 @@ h4 {
     margin-bottom: 8px;
 }
 
+.buy-me-a-coffee-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+
 /* Footer */
 .footer {
     text-align: center;
@@ -292,4 +323,19 @@ h4 {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 2px solid var(--border-color);
+}
+
+.footer-contact {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.footer-contact a {
+    color: #666;
+    text-decoration: none;
+  }
+  
+.footer-contact a:hover {
+text-decoration: underline;
+color: #444;
 }
