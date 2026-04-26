@@ -8,26 +8,30 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100
 
-# Set work directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    libpq-dev gcc curl && \
-    rm -rf /var/lib/apt/lists/*
+# curl is needed for healthchecks; remove gcc/libpq-dev once you're off Postgres
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev gcc curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY . .
 
-# Set permissions for security
-RUN chmod -R 755 /app
+# Collect static files at build time (files are baked into the image)
+# SECRET_KEY is a dummy — only needed so Django settings load without error
+RUN SECRET_KEY=dummy-build-key DEBUG_VALUE=dummy-debug-value python manage.py collectstatic --noinput --clear
 
-# Expose port 8000 (Gunicorn default)
+# Run as non-root user for security
+RUN useradd --no-create-home appuser && chown -R appuser /app
+USER appuser
+
 EXPOSE 8000
 
-# Run collectstatic at runtime, before Gunicorn starts
-CMD ["sh", "-c", "python manage.py collectstatic --noinput --clear && gunicorn --bind 0.0.0.0:8000 cantica.wsgi:application"]
+# Workers: 2*CPUs+1 is the standard Gunicorn recommendation
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "120", "cantica.wsgi:application"]
