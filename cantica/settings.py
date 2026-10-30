@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'liturgy',
+    'catalog',
     'web',
 ]
 
@@ -114,6 +115,11 @@ STORAGES = {
     },
 }
 
+# Outside production, WhiteNoise serves files straight from the app static/ dirs (no collectstatic),
+# so runserver shows CSS/JS even without DEBUG=1.
+WHITENOISE_USE_FINDERS = not PRODUCTION
+WHITENOISE_AUTOREFRESH = not PRODUCTION
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 if PRODUCTION:
@@ -133,6 +139,7 @@ LOGGING = {
 CANTICA_DATA_DIR = Path(os.environ.get('CANTICA_DATA_DIR', str(BASE_DIR / 'data')))
 CANTICA_RAW_CALENDAR_DIR = CANTICA_DATA_DIR / 'calendar' / 'raw'
 CANTICA_CELEBRATIONS_FILE = CANTICA_DATA_DIR / 'liturgy' / 'celebrations.yaml'
+CANTICA_CURATION_FILE = CANTICA_DATA_DIR / 'curated' / 'curation.yaml'
 # /health reports 'warn' when fewer days of calendar data remain.
 CANTICA_HEALTH_MIN_DAYS_AHEAD = 180
 CANTICA_DIOCESE_COOKIE = 'dieceze'

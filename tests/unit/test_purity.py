@@ -5,6 +5,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PURE_MODULES = (
+    'catalog/codes.py',
+    'catalog/curation.py',
     'liturgy/calapi.py',
     'liturgy/catalog.py',
     'liturgy/constants.py',
@@ -14,7 +16,12 @@ PURE_MODULES = (
     'liturgy/snapshot.py',
     'liturgy/sync.py',
 )
-FORBIDDEN = ('django', 'liturgy.models', 'liturgy.dbbuild', 'liturgy.services', 'web')
+FORBIDDEN = (
+    'django',
+    'liturgy.models', 'liturgy.dbbuild', 'liturgy.services',
+    'catalog.models', 'catalog.admin', 'catalog.dbsync', 'catalog.signals',
+    'web',
+)
 
 
 def _imports(path: Path) -> set[str]:

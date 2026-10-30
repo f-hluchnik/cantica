@@ -16,6 +16,8 @@ fi
 
 cd /app
 python manage.py migrate --noinput
+# Curated data (songs, groups) is edited in the admin; the YAML only seeds an empty DB.
+python manage.py curation_import --if-empty || echo "WARNING: curation_import failed" >&2
 # A broken data commit must not take the site down: keep serving the previous build.
 python manage.py calendar_build || echo "WARNING: calendar_build failed; serving the previous calendar data" >&2
 

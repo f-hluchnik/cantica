@@ -207,14 +207,15 @@ Computing the calendar locally (algorithmic temporale + sanctorale data files pe
 ### 6.1 Model
 
 ```
-Song(code PK '708A' | 'Z781' | '523', number '708', title, section,
+Song(code PK '708A' | 'Z781' | '523', number '708' (derived), position (derived, Kancionál order),
+     title, section,
      mass_song      bool | NULL,       # can serve as "mešní píseň"
      communion_verses   str | NULL,    # see below
      recessional_verses str | NULL,    # same semantics
-     verse_count int | NULL,
-     kancional_markers str,            # reference only (as printed on kancional.cz); never read by the engine
-     reviewed_at, note)
-SongGroup(key PK, name, description, source_page, members: ordered M2M Song)
+     verse_count int | NULL,           # optional; enables the "verse > count" check
+     reviewed bool, note)
+SongGroup(key PK, name, description, source_page, songs: ordered M2M Song through SongGroupMember)
+CurationState(version, exported_version)   # single row; §7.6
 ```
 
 - **One list of songs, exactly as on kancional.cz.** There is no edition model: organists look songs up there or in their printed copy with all the appendices.
@@ -226,28 +227,33 @@ SongGroup(key PK, name, description, source_page, members: ordered M2M Song)
   | value | meaning | shown to users |
   |---|---|---|
   | `NULL` | not verified | nothing |
-  | `''` | the song has no suitable verse | nothing |
+  | `'-'` | the song has no suitable verse | nothing |
   | `'*'` | yes, use the verse dedicated in Kancionál | nothing (Kancionál says it already) |
   | `'4'`, `'4,5'` | these specific verses | **yes**: "k přijímání 4. sl." (useful for songs without printed dedications) |
 
   The engine never treats `NULL` as yes. "Not verified" is an admin-only state and never reaches the UI (§8.2).
-- **Groups make "512 ad." explicit.** `mesni_obecne` = 512–525, 588–593, Z582 (membership curated). The book's lists become groups: `ke_pane_jezisi_mesni` (702, 707, 708, 709, 710, 711, 715, 717, 728), `prilezitostne_mesni` (904, 911, 917, 918), `advent_k_prijimani` (106–108, 114–116, 127), `kajicne_postni` (322, 321, 320, 319, 312, 309), `marianske` (801–820), …
+  *(Changed in M2: "none" is `-`, not the empty string, because the admin saves an empty field as NULL.)*
+- **Groups make "512 ad." explicit.** `mesni_obecne` = 512–525, 588–593, Z582 (membership curated). The book's lists become groups: `k_panu_jezisi_mesni` (702, 707, 708, 709, 710, 711, 715, 717, 728), `prilezitostne_mesni` (904, 911, 917, 918), `advent_k_prijimani` (106–108, 114–116, 127), `postni_kajicne` (322, 321, 320, 319, 312, 309), `marianske` (801–820), …
 - **No song texts are stored**: only codes, titles, sections and your annotations. Links go to kancional.cz.
 
-### 6.2 Import
+### 6.2 Import — done once, no scraper *(changed in M2)*
 
-`catalog_import` scrapes `kancional.cz/ciselny-seznam` for codes, titles and sections, and optionally each song page for verse count and printed markers. It is polite: about 1 request per second, run once. It writes `data/catalog/songs.yaml`, and `catalog_load` loads that into the DB. Your curation happens in the admin and is exported back to YAML.
+The catalog is static, so instead of a scraper the numbered list from `kancional.cz/ciselny-seznam` was transcribed once (2026-10-30; 511 entries in 14 sections, including prayers, ordinaria and psalm responses, since rules refer to e.g. 681, 682, 696). The result is `data/curated/curation.yaml`, one line per song, together with the first 15 groups from the book (pp. 8, 9, 17, 18, 20, 25, 27, 48). Verse counts and the printed M-markers are not imported: the markers are untrusted anyway, and `verse_count` can be filled in where needed.
+
+**One curation file for everything edited in the admin** (songs and groups now, rules in M3): `data/curated/curation.yaml`. `curation_export` writes it, `curation_import` loads it; the start script imports it only into an empty DB.
 
 ### 6.3 Curation UI
 
-The Song admin list has inline-editable `mass_song`, `communion_verses` and `recessional_verses`, a filter "not verified", and `kancional_markers` shown read-only next to them.
+The Song admin list has inline-editable `mass_song`, `communion_verses`, `recessional_verses`, `verse_count` and `reviewed`, filters by section, review state and each verse state (neověřeno / nemá / podle Kancionálu / konkrétní sloky), and a link to the song on kancional.cz. Groups are edited with an ordered inline list of songs (autocomplete).
 
 ### 6.4 Optional seed from v1
 
 **Decided: prefill.** v1 `has_communion_verse` / `has_recessional_verse` (326 songs) are matched to kancional.cz codes by (number, title), because v1 numbers collide.
 - `True` → `'*'`.
 - `False` → `NULL`. v1 cannot tell an explicit "no" from an untouched default, so we don't claim "none".
-- All prefilled songs start with `reviewed_at = NULL`, so they appear in the admin's "not reviewed" filter.
+- All prefilled songs start with `reviewed: false`, so they appear in the admin's "not reviewed" filter.
+- **Also pre-set (M2 review): `mass_song = true`** for the members of `mesni_obecne`, `k_panu_jezisi_mesni`, `prilezitostne_mesni` and every song v1 used as the main mass song (131 songs), unreviewed.
+- Result: 324 of 326 v1 songs matched automatically, the two v1 typos (895, Z781) by hand; 171 songs have a communion verse `*`, 215 a recessional verse `*`.
 
 ---
 
@@ -381,9 +387,9 @@ This is a rule with `action=neighbours`:
 
 ### 7.6 Authoring, versioning, lint
 
-- **Source of truth is the DB** (your choice). `rules_export` writes canonical YAML (stable order, one file per scope type) to `data/rules/`. A weekly Action runs it on prod and opens a PR with the diff. `rules_import` loads YAML; it is used for the initial transcription and for bulk edits.
-- **Overwrite guard:** the export records the ruleset version. Import refuses if the DB has changed since the YAML was exported, unless `--force` is given.
-- **`ruleset_version`** is a single row, bumped on any save or delete of a Rule, Song, SongGroup, Celebration or Period. The engine snapshot and the caches are keyed by it.
+- **Source of truth is the DB** (your choice). Rules join songs and groups in the single curation file `data/curated/curation.yaml` (built in M2): `curation_export` writes it, a weekly Action exports production and opens a PR with the diff, `curation_import` loads it (initial transcription, bulk edits).
+- **Overwrite guard (built in M2):** `CurationState` holds `version` (bumped on any save or delete of curated data) and `exported_version`. Import refuses if the DB has changes that were never exported, unless `--force` is given; importing identical content is a no-op.
+- **The engine snapshot and the caches are keyed by** (`CurationState.version`, latest `CalendarBuild`). Celebrations and periods are calendar-side data (git), so a calendar rebuild also invalidates the caches.
 - **Admin rule preview:** "this rule applies on: …" (next 24 months, per diocese), so a mistyped scope is visible right away.
 - **Lint** (in the admin and in CI) over 3 years × all dioceses:
   - errors: a song both recommended and avoided at the same specificity for the same part and day; unknown song codes; a `mass` part targeting a song with `mass_song = false`; a `direktar` source without a page;
@@ -561,7 +567,7 @@ Book assertion format:
 | | scope | done when |
 |---|---|---|
 | **M1 Foundation** ✅ code | skeleton, CI, settings, calendar sync/build, dioceses, norms, day page showing calendar only (ranked celebrations, colours, badges) | deployed to `test.directuscantica.cz` with 24 months of data |
-| **M2 Catalog** | catalog import, v1 flag prefill, groups, curation admin | every song in sections 100–900 present; groups defined for the book's lists |
+| **M2 Catalog** ✅ code | catalog import, v1 flag prefill, groups, curation admin | every song in sections 100–900 present; groups defined for the book's lists |
 | **M3 Rules + engine** | models, admin, YAML I/O, lint, engine incl. the plan (§8.3), book-assertion harness; transcription of *Obecné zásady* and *Liturgické doby* (pp. 6–28) | assertions for pp. 6–28 pass |
 | **M4 Kalendárium + occasions** | transcription of pp. 29–46 (months) and 47–48 (occasions page), category review, coverage report | coverage report reviewed by you |
 | **M5 Launch** | fragment navigation + prefetch, diocese selector, JSON API, self-hosted fonts, wording, about page | v2 replaces v1 on `directuscantica.cz` |

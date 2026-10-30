@@ -4,7 +4,7 @@
 
 app = 'directus-cantica'
 primary_region = 'fra'
-console_command = 'python /app/manage.py shell'
+console_command = 'gosu appuser python /app/manage.py shell'
 
 [build]
 

@@ -1,0 +1,62 @@
+# Weekly: export curated data (songs, groups; rules from M3) from production and open a PR with the diff.
+# Admin edits thereby end up in git as a reviewable backup. The export is validated in this workflow
+# (PRs opened with GITHUB_TOKEN do not trigger CI). Production is marked as exported only after the PR exists.
+name: Curation export
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Export from production
+        shell: bash
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        # gosu: never touch the SQLite files as root (the app runs as appuser).
+        run: |
+          flyctl ssh console --app directus-cantica \
+            -C "gosu appuser python /app/manage.py curation_export --print --no-mark" > export.yaml
+          # Keep only the YAML (flyctl may print connection noise before it).
+          tr -d '\r' < export.yaml | sed -n '/^# Curated data exported/,$p' > data/curated/curation.yaml
+          rm export.yaml
+      - name: Validate
+        shell: bash
+        run: |
+          python - <<'EOF'
+          from pathlib import Path
+          from catalog.curation import Curation
+          curation = Curation.load(Path('data/curated/curation.yaml'))
+          curation.validate()
+          assert len(curation.songs) > 500, f'suspicious export: only {len(curation.songs)} songs'
+          print(f'version {curation.version}: {len(curation.songs)} songs, {len(curation.groups)} groups')
+          EOF
+          echo "CURATION_VERSION=$(sed -n 's/^version: //p' data/curated/curation.yaml)" >> "$GITHUB_ENV"
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: curation-export
+          delete-branch: true
+          commit-message: 'curation: export from production'
+          title: 'Curation export'
+          body: 'Weekly export of the curated data edited in the production admin.'
+          add-paths: data/curated/curation.yaml
+      - name: Mark production as exported
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          flyctl ssh console --app directus-cantica \
+            -C "gosu appuser python /app/manage.py curation_export --mark-exported $CURATION_VERSION"

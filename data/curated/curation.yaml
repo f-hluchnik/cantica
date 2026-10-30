@@ -1,0 +1,586 @@
+# Curated data exported from the DB (source of truth: the admin).
+# Import into an empty DB: python manage.py curation_import --if-empty
+# Song verse fields: null = not verified, "-" = none, "*" = as dedicated in Kancionál, "4,5" = these verses.
+version: 2
+groups:
+- key: advent_k_prijimani
+  name: adventní písně k přijímání
+  source_page: 18
+  members: ['106', '107', '108', '114', '115', '116', '127', '603']
+- key: advent_predvanocni
+  name: adventní písně 17.–24. prosince
+  description: 'Direktář: „v předvánočním týdnu zvl. 102–117, 122, 124, 130“.'
+  source_page: 17
+  members: ['102', '103', '104', '105', '106', '107', '108', '109', '110', '111', '112', '113', '114', '115', '116', '117', '122', '124', '130']
+- key: advent_prvni_obdobi
+  name: adventní písně do 16. prosince
+  description: 'Direktář: „v prvním období zvl. …“ (všední dny).'
+  source_page: 17
+  members: [101A, 101B, 101C, '109', '121', '123', '126', '127', '128', '129']
+- key: dekovne
+  name: děkovné písně po přijímání (M5)
+  description: Direktář uvádí také „z odd. 701 ad.“ a responsoriální žalmy děkovného charakteru; ty řeší pravidla zvlášť.
+  source_page: 25
+  members: [813A, 813B, '902', '903', '907', '908', '909', '927', '928', '929']
+- key: k_panu_jezisi_mesni
+  name: písně k Pánu Ježíši pro mši
+  source_page: 25
+  members: ['702', '707', 708A, 708B, '709', '710', '711', '715', 717A, 717B, 717C, '728']
+- key: marianske
+  name: mariánské písně
+  description: 'Direktář: „O slavnostech, svátcích a památkách Panny Marie vybíráme z odd. 801–820 (po přijímání je vhodná 813).“'
+  source_page: 8
+  members: ['801', '802', '803', '804', '805', '806', '807', '808', '809', '810', '811', '812', 813A, 813B, '814', '815', '816', '817', '818', '819', '820']
+- key: mesni_obecne
+  name: mešní písně obecné
+  description: 'Direktář: „mešní obecné: 512 ad.“ Členství upřesněno: obecné mešní písně bez písní ke kropení (510, 511, 586, 587).'
+  source_page: 25
+  members: ['512', '513', '514', '515', '516', '517', 518A, 518B, '519', '520', '521', '522', '523', '524', '525', Z582, '588', '589', '590', '591', '592', '593']
+- key: pohrebni
+  name: písně při pohřební mši
+  description: Na vhodných místech pohřebního obřadu také 922, 924, 926.
+  source_page: 48
+  members: ['921', '923', '925']
+- key: postni_kajicne
+  name: postní písně kajícího charakteru
+  description: Direktář uvádí v závorce ještě 307, 301.
+  source_page: 20
+  members: ['322', '321', '320', '319', '312', '309']
+- key: postni_o_utrpeni
+  name: postní písně o utrpení Páně (k přijímání)
+  source_page: 20
+  members: ['305', '306', '307', '308']
+- key: posviceni_chramu
+  name: výročí posvěcení chrámu
+  source_page: 8
+  members: ['917', '918']
+- key: prilezitostne_mesni
+  name: příležitostné písně pro mši
+  source_page: 25
+  members: ['904', '911', '917', '918']
+- key: svatym_obecne
+  name: písně ke všem svatým
+  source_page: 9
+  members: ['840', '841']
+- key: svatym_skupiny
+  name: písně ke skupinám svatých
+  description: 842 mučedníci, 843 duchovní pastýři, 844, 845.
+  source_page: 9
+  members: ['842', '843', '844', '845']
+- key: zaver_obecne
+  name: obecné písně na závěr
+  description: 'Direktář: „… nebo např. 905, 910 a zvl. 930“.'
+  source_page: 27
+  members: ['905', '910', 930A, 930B, 930C]
+songs:
+- {code: '001', title: Modlitba Páně, section: prayers}
+- {code: '002', title: Apoštolské vyznání víry, section: prayers}
+- {code: '003', title: Vzývání Ducha Svatého, section: prayers}
+- {code: '004', title: Pozdravení andělské, section: prayers}
+- {code: '005', title: Anděl Páně, section: prayers}
+- {code: '006', title: 'Raduj se, Královno nebeská', section: prayers}
+- {code: '007', title: 'Zdrávas, Královno', section: prayers}
+- {code: 008, title: Pod ochranu tvou, section: prayers}
+- {code: 009, title: Modlitba růžence, section: prayers}
+- {code: '010', title: Anděle Boží, section: prayers}
+- {code: '011', title: K svatému Josefu po růžencové pobožnosti, section: prayers}
+- {code: '012', title: Za zemřelé, section: prayers}
+- {code: '016', title: Klanění, section: personal_prayer}
+- {code: '017', title: Chvála, section: personal_prayer}
+- {code: 018, title: Díky, section: personal_prayer}
+- {code: 019, title: 'Víra, naděje a láska', section: personal_prayer}
+- {code: '020', title: Prosba o vedení Duchem Svatým, section: personal_prayer}
+- {code: '021', title: Odevzdání se službě Bohu, section: personal_prayer}
+- {code: '022', title: K andělům, section: personal_prayer}
+- {code: '023', title: Po probuzení, section: personal_prayer}
+- {code: '024', title: Ráno, section: personal_prayer}
+- {code: '025', title: Krátké modlitby po celý den, section: personal_prayer}
+- {code: 026A, title: Modlitby u stolu, section: personal_prayer}
+- {code: 026B, title: Modlitby u stolu, section: personal_prayer}
+- {code: '027', title: K práci, section: personal_prayer}
+- {code: 028A, title: Večer, section: personal_prayer}
+- {code: 028B, title: Večer, section: personal_prayer}
+- {code: 029A, title: Za církev, section: personal_prayer}
+- {code: 029B, title: Za církev, section: personal_prayer}
+- {code: '030', title: Za farnost, section: personal_prayer}
+- {code: '031', title: Za jednotu křesťanů, section: personal_prayer}
+- {code: '032', title: Za misie, section: personal_prayer}
+- {code: '033', title: Za pronásledované křesťany a za nepřátele evangelia, section: personal_prayer}
+- {code: '034', title: Za vlast, section: personal_prayer}
+- {code: '035', title: Za mír, section: personal_prayer}
+- {code: '036', title: Odpovědnost za svět, section: personal_prayer}
+- {code: '037', title: Za lásku k bližnímu, section: personal_prayer}
+- {code: 038, title: Za trpící, section: personal_prayer}
+- {code: 039A, title: Obnova křestního vyznání, section: personal_prayer}
+- {code: 039B, title: Díky za křest, section: personal_prayer}
+- {code: '040', title: Prosba za život v síle biřmování, section: personal_prayer}
+- {code: 041A, title: Návštěva eucharistického Krista, section: personal_prayer}
+- {code: 041B, title: Návštěva eucharistického Krista, section: personal_prayer}
+- {code: '042', title: Duchovní přijímání, section: personal_prayer}
+- {code: 043A, title: Příprava na přijímání, section: personal_prayer}
+- {code: 043B, title: Příprava na přijímání, section: personal_prayer}
+- {code: 044A, title: Po přijímání, section: personal_prayer}
+- {code: 044B, title: Po přijímání, section: personal_prayer}
+- {code: '045', title: Před zpytováním svědomí, section: personal_prayer}
+- {code: 046A, title: Myšlenky k lítosti a předsevzení, section: personal_prayer}
+- {code: 046B, title: Myšlenky k lítosti a předsevzení, section: personal_prayer}
+- {code: 047A, title: Myšlenky k díkům za smíření, section: personal_prayer}
+- {code: 047B, title: Myšlenky k díkům za smíření, section: personal_prayer}
+- {code: 048A, title: Za nemocné, section: personal_prayer}
+- {code: 048B, title: V nemoci, section: personal_prayer}
+- {code: 048C, title: Ve stáří, section: personal_prayer}
+- {code: 048D, title: Za dobrou smrt, section: personal_prayer}
+- {code: 048E, title: Tváří v tvář smrti, section: personal_prayer}
+- {code: 048F, title: Za zemřelé, section: personal_prayer}
+- {code: 049A, title: Za papeže, section: personal_prayer}
+- {code: 049B, title: Za biskupa, section: personal_prayer}
+- {code: 049C, title: Za kněze, section: personal_prayer}
+- {code: 049D, title: Za kněze ve farnosti, section: personal_prayer}
+- {code: 049E, title: Za kněžská a řeholní povolání, section: personal_prayer}
+- {code: 050A, title: Za dobrou volbu manžela (manželky), section: personal_prayer}
+- {code: 050B, title: Snoubenců, section: personal_prayer}
+- {code: 050C, title: Manželů, section: personal_prayer}
+- {code: 050D, title: Rodičů, section: personal_prayer}
+- {code: 050E, title: Dětí za rodiče, section: personal_prayer}
+- {code: '051', title: 'Oslava Boha – žalm 95 (94), 1–7', section: personal_prayer}
+- {code: '052', title: Důvěra v Boha – žalm 23 (22), section: personal_prayer}
+- {code: '053', title: Prosba – žalm 70 (69), section: personal_prayer}
+- {code: '054', title: Díky – žalm 116 (114), section: personal_prayer}
+- {code: '055', title: Kajícnost – žalm 51 (50), section: personal_prayer}
+- {code: '061', title: Ambrosiánský chvalozpěv, section: devotions}
+- {code: '065', title: Litanie k nejsvětějšímu Srdci Ježíšovu, section: devotions}
+- {code: '066', title: Modlitba k zasvěcení Srdci Ježíšovu, section: devotions}
+- {code: '067', title: Litanie loretánská, section: devotions}
+- {code: 068A, title: Litanie ke všem svatým, section: devotions}
+- {code: 068B, title: Litanie ke všem svatým, section: devotions}
+- {code: 069, title: Litanie ke svatým ochráncům naší vlasti, section: devotions}
+- {code: '071', title: Křížová cesta I., section: devotions}
+- {code: '072', title: Křížová cesta II., section: devotions}
+- {code: '073', title: Křížová cesta III., section: devotions}
+- {code: '074', title: Křížová cesta IV., section: devotions}
+- {code: '075', title: Ke všem zastavením, section: devotions}
+- {code: '076', title: Želivská křížová cesta, section: devotions}
+- {code: '077', title: Svatý Michaeli, section: devotions}
+- {code: 078, title: Anděl Páně, section: devotions}
+- {code: Z079, title: Je cesta trním posetá, section: devotions}
+- {code: 081, title: Ranní chvály, section: hours}
+- {code: 084, title: Nedělní nešpory, section: hours}
+- {code: 085A, title: Mariánské nešpory, section: hours}
+- {code: 085B, title: Mariánské nešpory, section: hours}
+- {code: 089, title: Modlitba před spaním, section: hours}
+- {code: 101A, title: 'Ejhle, Hospodin přijde', section: advent}
+- {code: 101B, title: 'Ejhle, Hospodin přijde', section: advent}
+- {code: 101C, title: 'Ejhle, Hospodin přijde', section: advent}
+- {code: '102', title: Mnozí spravedliví, section: advent}
+- {code: '103', title: Vládce světa, section: advent}
+- {code: '104', title: Panno blahoslavená, section: advent}
+- {code: '105', title: Chvalme Boha vesele, section: advent}
+- {code: '106', title: 'Vítej, milý Jezu Kriste', section: advent, communion_verses: '*'}
+- {code: '107', title: Radostné to Děťátko, section: advent, communion_verses: '*'}
+- {code: '108', title: 'Ty jsi, Kriste, Boží Syn', section: advent, communion_verses: '*'}
+- {code: '109', title: Z milosti tak hojné, section: advent, communion_verses: '*'}
+- {code: '110', title: 'Prolom, Pane, nebesa', section: advent}
+- {code: '111', title: Všichni věrní křesťané, section: advent, mass_song: true}
+- {code: '112', title: Z hvězdy vyšlo slunce, section: advent}
+- {code: '113', title: Před Pána vstupujem, section: advent}
+- {code: '114', title: 'Zdráv buď, Pane Jezu Kriste', section: advent, communion_verses: '*'}
+- {code: '115', title: 'Požehnaný, velebný', section: advent, communion_verses: '*'}
+- {code: '116', title: 'Jezu, skrytý v svátosti', section: advent, communion_verses: '*'}
+- {code: '117', title: Rodičko Boží vznešená, section: advent, recessional_verses: '*'}
+- {code: '121', title: 'Aj, slyšte z nenadání', section: advent, mass_song: true, communion_verses: '*'}
+- {code: '122', title: Co již dávní proroci, section: advent, mass_song: true, communion_verses: '*'}
+- {code: '123', title: 'Ejhle, přijde Pán', section: advent, mass_song: true}
+- {code: '124', title: Jak růže krásná, section: advent, mass_song: true}
+- {code: '125', title: 'Sešli, nebe, Spasitele', section: advent, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '126', title: Vesele zpívejme, section: advent, mass_song: true}
+- {code: '127', title: 'Zavítej k nám, Stvořiteli', section: advent, communion_verses: '*'}
+- {code: '128', title: 'Dej rosu, nebe nad námi (Rorate)', section: advent}
+- {code: '129', title: Volá hlas, section: advent, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '130', title: Z nebe posel vychází, section: advent, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '140', title: 'Zdráva buď, Panno Maria', section: advent}
+- {code: '181', title: 'Rosu dejte, nebesa', section: advent, mass_song: true}
+- {code: Z181, title: 'Rosu dejte, oblakové', section: advent, communion_verses: '*'}
+- {code: '182', title: Hlásej píseň veselá, section: advent, mass_song: true}
+- {code: '183', title: 'Vítej, Jezu Kriste', section: advent, mass_song: true}
+- {code: '184', title: 'Vítej, Hosti nebeský', section: advent, communion_verses: '*'}
+- {code: '185', title: Slavná Matko Jezu Krista, section: advent, recessional_verses: '*'}
+- {code: '186', title: Slavná Spasitele Matko, section: advent, recessional_verses: '*'}
+- {code: '201', title: Narodil se Kristus Pán, section: christmas, recessional_verses: '*'}
+- {code: '202', title: Pojďte všichni k jesličkám, section: christmas, mass_song: true}
+- {code: '203', title: Zvěstujem vám radost, section: christmas}
+- {code: '204', title: S pastýři teď o závod, section: christmas}
+- {code: '205', title: 'Vítej nám, Bože vtělený', section: christmas, communion_verses: '*'}
+- {code: '206', title: 'Vítej, milý Jezu Kriste', section: christmas, communion_verses: '*'}
+- {code: '207', title: Nastal přeradostný čas, section: christmas, communion_verses: '*'}
+- {code: '208', title: Čas radosti veselosti, section: christmas, communion_verses: '*'}
+- {code: '209', title: Splnilo se Písmo svaté, section: christmas}
+- {code: '210', title: V půlnoční hodinu, section: christmas}
+- {code: '211', title: Z nebe jsi přišel, section: christmas}
+- {code: '212', title: Všude radost, section: christmas, communion_verses: '*'}
+- {code: '213', title: Hvězda svítí nad Betlémem, section: christmas, communion_verses: '*'}
+- {code: '214', title: Z nebeské výsosti, section: christmas, communion_verses: '*'}
+- {code: '215', title: 'Přijď, ó milý Spasiteli', section: christmas, communion_verses: '*', recessional_verses: '*'}
+- {code: '216', title: 'Vítej, vítej, božské Dítě', section: christmas, communion_verses: '*', recessional_verses: '*'}
+- {code: '217', title: 'Kriste, světa Spasiteli', section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '218', title: Náš Spasitel zvěstovaný, section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '219', title: 'Jdou zástupy věrných (Adéste, fidéles)', section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '220', title: 'Chtíc, aby spal', section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '221', title: Místo Betléma, section: christmas, communion_verses: '*', recessional_verses: '*'}
+- {code: '222', title: Nesem vám noviny, section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '223', title: 'Poslouchejte, křesťané', section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '224', title: Tichá noc, section: christmas, mass_song: true}
+- {code: '225', title: Veselé vánoční hody!, section: christmas, mass_song: true}
+- {code: '226', title: 'Vítaný buď, Ježíšku', section: christmas, communion_verses: '*'}
+- {code: '227', title: Co to znamenati má, section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '228', title: Vánoční čas nastává, section: christmas, communion_verses: '*', recessional_verses: '*'}
+- {code: '281', title: 'Poslechněte, národové', section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: Z281, title: 'Slyšte, slyšte, pastuškové', section: christmas}
+- {code: '282', title: Betlémské světlo, section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: Z282, title: Betlémské světlo, section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '283', title: S pastýři pospíchejte, section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '284', title: 'Slyšte, slyšte, pastuškové', section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '285', title: 'Sem, pastýři, pospíchejte', section: christmas, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '286', title: S chudými pastýři, section: christmas, communion_verses: '*', recessional_verses: '*'}
+- {code: '287', title: 'Poslyšte, bratři, jen', section: christmas, mass_song: true}
+- {code: '288', title: 'Ejhle, naše chasa', section: christmas, mass_song: true, recessional_verses: '*'}
+- {code: '289', title: Co to znamená, section: christmas, mass_song: true}
+- {code: '290', title: Vzhůru bratři milí, section: christmas, mass_song: true}
+- {code: '291', title: Ježíška vítat pospěšme, section: christmas, communion_verses: '*', recessional_verses: '*'}
+- {code: '292', title: 'Sióne, již otvírej', section: christmas, mass_song: true}
+- {code: '293', title: Pán je světlo národů, section: christmas}
+- {code: '301', title: 'Ach, můj nejsladší Ježíši', section: lent, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '302', title: Dokonáno jest, section: lent, mass_song: true}
+- {code: '303', title: Duše věrné, section: lent, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '304', title: Hořké muky, section: lent, mass_song: true}
+- {code: '305', title: Již jsem dost pracoval, section: lent, mass_song: true, communion_verses: '*'}
+- {code: '306', title: Když na kříži pněl Spasitel, section: lent, mass_song: true}
+- {code: '307', title: 'Kristus, příklad pokory', section: lent, mass_song: true, communion_verses: '*'}
+- {code: '308', title: Křesťanská duše, section: lent, mass_song: true, communion_verses: '*'}
+- {code: '309', title: 'Ó Kriste, v tichý postní den', section: lent, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '310', title: Poděkujme Kristu Pánu, section: lent, mass_song: true}
+- {code: '311', title: Matka pláče, section: lent, mass_song: true}
+- {code: '312', title: Nedejme se k spánku svésti, section: lent, mass_song: true}
+- {code: '313', title: 'Přistup, duše, v zkroušenosti', section: lent, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '314', title: Stála Matka, section: lent, mass_song: true}
+- {code: '315', title: Svatý Bože, section: lent, recessional_verses: '*'}
+- {code: '316', title: 'Svatý Bože, svatý Silný', section: lent, recessional_verses: '*'}
+- {code: '317', title: 'Svatý kříži, tebe ctíme', section: lent, mass_song: true}
+- {code: 318A, title: 'Kriste Králi, dárce spásy', section: lent, mass_song: true}
+- {code: 318B, title: 'Kriste Králi, dárce spásy', section: lent, mass_song: true}
+- {code: '319', title: 'Já chtěl bych, Bože můj', section: lent, mass_song: true}
+- {code: '320', title: Ó slyš a shlédni k nám, section: lent, mass_song: true}
+- {code: '321', title: Ó hlavo Těla církve, section: lent, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '322', title: Před tvou tváří, section: lent, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '381', title: 'Zahlaď, Bože, mou nepravost', section: lent}
+- {code: Z381, title: 'Veliký jsi, božský Pane', section: lent}
+- {code: '382', title: Ó srdce kamenné, section: lent, communion_verses: '*'}
+- {code: '383', title: Hořké Páně umučení, section: lent, communion_verses: '*'}
+- {code: '384', title: 'Ó Kriste, pohlédni', section: lent, communion_verses: '*'}
+- {code: '385', title: Kříži svatý skrze tebe, section: lent}
+- {code: '386', title: Kriste pro své rány a kříž, section: lent}
+- {code: '401', title: Aleluja! Živ buď nad smrtí slavný vítěz, section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: 402A, title: Bůh všemohoucí, section: easter}
+- {code: 402B, title: Bůh všemohoucí, section: easter}
+- {code: '403', title: 'Hle, vstal již z mrtvých', section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '404', title: Raduj se a vesel, section: easter, mass_song: true, recessional_verses: '*'}
+- {code: '405', title: 'Rozleťte se, zpěvy, vzhůru', section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: 406A, title: Velikonoční oběti, section: easter, communion_verses: '*'}
+- {code: 406B, title: Velikonoční oběti, section: easter, communion_verses: '*'}
+- {code: '407', title: 'Vesel se, nebes Královno', section: easter, recessional_verses: '*'}
+- {code: '408', title: Vstalť jest této chvíle, section: easter}
+- {code: '409', title: Základ církve pevná skála, section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '410', title: 'Aleluja, církev zpívá', section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '411', title: 'Aleluja. Zazpívej, církvi (O filii)', section: easter, mass_song: true}
+- {code: '412', title: Třetího dne vstal Stvořitel, section: easter, mass_song: true}
+- {code: '413', title: Žije! Kristus povstal z hrobu, section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '415', title: Vstoupil Pán v slávu nebeskou, section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '421', title: Kristus seslal Těšitele, section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: 422A, title: 'Přijď, ó Duchu přesvatý', section: easter}
+- {code: 422B, title: 'Přijď, ó Duchu přesvatý', section: easter}
+- {code: 422C, title: 'Svatý Duchu, sestup k nám', section: easter}
+- {code: '423', title: 'Přijď, Tvůrce, Duchu Svatý', section: easter}
+- {code: '424', title: 'Sestup na nás, Duchu Svatý', section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '425', title: Ty Boží lásko, section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '481', title: Jako vítěz, section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '482', title: Zvítězil Lev, section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '483', title: 'Bratři, nad svým vykoupením', section: easter, mass_song: true, communion_verses: '*'}
+- {code: '484', title: Pán Ježíš Kristus, section: easter, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '485', title: 'Raduj se, Královno nebeská', section: easter}
+- {code: 501A, title: Zpívané odpovědi ke mši, section: ordinaries}
+- {code: 501B, title: Zpívané odpovědi ke mši, section: ordinaries}
+- {code: '502', title: Ordinárium J. Olejníka I., section: ordinaries}
+- {code: '503', title: Ordinárium K. Břízy, section: ordinaries}
+- {code: '504', title: Ordinárium P. Ebena, section: ordinaries}
+- {code: '505', title: Ordinárium Z. Pololáníka, section: ordinaries}
+- {code: '506', title: Latinské odpovědi ke mši, section: ordinaries}
+- {code: '507', title: Ordinárium VIII – De angelis, section: ordinaries}
+- {code: '508', title: Ordinárium XI – Orbis factor, section: ordinaries}
+- {code: '509', title: Ordinárium – Missa mundi, section: ordinaries}
+- {code: 510A, title: Pokrop mě yzopem, section: mass_general}
+- {code: 510B, title: Rač yzopem mě pokropit, section: mass_general}
+- {code: 511A, title: Viděl jsem pramen vody, section: mass_general}
+- {code: 511B, title: 'Pojď, kajícníku, před oltář', section: mass_general}
+- {code: '512', title: 'Bože, před tvou velebností', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '513', title: 'Hleď, mocný Hospodine', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '514', title: 'Hospodine, všech věcí Pane', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '515', title: Jako dítky k Otci svému, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '516', title: Na své tváře padáme, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '517', title: 'Pozdvihni se, duše, z prachu', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: 518A, title: 'Shlédni, Bože, z nebes vysokosti', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: 518B, title: 'Shlédni, Bože, z nebes vysokosti', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '519', title: Buďte bdělí, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '520', title: Hospodine všemohoucí, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '521', title: 'Pane, chci být jako ty', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '522', title: 'Plníme, Kriste, tvoje přání', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '523', title: 'Ty jsi, Pane, v každém chrámě', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '524', title: V posvátné úctě klekáme, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '525', title: 'Všichni jsme děti, děti Boží', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: Z581, title: Ordinárium K. Židka, section: mass_general}
+- {code: '582', title: Druhé ordinárium J. Olejníka, section: mass_general}
+- {code: Z582, title: Ve tvém chrámě, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '583', title: Třetí ordinárium J. Olejníka, section: mass_general}
+- {code: '584', title: Staroslověnské ordinárium J. Olejníka, section: mass_general}
+- {code: '585', title: Ordinárium VIII – De angelis, section: ordinaries}
+- {code: '586', title: Pokrop mě yzopem, section: mass_general}
+- {code: '587', title: Viděl jsem pramen vody, section: mass_general}
+- {code: '588', title: V zkroušenosti klekáme, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '589', title: Na kolena padejme s pokorou, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '590', title: 'Tobě, Bože, na výsosti', section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '591', title: Před tebou hlavu sklání, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '592', title: V zkroušenosti srdce, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '593', title: Tak Bůh miloval svět, section: mass_general, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '601', title: 'Pane, přijď', section: psalm_responses}
+- {code: '602', title: 'Pane, ukaž nám své milosrdenství', section: psalm_responses}
+- {code: '603', title: 'Vězte, že blízko jest', section: psalm_responses}
+- {code: '604', title: K tobě pozvedám, section: psalm_responses}
+- {code: '611', title: Dnes jsme viděli, section: psalm_responses}
+- {code: '612', title: Uzřely všechny končiny země, section: psalm_responses}
+- {code: '613', title: Budou se ti klanět, section: psalm_responses}
+- {code: '621', title: Aleluja, section: psalm_responses}
+- {code: '622', title: Aleluja, section: psalm_responses}
+- {code: '623', title: Aleluja, section: psalm_responses}
+- {code: '624', title: Bůh nás obnovil, section: psalm_responses}
+- {code: '625', title: Pán povstal z hrobu, section: psalm_responses}
+- {code: '626', title: Sešli Ducha svého, section: psalm_responses}
+- {code: '627', title: Toto je den, section: psalm_responses}
+- {code: '628', title: Jásejte Bohu, section: psalm_responses}
+- {code: '629', title: Bůh se vznáší, section: psalm_responses}
+- {code: '631', title: Kristus vítězí, section: psalm_responses}
+- {code: '632', title: Kristus mezi námi, section: psalm_responses}
+- {code: '633', title: Okuste a vizte, section: psalm_responses}
+- {code: '641', title: Mé srdce jásá, section: psalm_responses}
+- {code: '642', title: Buď veleben Hospodin, section: psalm_responses}
+- {code: '643', title: 'Slyš, dcero', section: psalm_responses}
+- {code: '644', title: Velebí má duše, section: psalm_responses}
+- {code: '645', title: Všude na zemi, section: psalm_responses}
+- {code: '646', title: Do tvých rukou, section: psalm_responses}
+- {code: '647', title: Jděte do celého světa, section: psalm_responses}
+- {code: '648', title: Blaze každému, section: psalm_responses}
+- {code: '649', title: 'Má duše, chval', section: psalm_responses}
+- {code: '651', title: Zpívejte Hospodinu, section: psalm_responses}
+- {code: '652', title: 'Chválíme tě, Pane', section: psalm_responses}
+- {code: '653', title: 'Všechno, co žije', section: psalm_responses}
+- {code: '654', title: Na tebe spoléhám, section: psalm_responses}
+- {code: '655', title: Milosrdný a milostivý, section: psalm_responses}
+- {code: '656', title: Oslavujte Pána, section: psalm_responses}
+- {code: '657', title: Hospodin je mé světlo, section: psalm_responses}
+- {code: '658', title: Má duše žízní, section: psalm_responses}
+- {code: '659', title: Budu velebit, section: psalm_responses}
+- {code: '661', title: Z hlubin volám k tobě, section: psalm_responses}
+- {code: '662', title: 'Pamatuj, Pane', section: psalm_responses}
+- {code: '663', title: Vyslyš nás, section: psalm_responses}
+- {code: '664', title: 'Pane, smiluj se, neboť jsme zhřešili', section: psalm_responses}
+- {code: '665', title: 'Nevzpomínej, Pane', section: psalm_responses}
+- {code: '666', title: Hospodin je blízko, section: psalm_responses}
+- {code: '667', title: Když dnes uslyšíte, section: psalm_responses}
+- {code: '668', title: 'Buď se mnou, Pane', section: psalm_responses}
+- {code: '669', title: U Pána je slitování, section: psalm_responses}
+- {code: '671', title: Odpočinutí věčné, section: psalm_responses}
+- {code: '672', title: Pán je můj pastýř, section: psalm_responses}
+- {code: '673', title: Hospodin je můj pastýř, section: psalm_responses}
+- {code: '681', title: Kde je opravdová láska, section: psalm_responses}
+- {code: '682', title: Světlo k osvícení pohanů, section: psalm_responses}
+- {code: '683', title: 'Pane, smiluj se a zachraň nás', section: psalm_responses}
+- {code: '684', title: 'Slova tvá, Pane', section: psalm_responses}
+- {code: '685', title: Jsme jeho lid, section: psalm_responses}
+- {code: '686', title: Do domu Hospodinova, section: psalm_responses}
+- {code: '691', title: Aleluja, section: psalm_responses}
+- {code: '692', title: Aleluja, section: psalm_responses}
+- {code: '693', title: Aleluja, section: psalm_responses}
+- {code: '694', title: 'Aleluja, aleluja', section: psalm_responses}
+- {code: '695', title: 'Aleluja, aleluja, aleluja', section: psalm_responses}
+- {code: '696', title: 'Chvála tobě, Kriste', section: psalm_responses}
+- {code: '697', title: 'Chvála tobě, Kriste', section: psalm_responses}
+- {code: '701', title: Andělský chlebe, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '702', title: Ať Srdci Ježíšovu, section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '703', title: 'Buď slaven, mocný Králi', section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: 704A, title: Chvalte ústa, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: 704B, title: Chvalte ústa, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '705', title: 'Pange, lingua', section: jesus, communion_verses: '*'}
+- {code: '706', title: 'Jezu Kriste, štědrý kněže', section: jesus, mass_song: true}
+- {code: '707', title: 'Ježíši, Králi', section: jesus, mass_song: true}
+- {code: 708A, title: 'Ježíši, tebe hledám', section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: 708B, title: 'Ježíši, tebe hledám', section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '709', title: K nebesům se orla vzletem, section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '710', title: K svátku tajemnému, section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '711', title: 'Kde jsi, Jezu, spáso má', section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '712', title: Klaním se ti vroucně, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '713', title: Na kolena padejme, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '714', title: Ó pokrme pocestných, section: jesus, communion_verses: '*'}
+- {code: '715', title: 'Ó Srdce Páně, archo naší spásy', section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '716', title: Pojďte uctít poklonou, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: 717A, title: 'Sióne, chval Spasitele', section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: 717B, title: 'Sióne, chval Spasitele', section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: 717C, title: 'Sióne, chval Spasitele', section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '718', title: Skrytý Bože, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '719', title: 'Svatý, svatý', section: jesus, communion_verses: '*'}
+- {code: '720', title: Útěcho duše mé, section: jesus, communion_verses: '*'}
+- {code: '721', title: 'Vítej nám, hoste přemilý', section: jesus, communion_verses: '*'}
+- {code: '722', title: 'Vítej, vítej, tělo přezázračné', section: jesus, communion_verses: '*'}
+- {code: '723', title: 'Vzhůru, srdce', section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '724', title: Zde nebeská je mana, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '725', title: 'Zdráv buď, Chlebe', section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '726', title: 'Hledám, kde bydlíš, Pane', section: jesus, communion_verses: '*'}
+- {code: '727', title: 'Kde jsi, můj Ježíši', section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '728', title: Ó srdce Páně nejsvětější, section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '781', title: Chvalte ústa, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: Z781, title: Pojď k Spasiteli, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '782', title: Adoro te devote, section: jesus, communion_verses: '*'}
+- {code: Z782, title: Kdo jí mé tělo a pije mou krev, section: jesus, communion_verses: '*'}
+- {code: '783', title: Klaním se ti vroucně, section: jesus}
+- {code: '784', title: Svatá oběť začíná se, section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '785', title: Z lásky raněný Ježíši, section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '786', title: 'Vzpomínko sladká, Ježíši (Dulcis lesu memoria)', section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '787', title: 'Chléb, hle, jasných nebešťanů', section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '788', title: 'Srdce Páně, archo spásy', section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '789', title: 'Ó andělé, k nám dolů spějte', section: jesus, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '790', title: 'Ó Jezu, hoste nebeský', section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '791', title: Dárce spásy, section: jesus, communion_verses: '*'}
+- {code: '792', title: Svátosti drahá, section: jesus, communion_verses: '*'}
+- {code: '793', title: Pozdraven buď ve svátosti, section: jesus, communion_verses: '*'}
+- {code: '794', title: 'Ó Bože, zde se tobě klaníme', section: jesus, recessional_verses: '*'}
+- {code: '795', title: 'Ejhle, oběť přesvatá', section: jesus, communion_verses: '*'}
+- {code: '796', title: S poníženým k zemi čelem, section: jesus, communion_verses: '*', recessional_verses: '*'}
+- {code: '797', title: Adorémus in aeternum, section: jesus}
+- {code: '798', title: Je to jeden chléb, section: jesus}
+- {code: '801', title: Budiž vděčně velebena, section: mary_saints, recessional_verses: '*'}
+- {code: '802', title: 'Chválu vzdejme, ó křesťané', section: mary_saints, recessional_verses: '*'}
+- {code: '803', title: Jako ta růžička krásná, section: mary_saints, recessional_verses: '*'}
+- {code: '804', title: K nebesům dnes zaleť písní, section: mary_saints, recessional_verses: '*'}
+- {code: '805', title: 'Maria, Maria', section: mary_saints, recessional_verses: '*'}
+- {code: '806', title: Máti Páně přesvatá, section: mary_saints, recessional_verses: '*'}
+- {code: '807', title: 'Matko Boží, neslýcháno', section: mary_saints, recessional_verses: '*'}
+- {code: '808', title: Matko přesvatá, section: mary_saints, recessional_verses: '*'}
+- {code: '809', title: 'Ó Maria, Boží Máti', section: mary_saints}
+- {code: '810', title: 'Ó Maria, útočiště naše', section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '811', title: 'Slyš, jaký to nad řekou', section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '812', title: Tisíckráte pozdravujeme tebe, section: mary_saints, recessional_verses: '*'}
+- {code: 813A, title: Velebí má duše Hospodina, section: mary_saints, recessional_verses: '*'}
+- {code: 813B, title: Velebí má duše s jásotem, section: mary_saints, recessional_verses: '*'}
+- {code: '814', title: 'Zdráva buď, nebes královno', section: mary_saints}
+- {code: '815', title: 'Zdráva buď, Panno Maria', section: mary_saints, recessional_verses: '*'}
+- {code: '816', title: 'Zdrávas, hvězdo spanilá', section: mary_saints, recessional_verses: '*'}
+- {code: '817', title: 'Zdrávas, Maria! Anděl Páně z nebe', section: mary_saints, recessional_verses: '*'}
+- {code: '818', title: 'Buď zdráva, panen koruno', section: mary_saints, recessional_verses: '*'}
+- {code: '819', title: Jakou to vůní dýchá zem, section: mary_saints, recessional_verses: '*'}
+- {code: '820', title: Vychvalujme vesele, section: mary_saints, recessional_verses: '*'}
+- {code: '821', title: Dělníku Boží, section: mary_saints, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '822', title: Jak se moudrost Boží, section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '823', title: 'Zdráv buď, strážce', section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '824', title: Já jsem si vyvolil, section: mary_saints, recessional_verses: '*'}
+- {code: '825', title: Jak červánky ohlašují ráno, section: mary_saints, recessional_verses: '*'}
+- {code: '826', title: Od sítí tvých, section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '827', title: Vyvolil si apoštoly, section: mary_saints, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '828', title: 'Bože, cos ráčil', section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '829', title: 'Ejhle, oltář', section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: 830A, title: Svatý Václave, section: mary_saints, recessional_verses: '*'}
+- {code: 830B, title: Svatý Václave, section: mary_saints, recessional_verses: '*'}
+- {code: '831', title: V zemi věrných Čechů, section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '832', title: Ještě než vzpjal se první chrám, section: mary_saints, recessional_verses: '*'}
+- {code: '833', title: 'Ty, jenž jsi slavná koruna', section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '834', title: Lid český, section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '835', title: Vroucně vzýván, section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '836', title: Radostnou píseň Boží lid, section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '838', title: Svatým bratřím chvály znějí, section: mary_saints, recessional_verses: '*'}
+- {code: '839', title: K oltáři Páně, section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '840', title: Všichni boží vyvolení, section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: '841', title: Kolik svatých zdobí nebe, section: mary_saints, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '842', title: Prolití krve, section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '843', title: Pane žní, section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '844', title: Bůh je láska, section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '845', title: Vždy žena budiž chválena, section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '850', title: Vládu tmy Vítěz zahání, section: mary_saints}
+- {code: 870A, title: 'Anděle boží, strážce můj', section: mary_saints, recessional_verses: '*'}
+- {code: 870B, title: 'Anděle boží, strážce můj', section: mary_saints, recessional_verses: '*'}
+- {code: 870C, title: 'Anděle boží, strážce můj', section: mary_saints, recessional_verses: '*'}
+- {code: '881', title: Ó Panno líbezná, section: mary_saints, recessional_verses: '*'}
+- {code: Z881, title: Ó Maria přemilostná, section: mary_saints, recessional_verses: '*'}
+- {code: '882', title: Panno blahoslavená, section: mary_saints, recessional_verses: '*'}
+- {code: Z882, title: 'Pospěš, duše, do svatyně', section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '883', title: Hvězdo jitřní, section: mary_saints, recessional_verses: '*'}
+- {code: Z883, title: 'Maria Panno, v této svaté chvíli', section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '884', title: 'Maria, tvé jméno', section: mary_saints, recessional_verses: '*'}
+- {code: Z884, title: 'Zdráva buď, Maria', section: mary_saints, recessional_verses: '*'}
+- {code: '885', title: 'Buď zdráva, Panno Maria', section: mary_saints, recessional_verses: '*'}
+- {code: '886', title: Pod ochranu tvou, section: mary_saints, recessional_verses: '*'}
+- {code: '887', title: 'Zdrávas, Královno', section: mary_saints, recessional_verses: '*'}
+- {code: '888', title: Slavná slova, section: mary_saints, recessional_verses: '*'}
+- {code: '889', title: 'Andělé Boží, modlitby', section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '890', title: 'Anděle Boží, strážce můj', section: mary_saints, recessional_verses: '*'}
+- {code: '891', title: Pějme píseň o Hedvice, section: mary_saints, recessional_verses: '*'}
+- {code: Z891, title: Před oltářem Nejvyššího, section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '892', title: 'Vzývej, církvi, svého kněze Jana', section: mary_saints, mass_song: true, recessional_verses: '*'}
+- {code: Z892, title: Svatý otče Klemente, section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '893', title: Památku činíme, section: mary_saints, recessional_verses: '*'}
+- {code: Z893, title: Biskup Vojtěch na nebesa vzhlíží, section: mary_saints, recessional_verses: '*'}
+- {code: '894', title: Slavíce svátek milého, section: mary_saints, recessional_verses: '*'}
+- {code: Z894, title: 'Anežko naše, rozněť lásku vroucí', section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '895', title: Zdráva Matko vtělené moudrosti, section: mary_saints, recessional_verses: '*'}
+- {code: Z895, title: 'Před tebou, Bože, skláníme své hlavy', section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '896', title: Hlas v nebi volá, section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '897', title: 'Tobě ke cti, svatý Jene', section: mary_saints, communion_verses: '*', recessional_verses: '*'}
+- {code: '898', title: 'Voláme k tobě, svatý Floriáne', section: mary_saints, recessional_verses: '*'}
+- {code: '899', title: 'Zdráv buď, otče', section: mary_saints, recessional_verses: '*'}
+- {code: '901', title: 'Blíž k tobě, Bože můj', section: occasional, recessional_verses: '*'}
+- {code: '902', title: Chvalme Hospodáře všehomíra, section: occasional, recessional_verses: '*'}
+- {code: '903', title: S námi je Bůh náš, section: occasional, recessional_verses: '*'}
+- {code: '904', title: Tvůrce mocný, section: occasional, mass_song: true, recessional_verses: '*'}
+- {code: '905', title: 'Ty mocný, silný, veliký', section: occasional, recessional_verses: '*'}
+- {code: '906', title: Buď Bohu chvála, section: occasional, recessional_verses: '*'}
+- {code: '907', title: 'Chvalte Pána, chvalte', section: occasional, communion_verses: '*', recessional_verses: '*'}
+- {code: '908', title: 'Chvalte Pána, všichni lidé', section: occasional, communion_verses: '*', recessional_verses: '*'}
+- {code: '909', title: Nejvyšší a mocný, section: occasional, recessional_verses: '*'}
+- {code: '910', title: Jeden Pán, section: occasional, recessional_verses: '*'}
+- {code: '911', title: 'Otče náš, milý Pane', section: occasional, mass_song: true}
+- {code: '912', title: 'Hospodine, mocný Králi', section: occasional}
+- {code: '913', title: Přísný soudce, section: occasional, recessional_verses: '*'}
+- {code: '914', title: Bůh ti tento život dal, section: occasional, recessional_verses: '*'}
+- {code: '916', title: O hojné požehnání, section: occasional, communion_verses: '*', recessional_verses: '*'}
+- {code: '917', title: Buď ve svátosti, section: occasional, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '918', title: Bože všemocný a vlídný, section: occasional, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '921', title: 'Bože, věrným zemřelým', section: occasional, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '922', title: Matičko Kristova, section: occasional, recessional_verses: '*'}
+- {code: '923', title: 'Ó bože, k prosbám', section: occasional, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '924', title: Odpočiňte v pokoji, section: occasional, recessional_verses: '*'}
+- {code: '925', title: Při tvé lásce neslýchané, section: occasional, mass_song: true, communion_verses: '*', recessional_verses: '*'}
+- {code: '926', title: Zpívejme píseň naděje, section: occasional, recessional_verses: '*'}
+- {code: '927', title: 'Dej mi, Pane, bdělé srdce', section: occasional, communion_verses: '*', recessional_verses: '*'}
+- {code: '928', title: 'Učiň mě, Pane, nástrojem', section: occasional, communion_verses: '*', recessional_verses: '*'}
+- {code: '929', title: 'Vezmi si, Pane', section: occasional, communion_verses: '*', recessional_verses: '*'}
+- {code: 930A, title: 'Hospodine, pomiluj ny', section: occasional}
+- {code: 930B, title: 'Hospodine, ulituj nás', section: occasional}
+- {code: 930C, title: 'Hospodine, pomiluj ny', section: occasional}
+- {code: '931', title: 'Tam, kde strmí církve skála', section: occasional, recessional_verses: '*'}
+- {code: 932A, title: 'Bože, chválíme tebe', section: occasional, recessional_verses: '*'}
+- {code: 932B, title: 'Tebe, Bože, chválíme', section: occasional}
+- {code: '981', title: 'Hospodine, pomiluj nás', section: occasional}
+- {code: Z981, title: S knězem v tomto okamžiku, section: occasional, communion_verses: '*', recessional_verses: '*'}
+- {code: '982', title: 'Bože, chválíme tebe', section: occasional, recessional_verses: '*'}
+- {code: '983', title: 'Mluv, Pane', section: occasional}
+- {code: '984', title: 'Panno blahoslavená, Matko milosti', section: occasional, recessional_verses: '*'}
+- {code: '985', title: Kriste náš, section: occasional, communion_verses: '*', recessional_verses: '*'}
+- {code: '986', title: 'Náš Pane, spáso národů', section: occasional, recessional_verses: '*'}
+- {code: '987', title: Boha my chceme, section: occasional, recessional_verses: '*'}
+- {code: '988', title: 'Vezmi, Pane, život můj', section: occasional, recessional_verses: '*'}
+- {code: '989', title: Můj kříži, section: occasional, recessional_verses: '*'}
+- {code: Z991, title: Kde domov můj, section: occasional}

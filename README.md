@@ -3,8 +3,8 @@
 Online direktář pro varhaníky: the liturgical calendar plus song recommendations from Kancionál,
 following *Direktář pro varhaníky*. Design: [docs/design-v2.md](docs/design-v2.md).
 
-Status: **v2, milestone M1** — calendar only (ranked celebrations, liturgical colours,
-Sláva / Věřím / Aleluja, dioceses). Song recommendations arrive in M3.
+Status: **v2, milestone M2** — calendar (M1) and the song catalog with curation in the admin (M2).
+Song recommendations arrive in M3.
 
 ## Local development
 
@@ -12,7 +12,9 @@ Sláva / Věřím / Aleluja, dioceses). Song recommendations arrive in M3.
 python3.13 -m venv .venv && . .venv/bin/activate
 pip install -r requirements-dev.txt
 DEBUG=1 python manage.py migrate
-DEBUG=1 python manage.py calendar_build      # needs data/, see below
+DEBUG=1 python manage.py curation_import --if-empty   # songs and groups from data/curated/
+DEBUG=1 python manage.py calendar_build               # needs data/, see below
+DEBUG=1 python manage.py createsuperuser              # for /admin/
 DEBUG=1 python manage.py runserver
 ```
 
@@ -54,12 +56,35 @@ python manage.py calendar_build
 git add data && git commit -m "calendar: initial data"
 ```
 
+## Curated data (songs, groups; rules from M3)
+
+Unlike the calendar, curated data is **edited in the admin**; the DB is the source of truth and
+`data/curated/curation.yaml` is its export (backup, review, tests).
+
+| command | what it does |
+|---|---|
+| `curation_export [--print]` | write the DB to the YAML and mark the DB as exported |
+| `curation_import [--if-empty] [--force]` | replace the curated tables with the YAML; refuses if the DB has unexported changes |
+
+Every admin save bumps a version counter (admin → *Stav kurátorských dat*). A weekly Action exports
+production and opens a PR. To push hand edits of the YAML to production: merge them, then
+`fly ssh console -C "gosu appuser python /app/manage.py curation_import"` (refused if the admin has unexported changes).
+
+Song verse fields (*k přijímání*, *na závěr*): empty = not verified, `-` = none, `*` = as dedicated in
+Kancionál, `4,5` = these verses. The admin song list can filter by each state.
+
+The catalog (511 entries, codes as on kancional.cz) was transcribed from kancional.cz/ciselny-seznam on
+2026-10-30; the v1 communion/recessional flags were carried over as `*`, and *mešní píseň* was pre-set for
+131 songs (members of the mass groups plus every song v1 used as the main mass song). All of it is `reviewed: false`.
+
 ## Deployment (Fly.io)
 
 - `fly.toml` = production (`directuscantica.cz`), `fly.test.toml` = test instance (`test.directuscantica.cz`).
 - SQLite lives on a Fly volume mounted at `/data`; one machine, always on.
-- `bin/start.sh` runs `migrate` and `calendar_build` on start (Fly's release machine cannot see the volume),
-  then gunicorn. A failing `calendar_build` keeps the previous data and the site stays up.
+- `bin/start.sh` runs `migrate`, `curation_import --if-empty` and `calendar_build` on start (Fly's release
+  machine cannot see the volume), then gunicorn. A failing build keeps the previous data and the site stays up.
+- Run management commands on Fly **as appuser** (`gosu appuser python /app/manage.py …`), never as root:
+  SQLite files created by root would make the database read-only for the app.
 - Push to `main` → CI → deploy. Any branch can go to the test instance via the "Deploy test instance" workflow.
 - `/live` is the Fly health check; `/health` reports calendar freshness and is checked daily by an Action.
 
