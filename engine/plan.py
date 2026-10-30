@@ -5,11 +5,12 @@ import hashlib
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from catalog.codes import has_verse, number_of, verse_numbers
+from catalog.codes import has_verse, number_of
 from engine.model import DayCtx, OccurrenceCtx, Snapshot
-from engine.resolve import Entry, Item, PartResult, Reason, SongRef
+from engine.resolve import Entry, Item, PartResult, Reason, SongRef, shown_reasons
 from engine.vocab import (
     COVERED_BY_MASS_SONG,
+    OCCASIONAL_PARTS,
     PART_INDEX,
     PART_LABELS,
     SPECIFICITY,
@@ -17,13 +18,12 @@ from engine.vocab import (
 from liturgy.norms import liturgical_year
 
 GAP_NOTE = 'Direktář pro tuto část nic neuvádí.'
-MASS_VERSE_REASON = Reason('sloka mešní písně')
 
 
 @dataclass
 class PlanEntry:
     part: str
-    kind: str  # 'songs' | 'mass_verse' | 'gap' | 'silence'
+    kind: str  # 'songs' | 'gap' | 'silence'
     songs: list[SongRef] = field(default_factory=list)
     tier: str | None = None
     reasons: list[Reason] = field(default_factory=list)
@@ -35,6 +35,10 @@ class PlanEntry:
     @property
     def label(self) -> str:
         return PART_LABELS[self.part]
+
+    @property
+    def shown_reasons(self) -> list[Reason]:
+        return shown_reasons(self.reasons)
 
     @property
     def covers_label(self) -> str:
@@ -113,19 +117,6 @@ def _songs_entry(part: str, chosen: list[Entry], result: PartResult | None, snap
     )
 
 
-def _mass_verse_entry(part: str, mass: Entry, spec: str | None, result: PartResult | None, snap: Snapshot) -> PlanEntry:
-    song = snap.songs[mass.code]
-    verses = ','.join(str(n) for n in verse_numbers(spec))  # only specific numbers are shown
-    return PlanEntry(
-        part=part,
-        kind='mass_verse',
-        songs=[SongRef(code=song.code, title=song.title, verses=verses, url=song.url)],
-        tier=mass.tier,
-        reasons=[MASS_VERSE_REASON],
-        alternatives=_alternatives(result, set()),
-    )
-
-
 class _Planner:
     """Builds the plan part by part; `used` keeps a song from appearing twice."""
 
@@ -168,16 +159,6 @@ class _Planner:
     def mass_spec(self) -> int:
         return self.mass.specificity if self.mass else 0
 
-    def mass_verse(self, field_name: str) -> str | None:
-        """The mass song's verified verse spec for a part, or None if it has none / is not verified."""
-        if self.mass is None:
-            return None
-        spec = getattr(self.snap.songs[self.mass.code], field_name)
-        return spec if has_verse(spec) else None
-
-    def add_mass_verse(self, part: str, spec: str) -> None:
-        self.add(_mass_verse_entry(part, self.mass, spec, self.parts.get(part), self.snap))
-
     # steps ----------------------------------------------------------------------------------
 
     def _overrides(self, part: str, spec: int) -> bool:
@@ -212,37 +193,48 @@ class _Planner:
             if own_song:
                 self.add_songs(part, _choose(self.candidates(part), self.seed(part)))
 
+    def _better_fitted(self, entry: Entry) -> bool:
+        """A communion song worth naming next to the mass song: prescribed, more specific, or a ▲/■ song at
+        least as specific (Zjevení Páně: 202 + k přijímání 213, 219). A general list (701 ad.) is not."""
+        if entry.strength == 'prescribed' or entry.specificity > self.mass_spec:
+            return True
+        return entry.specificity >= max(self.mass_spec, SPECIFICITY['category'])
+
+    def covered_by_mass_song(self, field_name: str) -> bool:
+        """The mass song is sung at every part that has no better-fitted song of its own (the author's practice),
+        if it has a verified verse for that part."""
+        if self.mass is None:
+            return False
+        return has_verse(getattr(self.snap.songs[self.mass.code], field_name))
+
     def communion(self) -> None:
+        """Own song when a communion rule is prescribed or at least as specific as the mass song; otherwise the
+        mass song continues (not shown); a general communion song only when the mass song can't continue."""
         if self.silenced('communion'):
             return
         cands = self.candidates('communion')
-        verse = self.mass_verse('communion_verses')
-        specific = bool(cands) and (cands[0].strength == 'prescribed' or cands[0].specificity > self.mass_spec)
-        if cands and (specific or verse is None or self.seed('communion/verse') % 2):
+        if cands and (self.mass is None or self._better_fitted(cands[0])):
             self.add_songs('communion', _choose(cands, self.seed('communion')))
-        elif verse is not None:
-            self.add_mass_verse('communion', verse)
+        elif self.covered_by_mass_song('communion_verses'):
+            return
+        elif cands:
+            self.add_songs('communion', _choose(cands, self.seed('communion')))
         else:
             self.add_gap('communion')
 
     def recessional(self) -> None:
         """Prescribed or period-level (and more specific) songs first; then songs from nearby celebrations
-        (Direktář p. 27), which beat the general seasonal list; then the general list or the mass song's verse."""
+        (Direktář p. 27), which beat the general seasonal list; then the general list."""
         if self.silenced('recessional'):
             return
         cands = self.candidates('recessional')
         strong = [e for e in cands if e.strength == 'prescribed' or e.specificity >= SPECIFICITY['period']]
         neighbours = [e for e in cands if e.neighbour]
-        verse = self.mass_verse('recessional_verses')
-        for group in (strong, neighbours):
+        for group in (strong, neighbours, cands):
             if group:
                 self.add_songs('recessional', _choose(group, self.seed('recessional')))
                 return
-        if cands and (verse is None or self.seed('recessional/verse') % 2 == 0):
-            self.add_songs('recessional', _choose(cands, self.seed('recessional')))
-        elif verse is not None:
-            self.add_mass_verse('recessional', verse)
-        else:
+        if not self.covered_by_mass_song('recessional_verses'):
             self.add_gap('recessional')
 
     def special_parts(self) -> None:
@@ -252,6 +244,8 @@ class _Planner:
             if part in handled or self.silenced(part):
                 continue
             cands = self.candidates(part)
+            if part in OCCASIONAL_PARTS:
+                cands = [e for e in cands if e.strength == 'prescribed' or e.specificity >= SPECIFICITY['category']]
             if cands:
                 self.add_songs(part, _choose(cands, self.seed(part)))
 

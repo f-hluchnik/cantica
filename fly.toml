@@ -1,9 +1,9 @@
 # Production: https://directuscantica.cz
 # Secrets (set once): fly secrets set SECRET_KEY=... [SENTRY_DSN=...]
-# Volume (create once): fly volumes create cantica_data --region fra --size 1
+# Volume (create once): fly volumes create cantica_data --region ams --size 1
 
 app = 'directus-cantica'
-primary_region = 'fra'
+primary_region = 'ams'
 console_command = 'gosu appuser python /app/manage.py shell'
 
 [build]

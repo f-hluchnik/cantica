@@ -17,6 +17,7 @@ PERIODS = Periods.loads("""
 SONGS = [
     SongInfo('523', 'Ty jsi, Pane', 'mass_general', mass_song=True, communion_verses='4', recessional_verses='*'),
     SongInfo('512', 'Bože, před tvou velebností', 'mass_general', mass_song=True),
+    SongInfo('516', 'Bez sloky k přijímání', 'misc', mass_song=True, communion_verses='-', recessional_verses='-'),
     SongInfo('510A', 'Pokrop mě yzopem', 'mass_general', mass_song=False),
     SongInfo('712', 'Klaním se ti vroucně', 'jesus', communion_verses='*'),
     SongInfo('714', 'Ó pokrme pocestných', 'jesus'),
@@ -110,7 +111,7 @@ class MatchingTests(unittest.TestCase):
 
 class ResolutionTests(unittest.TestCase):
     def test_general_day(self) -> None:
-        parts, _ = resolve_mass(snap(), ctx(), occ())
+        parts, *_ = resolve_mass(snap(), ctx(), occ())
         by = {p.part: p for p in parts}
         self.assertEqual(codes(by['mass']), ['512', '523'])  # 510A has mass_song = False
         self.assertEqual(codes(by['communion']), ['712'])
@@ -126,11 +127,11 @@ class ResolutionTests(unittest.TestCase):
         ]
         day = date(2027, 5, 12)
         feria = occ('Středa', None, '3.13')
-        parts, _ = resolve_mass(snap(*rules), ctx(day, feria, season='easter'), feria)
+        parts, *_ = resolve_mass(snap(*rules), ctx(day, feria, season='easter'), feria)
         self.assertEqual(codes(parts[0]), ['523'])  # 805 avoided in May
-        self.assertIn('Mariánské písně po mši.', parts[0].notes)
+        self.assertIn('Mariánské písně po mši.', parts[0].general_notes)  # ● note: shown for the day
         marian = occ('Panny Marie Fatimské', 'pm', '3.12', 'nezávazná památka', frozenset({'virgin_mary'}))
-        parts, _ = resolve_mass(snap(*rules), ctx(day, marian, season='easter'), marian)
+        parts, *_ = resolve_mass(snap(*rules), ctx(day, marian, season='easter'), marian)
         self.assertEqual(codes(parts[0]), ['805', '523'])  # ■ rule outranks the period avoid
         self.assertEqual(parts[0].entries[0].tier, '■')
 
@@ -141,7 +142,7 @@ class ResolutionTests(unittest.TestCase):
             RuleInfo('pres', ('mass',), strength='prescribed', targets=parse_targets('512'), season='ordinary'),
         ]
         o = occ('C', 'c', '3.1', 'památka')
-        parts, _ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), o), o)
+        parts, *_ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), o), o)
         self.assertEqual(codes(parts[0]), ['512', '523', '828'])
 
     def test_merge_keeps_best_and_collects_reasons(self) -> None:
@@ -150,7 +151,7 @@ class ResolutionTests(unittest.TestCase):
             RuleInfo('specific', ('mass',), targets=parse_targets('523'), celebration='c', page=38),
         ]
         o = occ('C', 'c', '3.1', 'památka')
-        parts, _ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), o), o)
+        parts, *_ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), o), o)
         first = parts[0].entries[0]
         self.assertEqual((first.code, first.tier), ('523', '▲'))
         self.assertEqual([r.source for r in first.reasons], ['Direktář s. 38', 'Direktář s. 25'])
@@ -163,10 +164,10 @@ class ResolutionTests(unittest.TestCase):
             RuleInfo('own', ('mass',), targets=parse_targets('805'), celebration='c'),
         ]
         plain = occ('Sv. X', 'x', '3.1', 'památka', frozenset({'saint', 'martyr'}))
-        parts, _ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), plain), plain)
+        parts, *_ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), plain), plain)
         self.assertEqual(sorted(codes(parts[0])), ['827', '828', '829'])  # same tier: the fallback stays
         own = occ('Sv. C', 'c', '3.1', 'památka', frozenset({'saint', 'martyr'}))
-        parts, _ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), own), own)
+        parts, *_ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), own), own)
         self.assertEqual(codes(parts[0]), ['805', '827'])  # own ▲ song: 828/829 dropped, the martyr song stays
 
     def test_silence(self) -> None:
@@ -175,7 +176,7 @@ class ResolutionTests(unittest.TestCase):
             RuleInfo('quiet', ('entrance',), kind='silence', celebration='gf', note='Při vstupu se nic nezpívá.'),
         ]
         o = occ('Velký pátek', 'gf', '1.1', 'Velikonoční triduum')
-        parts, _ = resolve_mass(snap(*rules), ctx(date(2027, 3, 26), o, season='lent'), o)
+        parts, *_ = resolve_mass(snap(*rules), ctx(date(2027, 3, 26), o, season='lent'), o)
         by = {p.part: p for p in parts}
         self.assertTrue(by['entrance'].silenced)
         self.assertEqual(codes(by['entrance']), [])
@@ -188,7 +189,7 @@ class ResolutionTests(unittest.TestCase):
             NeighbourCtx(date(2027, 7, 5), 'Sv. Cyrila a Metoděje', 'cm', Decimal('1.4')),
             NeighbourCtx(date(2027, 7, 20), 'Daleko', 'cm', Decimal('1.4')),  # outside the window
         )
-        parts, _ = resolve_mass(snap(*rules), ctx(day, neighbours=neighbours), occ())
+        parts, *_ = resolve_mass(snap(*rules), ctx(day, neighbours=neighbours), occ())
         recessional = {p.part: p for p in parts}['recessional']
         self.assertEqual(codes(recessional), ['828', '829', '930A'])
         self.assertIn('ze svátku Sv. Cyrila a Metoděje (po 5. 7.)', recessional.entries[0].reasons[0].text())
@@ -199,7 +200,7 @@ class PlanTests(unittest.TestCase):
         o = o or occ()
         c = ctx(day, o, **kw)
         s = snap(*rules)
-        parts, _ = resolve_mass(s, c, o)
+        parts, *_ = resolve_mass(s, c, o)
         return build_plan({p.part: p for p in parts}, s, c, o)
 
     def test_prescribed_mass_songs_all_used(self) -> None:
@@ -222,16 +223,17 @@ class PlanTests(unittest.TestCase):
         communion = next(e for e in plan if e.part == 'communion')
         self.assertEqual((communion.kind, communion.songs[0].code), ('songs', '714'))
 
-    def test_mass_verse_when_no_other_communion(self) -> None:
-        rules = [RuleInfo('m', ('mass',), targets=parse_targets('523'), season='ordinary')]
+    def test_mass_song_continues_where_nothing_fits_better(self) -> None:
+        rules = [RuleInfo('m', ('mass',), targets=parse_targets('523'), season='ordinary'),
+                 RuleInfo('c', ('communion',), targets=parse_targets('714'), season='ordinary')]
         plan = self._plan(rules)
-        communion = next(e for e in plan if e.part == 'communion')
-        self.assertEqual((communion.kind, communion.songs[0].code, communion.songs[0].verses), ('mass_verse', '523', '4'))
-        recessional = next(e for e in plan if e.part == 'recessional')
-        self.assertEqual((recessional.kind, recessional.songs[0].verses), ('mass_verse', ''))  # '*' shows no hint
+        self.assertEqual([e.part for e in plan], ['mass'])  # 523 is sung at communion too: not repeated
+        rules[1] = RuleInfo('c', ('communion',), targets=parse_targets('714'), celebration='x')
+        plan = self._plan(rules, occ('Sv. X', 'x', '3.1', 'památka'))
+        self.assertEqual([e.part for e in plan], ['mass', 'communion'])  # a better-fitted (▲) communion song
 
     def test_gaps_are_visible(self) -> None:
-        plan = self._plan([RuleInfo('m', ('mass',), targets=parse_targets('512'), season='ordinary')])
+        plan = self._plan([RuleInfo('m', ('mass',), targets=parse_targets('516'), season='ordinary')])
         self.assertEqual([(e.part, e.kind) for e in plan], [('mass', 'songs'), ('communion', 'gap'),
                                                              ('recessional', 'gap')])
 
@@ -273,7 +275,7 @@ class RecommendTests(unittest.TestCase):
         self.assertNotEqual(last, now)
         result = recommend(current, s).masses[0]
         self.assertTrue(result.gap)  # memorial without ▲/■ recommendations
-        self.assertEqual(result.summary[0].kind, 'song')
+        self.assertEqual(result.summary, [])  # single ● songs only steer the plan
 
     def test_commemorations_are_not_masses(self) -> None:
         c = ctx(date(2027, 12, 21), occ('21. prosince', None, '2.9'), occ('Sv. Petra Kanisia', 'pk', '4.0', 'připomínka'),

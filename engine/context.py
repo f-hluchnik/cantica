@@ -6,14 +6,40 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import date, timedelta
+from decimal import Decimal
 
 from engine.model import DayCtx, NeighbourCtx, OccurrenceCtx
-from liturgy.days import BuiltDay
+from liturgy.constants import RANK_VOTIVE
+from liturgy.days import BuiltDay, BuiltOccurrence
 
 NEIGHBOUR_WINDOW = 7
 
 
+FIRST_FRIDAY_KEY = 'prvni-patek'
+FIRST_FRIDAY_TITLE = 'První pátek v měsíci – votivní mše o Nejsvětějším Srdci Ježíšově'
+VOTIVE_ALLOWED_FROM = Decimal('3.12')  # only ferias and optional memorials leave room for a votive mass
+
+
+def first_friday_votive(day: BuiltDay) -> BuiltOccurrence | None:
+    """The customary votive mass of the first Friday: weekdays of Ordinary Time only (votive masses are not
+    said in the strong seasons), and only when no obligatory memorial or higher celebration occurs."""
+    if day.date.weekday() != 4 or day.date.day > 7 or day.season != 'ordinary':
+        return None
+    if any(o.is_mass_option and o.rank_num < VOTIVE_ALLOWED_FROM for o in day.occurrences):
+        return None
+    return BuiltOccurrence(
+        position=max((o.position for o in day.occurrences), default=0) + 1,
+        title=FIRST_FRIDAY_TITLE,
+        rank_label=RANK_VOTIVE,
+        rank_num=Decimal('3.13'),
+        colour='white',
+        celebration_key=FIRST_FRIDAY_KEY,
+    )
+
+
 def occurrence_ctx(day: BuiltDay, categories: Mapping[str, frozenset[str]]) -> tuple[OccurrenceCtx, ...]:
+    votive = first_friday_votive(day)
+    occurrences = (*day.occurrences, votive) if votive else day.occurrences
     return tuple(
         OccurrenceCtx(
             title=o.title,
@@ -24,7 +50,7 @@ def occurrence_ctx(day: BuiltDay, categories: Mapping[str, frozenset[str]]) -> t
             categories=categories.get(o.celebration_key, frozenset()) if o.celebration_key else frozenset(),
             position=o.position,
         )
-        for o in day.occurrences
+        for o in occurrences
     )
 
 

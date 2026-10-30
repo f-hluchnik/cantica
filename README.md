@@ -98,6 +98,9 @@ The engine (`engine/`, pure Python) turns the day's calendar + rules into, per m
 their tier and source, the always-visible summary, and *detailní doporučení* (one deterministic combination
 that changes from week to week). Design: §7–8 of the design doc.
 
+JSON: `/api/v1/days/2026-12-24.json?dieceze=olm` returns the same recommendations as the day page (unstable
+until v2.1). The day page swaps days in place via `?fragment=1` (plain links still work without JS).
+
 Occasions (křest, svatba, pohřeb, …; Direktář pp. 47–48) are rules with the `occasion` scope. They never
 apply to a calendar day and are shown on `/prilezitosti/<key>/`.
 
@@ -126,6 +129,23 @@ Tests: `tests/book/` runs the real engine on the committed data without Django (
 Upgrading an instance that already has curated data (e.g. the test instance after M2 → M3): `--if-empty` does
 nothing there, so load the new file once with
 `fly ssh console --app <app> -C "gosu appuser python /app/manage.py curation_import"`.
+
+Moving an app to another region (e.g. fra → ams; `primary_region` in the toml files is already `ams`).
+A volume can't move, so the machine is cloned with a new volume and the old one is removed:
+
+```sh
+fly volumes list --app directus-cantica                      # note the old volume id
+fly volumes snapshots create <old_volume_id>                 # fresh snapshot: keeps admin users and unexported edits
+fly machine list --app directus-cantica                      # note the machine id
+fly machine clone <machine_id> --region ams --from-snapshot last --app directus-cantica
+#   if restoring the snapshot in another region is refused, clone without --from-snapshot: the new volume is
+#   empty, start.sh rebuilds the calendar and imports data/curated/curation.yaml; then create the admin again
+#   (fly ssh console -C "gosu appuser python /app/manage.py createsuperuser"). Export unexported admin edits first.
+fly machine destroy <machine_id> --force --app directus-cantica   # the old one in fra
+fly volumes destroy <old_volume_id> --app directus-cantica
+```
+
+Volumes are billed by provisioned size ($0.15/GB/month); 1 GB is the smallest size Fly offers.
 
 One-time setup:
 - per Fly app: `fly volumes create …`, `fly secrets set SECRET_KEY=…` (see the comments in the toml files);

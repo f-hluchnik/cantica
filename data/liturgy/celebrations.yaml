@@ -527,6 +527,11 @@
   categories:
   - lord
   categories_reviewed: true
+- key: prvni-patek
+  name: První pátek v měsíci
+  aliases: []
+  categories: []
+  categories_reviewed: true
 - key: seslani-ducha-svateho
   name: Seslání Ducha svatého
   aliases: []

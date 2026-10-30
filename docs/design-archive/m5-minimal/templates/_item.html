@@ -1,0 +1,8 @@
+<div class="item{% if item.strength == 'alternative' %} is-alternative{% endif %}">
+    <span class="tier {% if item.tier == '▲' %}tier-celebration{% elif item.tier == '■' %}tier-category{% else %}tier-general{% endif %}" title="{% if item.tier == '▲' %}píseň podle svátku{% elif item.tier == '■' %}píseň podle typu svátku{% else %}obecné doporučení{% endif %}">{{ item.tier }}</span>
+    <span class="what">
+        {% if item.kind == 'song' %}{% for song in item.songs %}<span class="song-wrap">{% include 'web/_song.html' %}</span>{% endfor %}{% else %}<span class="group">{{ item.label }}</span>{% endif %}
+        {% if item.strength == 'prescribed' %}<span class="tag">předepsáno</span>{% endif %}
+        {% include 'web/_sources.html' with reasons=item.shown_reasons %}
+    </span>
+</div>

@@ -2,7 +2,7 @@ from datetime import date
 
 from django.urls import path, register_converter
 
-from web import views
+from web import api, views
 
 
 class IsoDateConverter:
@@ -23,6 +23,7 @@ urlpatterns = [
     path('prilezitosti/', views.occasions_page, name='occasions'),
     path('prilezitosti/<slug:key>/', views.occasions_page, name='occasion'),
     path('o-aplikaci/', views.about_page, name='about'),
+    path('api/v1/days/<isodate:day>.json', api.day_json, name='api_day'),
     path('health', views.health_check, name='health'),
     # /live is answered by web.middleware.LiveMiddleware
 ]

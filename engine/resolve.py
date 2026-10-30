@@ -11,6 +11,7 @@ from engine.vocab import (
     NEIGHBOUR_MAX_RANK,
     PART_INDEX,
     PART_LABELS,
+    SPECIFICITY,
     STRENGTH_RANK,
     WEEKDAY_ABBR,
     tier,
@@ -28,8 +29,18 @@ class Reason:
     neighbour: str = ''  # 'ze svátku sv. Cyrila a Metoděje (po 5. 7.)'
 
     def text(self) -> str:
-        parts = [self.neighbour, self.source, self.note]
-        return ' · '.join(p for p in parts if p)
+        """'Direktář s. 17: Příchod Krista na konci věků.' - the note always belongs to its own source."""
+        head = f'{self.neighbour}, {self.source}' if self.neighbour else self.source
+        return f'{head}: {self.note}' if self.note else head
+
+
+def shown_reasons(reasons: list[Reason]) -> list[Reason]:
+    """For display: the deciding reason, plus further ones only when they say something (a note)."""
+    shown: list[Reason] = []
+    for index, reason in enumerate(reasons):
+        if (index == 0 or reason.note) and all(r.text() != reason.text() for r in shown):
+            shown.append(reason)
+    return shown
 
 
 @dataclass(frozen=True)
@@ -82,10 +93,15 @@ class Item:
     tier: str
     strength: str
     reasons: list[Reason]
+    primary: bool = True  # the rule's first target ('@mesni_obecne' of '@mesni_obecne, @k_panu_jezisi_mesni')
 
     @property
     def part_label(self) -> str:
         return PART_LABELS[self.part]
+
+    @property
+    def shown_reasons(self) -> list[Reason]:
+        return shown_reasons(self.reasons)
 
 
 @dataclass
@@ -95,6 +111,7 @@ class PartResult:
     items: list[Item]
     notes: list[str]
     silenced: bool = False
+    general_notes: list[str] = field(default_factory=list)  # from ● rules: shown once for the day, not per part
 
     @property
     def label(self) -> str:
@@ -146,10 +163,15 @@ def _song_ref(song: SongInfo, verses: str) -> SongRef:
     return SongRef(code=song.code, title=song.title, verses=verses, url=song.url)
 
 
-def _avoided(part_rules: list[RuleInfo], snap: Snapshot) -> tuple[dict[str, int], list[str]]:
+def is_general(rule: RuleInfo) -> bool:
+    """● rules (period, season, global): their notes describe the day or the season, not one celebration."""
+    return rule.specificity <= SPECIFICITY['period']
+
+
+def _avoided(part_rules: list[RuleInfo], snap: Snapshot) -> tuple[dict[str, int], list[tuple[RuleInfo, str]]]:
     """code -> highest specificity of an avoid rule hitting it; plus the notes of avoid rules that hit."""
     avoided: dict[str, int] = {}
-    notes: list[str] = []
+    notes: list[tuple[RuleInfo, str]] = []
     for rule in part_rules:
         if rule.kind != 'songs' or rule.strength != 'avoid':
             continue
@@ -157,7 +179,7 @@ def _avoided(part_rules: list[RuleInfo], snap: Snapshot) -> tuple[dict[str, int]
         for code in codes:
             avoided[code] = max(avoided.get(code, 0), rule.specificity)
         if codes and rule.note:
-            notes.append(rule.note)
+            notes.append((rule, rule.note))
     return avoided, notes
 
 
@@ -190,7 +212,16 @@ def _is_neighbour(rule: RuleInfo, nb: NeighbourCtx, ctx: DayCtx, occ: Occurrence
     )
 
 
+def _takes_neighbours(ctx: DayCtx, occ: OccurrenceCtx) -> bool:
+    """A feast or solemnity (and All Souls) has its own character: no závěr borrowed from another feast."""
+    if occ.rank_label in (RANK_FEAST, RANK_SOLEMNITY) or is_all_souls(ctx.date, occ.rank_label, occ.title):
+        return False
+    return not (occ.rank_label == RANK_PRIMARY and is_solemnity(ctx.date, occ.rank_label, occ.title))
+
+
 def _neighbour_entries(rule: RuleInfo, ctx: DayCtx, occ: OccurrenceCtx, snap: Snapshot) -> list[Entry]:
+    if not _takes_neighbours(ctx, occ):
+        return []
     entries = []
     for nb in ctx.neighbours:
         if not _is_neighbour(rule, nb, ctx, occ):
@@ -210,6 +241,10 @@ def _merge(entries: list[Entry]) -> list[Entry]:
         if best is None:
             merged[entry.code] = entry
             continue
+        # 910 předepsáno for the unity week (●) and recommended by the day's own rule (▲): ▲ předepsáno.
+        # A 'možno též' mention does not lift a song's tier.
+        if STRENGTH_RANK[entry.strength] >= STRENGTH_RANK['recommended']:
+            best.specificity = max(best.specificity, entry.specificity)
         for reason in entry.reasons:
             if reason not in best.reasons:
                 best.reasons.append(reason)
@@ -220,8 +255,10 @@ def resolve_part(part: str, rules: list[RuleInfo], snap: Snapshot, ctx: DayCtx, 
     part_rules = [r for r in rules if part in r.parts]
     silence = [r for r in part_rules if r.kind == 'silence']
     silence_spec = max((r.specificity for r in silence), default=0)
-    notes = [r.note for r in part_rules if r.kind in ('note', 'silence') and r.note]
     avoided, avoid_notes = _avoided(part_rules, snap)
+    noted = [(r, r.note) for r in part_rules if r.kind in ('note', 'silence') and r.note] + avoid_notes
+    notes = [n for r, n in noted if r.kind == 'silence' or not is_general(r)]
+    general_notes = [n for r, n in noted if r.kind != 'silence' and is_general(r)]
 
     entries: list[Entry] = []
     for rule in part_rules:
@@ -242,8 +279,9 @@ def resolve_part(part: str, rules: list[RuleInfo], snap: Snapshot, ctx: DayCtx, 
         part=part,
         entries=ordered,
         items=_items(part, ordered, snap),
-        notes=list(dict.fromkeys(notes + avoid_notes)),
+        notes=list(dict.fromkeys(notes)),
         silenced=bool(silence),
+        general_notes=list(dict.fromkeys(general_notes)),
     )
 
 
@@ -258,12 +296,12 @@ def _items(part: str, entries: list[Entry], snap: Snapshot) -> list[Item]:
         shown.add(number_of(entry.code))
         song = snap.songs[entry.code]
         target = entry.target
-        if target is not None and target.kind in ('group', 'section', 'range'):
+        if target is not None and _is_collection(target):
             key = (entry.rule.id, entry.target_index)
             item = grouped.get(key)
             if item is None:
                 item = Item(part, 'group', _target_label(target, snap), [], entry.tier, entry.strength,
-                            list(entry.reasons))
+                            list(entry.reasons), primary=entry.target_index == 0)
                 grouped[key] = item
                 items.append(item)
             item.songs.append(_song_ref(song, entry.verses))
@@ -271,6 +309,20 @@ def _items(part: str, entries: list[Entry], snap: Snapshot) -> list[Item]:
             items.append(Item(part, 'song', song.title, [_song_ref(song, entry.verses)], entry.tier, entry.strength,
                               list(entry.reasons)))
     return items
+
+
+SHORT_RANGE = 5  # 821-823, 921-925: shown as songs; longer ranges (781-798) as one item
+
+
+def _is_collection(target: Target) -> bool:
+    if target.kind in ('group', 'section'):
+        return True
+    if target.kind != 'range':
+        return False
+    try:
+        return int(target.ref_end) - int(target.ref) + 1 > SHORT_RANGE
+    except ValueError:
+        return True
 
 
 def _target_label(target: Target, snap: Snapshot) -> str:
@@ -282,15 +334,17 @@ def _target_label(target: Target, snap: Snapshot) -> str:
     return f'{target.ref}–{target.ref_end}'
 
 
-def resolve_mass(snap: Snapshot, ctx: DayCtx, occ: OccurrenceCtx) -> tuple[list[PartResult], list[str]]:
-    """(parts with something to say, mass-level notes)."""
+def resolve_mass(snap: Snapshot, ctx: DayCtx, occ: OccurrenceCtx) -> tuple[list[PartResult], list[str], list[str]]:
+    """(parts with something to say, mass-level notes of ▲/■ rules, mass-level notes of ● rules)."""
     rules = matching_rules(snap, ctx, occ)
-    mass_notes = [r.note for r in rules if r.kind == 'note' and not r.parts and r.note]
+    mass_rules = [r for r in rules if r.kind == 'note' and not r.parts and r.note]
     parts = []
     for part in sorted({p for r in rules for p in r.parts}, key=lambda p: PART_INDEX.get(p, 99)):
         if part not in PART_INDEX:
             continue
         result = resolve_part(part, rules, snap, ctx, occ)
-        if result.entries or result.notes or result.silenced:
+        if result.entries or result.notes or result.silenced or result.general_notes:
             parts.append(result)
-    return parts, list(dict.fromkeys(mass_notes))
+    notes = list(dict.fromkeys(r.note for r in mass_rules if not is_general(r)))
+    general = list(dict.fromkeys(r.note for r in mass_rules if is_general(r)))
+    return parts, notes, general

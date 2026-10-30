@@ -1,0 +1,55 @@
+{% extends 'web/base.html' %}
+
+{% block title %}O aplikaci – Directus Cantica{% endblock %}
+
+{% block content %}
+<article class="prose">
+    <h1>O aplikaci</h1>
+    <p>
+        Directus Cantica je online direktář, který varhaníkům pomáhá vybírat písně z&nbsp;Kancionálu.
+        Doporučení vycházejí z&nbsp;<em>Direktáře pro varhaníky</em>: podle konkrétního svátku, typu svátku
+        a&nbsp;liturgické doby. U&nbsp;každého doporučení víme, odkud pochází, a&nbsp;kde Direktář nic neuvádí,
+        řekneme to otevřeně.
+    </p>
+
+    <h2>Jak číst doporučení</h2>
+    <ul class="plain">
+        <li><span class="tier tier-celebration">▲</span> píseň, kterou Direktář uvádí přímo pro daný svátek,</li>
+        <li><span class="tier tier-category">■</span> píseň podle typu svátku (mariánský, mučedníci, duchovní pastýři…),</li>
+        <li><span class="tier tier-general">●</span> obecné doporučení pro liturgickou dobu.</li>
+    </ul>
+    <p>
+        Nejdřív uvádíme všechny vhodné písně. <strong>Detailní doporučení</strong> je jedna z&nbsp;možných sestav
+        podle Direktáře – výběr je vždy na vás. Mešní píseň se zpívá i&nbsp;při těch částech mše, pro které
+        není uvedena vhodnější píseň; proto ji u&nbsp;nich znovu neopakujeme. Sestava se každý týden trochu obmění.
+    </p>
+    <p>
+        Přepínač <strong>zdroje</strong> ukáže u&nbsp;každé písně, odkud doporučení pochází (strana Direktáře nebo
+        doporučení autora) a&nbsp;případnou poznámku z&nbsp;Direktáře.
+    </p>
+    <p>
+        V&nbsp;sobotu a&nbsp;24.&nbsp;prosince ukazujeme pod dnem i&nbsp;večerní mši z&nbsp;následujícího dne.
+        Na první pátek v&nbsp;měsíci (v&nbsp;liturgickém mezidobí, pokud nepřipadne památka či svátek) nabízíme
+        také votivní mši o&nbsp;Nejsvětějším Srdci Ježíšově.
+    </p>
+
+    <h2>Odkud bereme data</h2>
+    <p>
+        Liturgický kalendář přebíráme ze služby <a href="http://calapi.inadiutorium.cz/">Church Calendar API</a>,
+        písně odkazují na <a href="https://kancional.cz/">kancional.cz</a>. Data jsou k&nbsp;dispozici také
+        ve formátu JSON (např. <code>/api/v1/days/{{ example_day|default:"2026-12-24" }}.json?dieceze=olm</code>);
+        rozhraní se ještě může měnit.
+    </p>
+
+    <h2>Soukromí</h2>
+    <p class="small">
+        Vyberete-li diecézi, uložíme volbu do cookie <code>dieceze</code>, abychom vám příště ukázali její kalendář.
+        Nastavení přepínače „zdroje“ si pamatuje váš prohlížeč (localStorage). Nic dalšího neukládáme.
+        Návštěvnost měříme službou Umami, která cookies nepoužívá.
+    </p>
+
+    <h2>Podpora</h2>
+    <p>Pokud vám aplikace pomáhá, budu rád, když podpoříte její vývoj a&nbsp;provoz.</p>
+    <p><a class="btn" href="https://www.buymeacoffee.com/f.hluchnik" target="_blank" rel="noopener">Podpořit na Buy Me a&nbsp;Coffee</a></p>
+</article>
+{% endblock %}

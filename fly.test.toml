@@ -1,11 +1,11 @@
 # Test instance: https://test.directuscantica.cz  (deploy: fly deploy -c fly.test.toml)
 # Create once:  fly apps create directus-cantica-test
-#               fly volumes create cantica_test_data --app directus-cantica-test --region fra --size 1
+#               fly volumes create cantica_test_data --app directus-cantica-test --region ams --size 1
 #               fly secrets set --app directus-cantica-test SECRET_KEY=...
 #               fly certs add test.directuscantica.cz --app directus-cantica-test
 
 app = 'directus-cantica-test'
-primary_region = 'fra'
+primary_region = 'ams'
 console_command = 'gosu appuser python /app/manage.py shell'
 
 [build]

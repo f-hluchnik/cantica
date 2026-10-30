@@ -3,23 +3,45 @@
 {% block title %}O aplikaci – Directus Cantica{% endblock %}
 
 {% block content %}
-<section class="about">
+<article class="about">
     <h1>O aplikaci</h1>
     <p>
-        Directus Cantica je online direktář vytvořený pro pomoc varhaníkům při výběru liturgických písní.
-        Doporučuje vhodné písně z Kancionálu podle konkrétních svátků, typu svátků a&nbsp;liturgického období,
-        a to podle pravidel uvedených v&nbsp;Direktáři pro varhaníky. U&nbsp;každého doporučení uvádíme, odkud pochází;
-        kde Direktář nic neuvádí, řekneme to otevřeně.
+        Directus Cantica je online direktář, který varhaníkům pomáhá vybírat písně z&nbsp;Kancionálu.
+        Doporučení vycházejí z&nbsp;<em>Direktáře pro varhaníky</em>: podle konkrétního svátku, typu svátku
+        a&nbsp;liturgické doby.
     </p>
-    <p>Věříme, že tato aplikace usnadní vaši přípravu na liturgii a&nbsp;přispěje k&nbsp;obohacení liturgického slavení.</p>
-    <p>Liturgický kalendář přebíráme ze služby <a href="http://calapi.inadiutorium.cz/">Church Calendar API</a>; písně odkazují na <a href="https://kancional.cz/">kancional.cz</a>.</p>
-    <p class="small">Soukromí: pokud si vyberete diecézi, uložíme vaši volbu do cookie <code>dieceze</code>, abychom vám příště ukázali její kalendář. Nic jiného do vašeho prohlížeče neukládáme. Návštěvnost měříme službou Umami, která cookies nepoužívá.</p>
-    <p>Pokud se vám aplikace líbí a pomáhá vám, budu rád, když podpoříte její vývoj a provoz prostřednictvím služby Buy Me a Coffee.</p>
-    <div class="buy-me-a-coffee-button">
-        {# TODO(M5): serve the button image locally (design §9.5) #}
-        <a href="https://www.buymeacoffee.com/f.hluchnik" target="_blank" rel="noopener">
-            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 50px; width: auto;">
-        </a>
-    </div>
-</section>
+
+    <h2>Jak číst doporučení</h2>
+    <ul class="plain">
+        <li><span class="tier tier-celebration">▲</span> píseň, kterou Direktář uvádí přímo pro daný svátek,</li>
+        <li><span class="tier tier-category">■</span> píseň podle typu svátku (mariánský, mučedníci, duchovní pastýři…),</li>
+        <li><span class="tier tier-general">●</span> obecné doporučení pro liturgickou dobu.</li>
+    </ul>
+    <p>
+        Nejdřív uvádíme všechny vhodné písně. <strong>Detailní doporučení</strong> je jedna z&nbsp;možných sestav
+        podle Direktáře – výběr je vždy na vás.
+    </p>
+    <p>
+        Přepínač <strong>zobrazit zdroje</strong> ukáže u&nbsp;každé písně, odkud doporučení pochází (strana Direktáře nebo
+        doporučení autora) a&nbsp;případnou poznámku z&nbsp;Direktáře.
+    </p>
+
+    <h2>Odkud bereme data</h2>
+    <p>
+        Liturgický kalendář přebíráme ze služby <a href="http://calapi.inadiutorium.cz/">Church Calendar API</a>,
+        písně odkazují na <a href="https://kancional.cz/">kancional.cz</a>. Data jsou k&nbsp;dispozici také
+        ve formátu JSON (např. <code>/api/v1/days/{{ example_day|default:"2026-12-24" }}.json?dieceze=olm</code>).
+    </p>
+
+    <h2>Soukromí</h2>
+    <p class="small">
+        Vyberete-li diecézi, uložíme volbu do cookie <code>dieceze</code>, abychom vám příště ukázali její kalendář.
+        Nastavení přepínače „zobrazit zdroje“ si pamatuje váš prohlížeč (localStorage). Nic dalšího neukládáme.
+        Návštěvnost měříme službou Umami, která cookies nepoužívá.
+    </p>
+
+    <h2>Podpora</h2>
+    <p>Pokud vám aplikace pomáhá, budu rád, když podpoříte její vývoj a&nbsp;provoz.</p>
+    <p><a class="btn" href="https://www.buymeacoffee.com/f.hluchnik" target="_blank" rel="noopener">Podpořit na Buy Me a&nbsp;Coffee</a></p>
+</article>
 {% endblock %}

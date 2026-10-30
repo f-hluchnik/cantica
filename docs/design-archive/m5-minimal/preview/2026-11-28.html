@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="cs" class="js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>28. 11. 2026 – Directus Cantica</title>
+    <meta name="description" content="Online direktář pro varhaníky: liturgický kalendář a doporučení písní z Kancionálu podle Direktáře pro varhaníky.">
+    <meta name="theme-color" content="#f7f3ed">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/web/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/web/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/web/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/static/web/favicons/site.webmanifest">
+    <style>/* Directus Cantica — v2. Mobile first, system fonts, native controls. */
+:root {
+    --ink: #2b2118;
+    --muted: #7b6b5b;
+    --accent: #6b4e31;
+    --accent-soft: #efe6da;
+    --line: #e4dacd;
+    --bg: #f7f3ed;
+    --card: #fff;
+    --radius: 10px;
+
+    /* liturgical colours (card stripe) */
+    --lit-white: #d9cfb8;
+    --lit-red: #b22222;
+    --lit-green: #3a7d44;
+    --lit-violet: #6a3d8f;
+    --lit-rose: #d98ba6;
+    --lit-black: #222;
+
+    color-scheme: light;
+    accent-color: var(--accent);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+}
+
+a { color: var(--accent); }
+
+h1, h2, h3 { line-height: 1.25; }
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.js .js-hide { display: none; }
+
+/* --- layout ------------------------------------------------------------------------------ */
+
+.site-header, .page, .site-footer {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .25rem 1rem;
+    padding-top: .9rem;
+    padding-bottom: .6rem;
+}
+
+.brand {
+    font-weight: 650;
+    font-size: 1.05rem;
+    letter-spacing: .01em;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.site-nav { display: flex; gap: .9rem; }
+
+.site-nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: .95rem;
+    padding: .2rem 0;
+}
+
+.site-nav a[aria-current="page"] {
+    color: var(--ink);
+    border-bottom: 2px solid var(--accent);
+}
+
+.site-footer {
+    margin-top: 2.5rem;
+    padding-bottom: 2rem;
+    font-size: .8rem;
+    color: var(--muted);
+}
+
+.site-footer p { margin: .4rem 0; }
+
+/* --- controls ------------------------------------------------------------------------------ */
+
+.btn, select, input[type="date"] {
+    font: inherit;
+    font-size: .95rem;
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    min-height: 2.5rem;
+    padding: .35rem .7rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn:hover, select:hover, input[type="date"]:hover { border-color: var(--accent); }
+
+.btn.icon { width: 2.5rem; padding: 0; font-size: 1.4rem; line-height: 1; }
+
+.btn.today.is-today { background: var(--accent-soft); border-color: var(--accent-soft); }
+
+.settings {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin: .25rem 0 1rem;
+}
+
+.diocese-form { display: flex; gap: .4rem; min-width: 0; flex: 1; }
+
+.diocese-form select { min-width: 0; max-width: 100%; flex: 1; }
+
+.sources-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .9rem;
+    color: var(--muted);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.sources-switch input { width: 1.1rem; height: 1.1rem; margin: 0; }
+
+.day-nav {
+    display: flex;
+    gap: .4rem;
+    align-items: center;
+}
+
+.date-form { display: flex; gap: .4rem; flex: 1; min-width: 0; }
+
+.date-form input { flex: 1; min-width: 0; }
+
+/* --- day ------------------------------------------------------------------------------------ */
+
+.day-heading {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 1.1rem 0 .1rem;
+}
+
+.day-heading::first-letter { text-transform: uppercase; }
+
+.season-line { margin: 0 0 1rem; color: var(--muted); font-size: .9rem; }
+
+.day-notes {
+    margin: 0 0 1rem;
+    padding: .6rem .85rem;
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+    color: #5c4a39;
+    font-size: .88rem;
+}
+
+.day-notes p { margin: .2rem 0; }
+
+.hint { color: var(--muted); font-size: .88rem; }
+
+.empty-message { color: var(--muted); padding: 2rem 0; text-align: center; }
+
+.evening-heading {
+    font-size: .95rem;
+    font-weight: 600;
+    margin: 1.75rem 0 .6rem;
+    color: var(--muted);
+}
+
+.evening-heading a { color: inherit; text-decoration: none; }
+.evening-heading a::after { content: " ›"; }
+
+/* --- mass card ----------------------------------------------------------------------------- */
+
+.mass {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--lit-white);
+    border-radius: var(--radius);
+    padding: .9rem 1rem .6rem;
+    margin: 0 0 1rem;
+}
+
+.colour-red { border-left-color: var(--lit-red); }
+.colour-green { border-left-color: var(--lit-green); }
+.colour-violet { border-left-color: var(--lit-violet); }
+.colour-rose { border-left-color: var(--lit-rose); }
+.colour-black { border-left-color: var(--lit-black); }
+
+.mass-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 .25rem; }
+
+.meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .15rem .8rem;
+    margin: 0 0 .6rem;
+    font-size: .85rem;
+    color: var(--muted);
+}
+
+.norm-no { opacity: .75; }
+
+.note { font-size: .9rem; color: #5c4a39; margin: .3rem 0 .6rem; }
+
+/* summary and plan share the "line" layout: part label on the left (or above on phones) */
+
+.summary { margin: .4rem 0 .2rem; }
+
+.line { padding: .35rem 0; }
+
+.line + .line { border-top: 1px solid #f1ebe3; }
+
+.part {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    margin: 0 0 .15rem;
+}
+
+.items { list-style: none; margin: 0; padding: 0; }
+
+.items li + li { margin-top: .15rem; }
+
+.item { display: flex; gap: .5rem; align-items: baseline; }
+
+.item.is-alternative { opacity: .7; }
+
+.tier {
+    flex: none;
+    width: 1.2rem;
+    text-align: center;
+    font-size: 1.05rem;
+    line-height: 1;
+    color: var(--accent);
+}
+
+/* the tiers read as a scale, not as list bullets: strong ▲, ■, light ● */
+.tier-celebration { color: #8a2f1c; }
+.tier-category { color: var(--accent); }
+.tier-general { color: #b9a68f; }
+
+.what { min-width: 0; }
+
+.song { color: var(--ink); text-decoration: none; }
+
+.song-wrap + .song-wrap::before { content: " · "; color: var(--muted); }
+
+.song:hover { color: var(--accent); text-decoration: underline; }
+
+.group { color: var(--ink); }
+
+.verses { color: var(--muted); font-size: .9em; }
+
+.tag {
+    display: inline-block;
+    margin-left: .3rem;
+    padding: 0 .4rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: .75rem;
+    vertical-align: .1em;
+}
+
+.part-note { margin: .2rem 0 0; font-size: .85rem; color: var(--muted); }
+
+.gap { color: var(--muted); }
+
+/* sources: hidden until the switch is on (JS remembers it; :has() makes it work without JS) */
+
+.sources { display: none; }
+
+.show-sources .sources, html:has(#zdroje:checked) .sources {
+    display: block;
+    margin-top: .1rem;
+}
+
+.source { display: block; font-size: .8rem; color: #8a7a6a; }
+
+/* detailní doporučení */
+
+.plan { margin-top: .5rem; border-top: 1px solid var(--line); }
+
+.plan > summary {
+    cursor: pointer;
+    padding: .55rem 0 .3rem;
+    color: var(--accent);
+    font-size: .92rem;
+    list-style-position: inside;
+}
+
+.plan dl { margin: 0 0 .3rem; }
+
+.plan dd { margin: 0; }
+
+.plan-silence em, .plan-gap em { color: var(--muted); font-size: .92rem; }
+
+@media (min-width: 34rem) {
+    .line { display: grid; grid-template-columns: 8.5rem 1fr; column-gap: .75rem; align-items: baseline; }
+    .line-mass { display: block; }
+    .line .part { margin: 0; text-align: right; padding-top: .12rem; }
+    .line .part-note { grid-column: 2; }
+    .plan .line-mass { display: grid; }
+    .day-heading { font-size: 1.5rem; }
+}
+
+/* --- legend, chips, prose ------------------------------------------------------------------- */
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .3rem 1.1rem;
+    font-size: .82rem;
+    color: var(--muted);
+    margin: 1.25rem 0 0;
+}
+
+.legend > span { display: inline-flex; gap: .3rem; align-items: baseline; }
+
+.legend .tier { width: auto; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .8rem 0 1.2rem; }
+
+.chip {
+    padding: .35rem .8rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: .92rem;
+}
+
+.chip[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.prose { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: .5rem 1.1rem 1rem; }
+
+.prose h1 { font-size: 1.35rem; }
+
+.prose h2 { font-size: 1.05rem; margin-top: 1.4rem; }
+
+.prose .plain { list-style: none; padding: 0; }
+
+.prose .plain li { display: flex; gap: .5rem; align-items: baseline; }
+
+.small { font-size: .85rem; color: var(--muted); }
+
+code { font-size: .88em; background: var(--accent-soft); padding: 0 .25rem; border-radius: 4px; }
+
+/* fragment navigation: keep the old content visible but dimmed while loading */
+#day.is-loading { opacity: .55; transition: opacity .15s .1s; }
+</style>
+    
+</head>
+<body>
+    
+    <header class="site-header">
+        <a href="/" class="brand">Directus Cantica</a>
+        <nav class="site-nav" aria-label="hlavní navigace">
+            <a href="/" aria-current="page">kalendář</a>
+            <a href="/prilezitosti/">příležitosti</a>
+            <a href="/o-aplikaci/">o aplikaci</a>
+        </nav>
+    </header>
+    
+
+    <div class="page">
+        
+<div class="settings">
+    <form method="get" class="diocese-form" action="/2026-11-28/">
+        <label for="dieceze" class="visually-hidden">diecéze</label>
+        <select name="dieceze" id="dieceze">
+            
+                <option value="czech" selected>Česká republika (obecný kalendář)</option>
+            
+                <option value="cechy">Čechy (obecně)</option>
+            
+                <option value="morava">Morava (obecně)</option>
+            
+                <option value="pha">Arcidiecéze pražská</option>
+            
+                <option value="ltm">Diecéze litoměřická</option>
+            
+                <option value="hk">Diecéze královéhradecká</option>
+            
+                <option value="cb">Diecéze českobudějovická</option>
+            
+                <option value="plz">Diecéze plzeňská</option>
+            
+                <option value="olm">Arcidiecéze olomoucká</option>
+            
+                <option value="brn">Diecéze brněnská</option>
+            
+                <option value="oo">Diecéze ostravsko-opavská</option>
+            
+        </select>
+        <button type="submit" class="btn js-hide">nastavit</button>
+    </form>
+    <label class="sources-switch"><input type="checkbox" id="zdroje"> zdroje</label>
+</div>
+
+<div id="day"><div class="day-view" data-title="28. 11. 2026 – Directus Cantica" data-url="/2026-11-28/">
+    <nav class="day-nav" aria-label="výběr dne">
+        <a class="btn icon" href="/2026-11-27/" data-nav aria-label="předchozí den">&#8249;</a>
+        <form method="get" class="date-form" action="/">
+            <input type="date" name="datum" value="2026-11-28" aria-label="datum">
+            <button type="submit" class="btn js-hide">zobrazit</button>
+        </form>
+        <a class="btn icon" href="/2026-11-29/" data-nav aria-label="následující den">&#8250;</a>
+        <a class="btn today" href="/" data-nav>dnes</a>
+    </nav>
+
+    <h1 class="day-heading">sobota 28. listopadu 2026</h1>
+
+    
+        <p class="season-line">
+            liturgické mezidobí · 34. týden
+            · cyklus A/II
+        </p>
+
+        
+
+        
+            <p class="hint">Tento den lze slavit mši z kteréhokoli z uvedených formulářů.</p>
+        
+
+        <article class="mass colour-white">
+    <h2 class="mass-title">Sobotní památka Panny Marie</h2>
+    <p class="meta">
+        <span>nezávazná památka</span>
+        <span>barva bílá</span>
+        <span class="norm norm-no">Sláva na výsostech: ne</span>
+        <span class="norm norm-no">Věřím: ne</span>
+    </p>
+    
+    
+
+    
+        <div class="summary">
+            
+                <div class="line line-mass">
+                    
+                    <ul class="items">
+                        <li><div class="item">
+    <span class="tier tier-category" title="píseň podle typu svátku">■</span>
+    <span class="what">
+        <span class="group">mariánské písně</span>
+        
+        <span class="sources"><span class="source">Direktář s. 8</span></span>
+    </span>
+</div>
+</li><li><div class="item">
+    <span class="tier tier-general" title="obecné doporučení">●</span>
+    <span class="what">
+        <span class="group">mešní písně obecné</span>
+        
+        <span class="sources"><span class="source">Direktář s. 25</span></span>
+    </span>
+</div>
+</li><li><div class="item">
+    <span class="tier tier-general" title="obecné doporučení">●</span>
+    <span class="what">
+        <span class="group">písně k Pánu Ježíši pro mši</span>
+        
+        <span class="sources"><span class="source">Direktář s. 25</span></span>
+    </span>
+</div>
+</li><li><div class="item">
+    <span class="tier tier-general" title="obecné doporučení">●</span>
+    <span class="what">
+        <span class="group">příležitostné písně pro mši</span>
+        
+        <span class="sources"><span class="source">Direktář s. 25</span></span>
+    </span>
+</div>
+</li>
+                    </ul>
+                </div>
+            
+                <div class="line line-thanksgiving">
+                    <div class="part">díkůvzdání po přijímání</div>
+                    <ul class="items">
+                        <li><div class="item">
+    <span class="tier tier-category" title="píseň podle typu svátku">■</span>
+    <span class="what">
+        <span class="song-wrap"><a href="https://kancional.cz/813A" class="song" target="_blank" rel="noopener">813A: Velebí má duše Hospodina</a></span>
+        
+        <span class="sources"><span class="source">Direktář s. 8</span></span>
+    </span>
+</div>
+</li>
+                    </ul>
+                </div>
+            
+        </div>
+    
+    
+
+    
+        <details class="plan" open>
+            <summary>detailní doporučení</summary>
+            <dl>
+                
+                    <div class="line line-mass plan-songs">
+                        <dt class="part">mešní píseň</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-category" title="píseň podle typu svátku">■</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/811" class="song" target="_blank" rel="noopener">811: Slyš, jaký to nad řekou</a>
+                                        <span class="sources"><span class="source">Direktář s. 8</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+                    <div class="line line-communion plan-songs">
+                        <dt class="part">k přijímání</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-general" title="obecné doporučení">●</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/788" class="song" target="_blank" rel="noopener">788: Srdce Páně, archo spásy</a>
+                                        <span class="sources"><span class="source">Direktář s. 9</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+                    <div class="line line-thanksgiving plan-songs">
+                        <dt class="part">díkůvzdání po přijímání</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-category" title="píseň podle typu svátku">■</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/813A" class="song" target="_blank" rel="noopener">813A: Velebí má duše Hospodina</a>
+                                        <span class="sources"><span class="source">Direktář s. 8</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+                    <div class="line line-recessional plan-songs">
+                        <dt class="part">na závěr</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-general" title="obecné doporučení">●</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/707" class="song" target="_blank" rel="noopener">707: Ježíši, Králi</a>
+                                        <span class="sources"><span class="source">ze svátku Ježíše Krista krále (ne 22. 11.), Direktář s. 10</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+            </dl>
+        </details>
+    
+</article>
+<article class="mass colour-green">
+    <h2 class="mass-title">Sobota 34. týdne v mezidobí</h2>
+    <p class="meta">
+        
+        <span>barva zelená</span>
+        <span class="norm norm-no">Sláva na výsostech: ne</span>
+        <span class="norm norm-no">Věřím: ne</span>
+    </p>
+    
+    
+
+    
+        <div class="summary">
+            
+                <div class="line line-mass">
+                    
+                    <ul class="items">
+                        <li><div class="item">
+    <span class="tier tier-general" title="obecné doporučení">●</span>
+    <span class="what">
+        <span class="group">mešní písně obecné</span>
+        
+        <span class="sources"><span class="source">Direktář s. 25</span></span>
+    </span>
+</div>
+</li><li><div class="item">
+    <span class="tier tier-general" title="obecné doporučení">●</span>
+    <span class="what">
+        <span class="group">písně k Pánu Ježíši pro mši</span>
+        
+        <span class="sources"><span class="source">Direktář s. 25</span></span>
+    </span>
+</div>
+</li><li><div class="item">
+    <span class="tier tier-general" title="obecné doporučení">●</span>
+    <span class="what">
+        <span class="group">příležitostné písně pro mši</span>
+        
+        <span class="sources"><span class="source">Direktář s. 25</span></span>
+    </span>
+</div>
+</li>
+                    </ul>
+                </div>
+            
+        </div>
+    
+    
+
+    
+        <details class="plan" open>
+            <summary>detailní doporučení</summary>
+            <dl>
+                
+                    <div class="line line-mass plan-songs">
+                        <dt class="part">mešní píseň</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-general" title="obecné doporučení">●</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/519" class="song" target="_blank" rel="noopener">519: Buďte bdělí</a>
+                                        <span class="sources"><span class="source">Direktář s. 27: Eschatologický charakter posledního týdne mezidobí.</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+                    <div class="line line-thanksgiving plan-songs">
+                        <dt class="part">díkůvzdání po přijímání</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-general" title="obecné doporučení">●</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/929" class="song" target="_blank" rel="noopener">929: Vezmi si, Pane</a>
+                                        <span class="sources"><span class="source">Direktář s. 25</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+                    <div class="line line-recessional plan-songs">
+                        <dt class="part">na závěr</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-general" title="obecné doporučení">●</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/707" class="song" target="_blank" rel="noopener">707: Ježíši, Králi</a>
+                                        <span class="sources"><span class="source">ze svátku Ježíše Krista krále (ne 22. 11.), Direktář s. 10</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+            </dl>
+        </details>
+    
+</article>
+
+
+        
+
+        
+            <h2 class="evening-heading"><a href="/2026-11-29/" data-nav>Večerní mše z neděle</a></h2>
+            <article class="mass colour-violet">
+    <h2 class="mass-title">1. neděle adventní</h2>
+    <p class="meta">
+        <span>neděle</span>
+        <span>barva fialová</span>
+        <span class="norm norm-no">Sláva na výsostech: ne</span>
+        <span class="norm norm-yes">Věřím: ano</span>
+    </p>
+    
+    
+
+    
+        <div class="summary">
+            
+                <div class="line line-mass">
+                    
+                    <ul class="items">
+                        <li><div class="item">
+    <span class="tier tier-celebration" title="píseň podle svátku">▲</span>
+    <span class="what">
+        <span class="song-wrap"><a href="https://kancional.cz/129" class="song" target="_blank" rel="noopener">129: Volá hlas</a></span><span class="song-wrap"><a href="https://kancional.cz/126" class="song" target="_blank" rel="noopener">126: Vesele zpívejme</a></span>
+        
+        <span class="sources"><span class="source">Direktář s. 17: Příchod Krista na konci věků.</span></span>
+    </span>
+</div>
+</li><li><div class="item">
+    <span class="tier tier-general" title="obecné doporučení">●</span>
+    <span class="what">
+        <span class="group">Adventní písně</span>
+        
+        <span class="sources"><span class="source">Direktář s. 8</span></span>
+    </span>
+</div>
+</li>
+                    </ul>
+                </div>
+            
+        </div>
+    
+    
+
+    
+        <details class="plan" open>
+            <summary>detailní doporučení</summary>
+            <dl>
+                
+                    <div class="line line-before_mass plan-songs">
+                        <dt class="part">před mší</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-general" title="obecné doporučení">●</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/128" class="song" target="_blank" rel="noopener">128: Dej rosu, nebe nad námi (Rorate)</a>
+                                        <span class="sources"><span class="source">Direktář s. 18: Dobrá tradice v neděle.</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+                    <div class="line line-mass plan-songs">
+                        <dt class="part">mešní píseň</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-celebration" title="píseň podle svátku">▲</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/126" class="song" target="_blank" rel="noopener">126: Vesele zpívejme</a>
+                                        <span class="sources"><span class="source">Direktář s. 17: Příchod Krista na konci věků.</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+                    <div class="line line-communion plan-songs">
+                        <dt class="part">k přijímání</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-general" title="obecné doporučení">●</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/115" class="song" target="_blank" rel="noopener">115: Požehnaný, velebný</a>
+                                        <span class="sources"><span class="source">Direktář s. 18</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+                    <div class="line line-recessional plan-songs">
+                        <dt class="part">na závěr</dt>
+                        <dd>
+                            
+                                <div class="item">
+                                    <span class="tier tier-general" title="obecné doporučení">●</span>
+                                    <span class="what">
+                                        <a href="https://kancional.cz/125" class="song" target="_blank" rel="noopener">125: Sešli, nebe, Spasitele</a>
+                                        <span class="sources"><span class="source">Direktář s. 10</span></span>
+                                    </span>
+                                </div>
+                            
+                            
+                        </dd>
+                    </div>
+                
+            </dl>
+        </details>
+    
+</article>
+
+        
+    
+</div>
+</div>
+
+<p class="legend">
+    <span><span class="tier tier-celebration">▲</span> podle svátku</span>
+    <span><span class="tier tier-category">■</span> podle typu svátku</span>
+    <span><span class="tier tier-general">●</span> obecné doporučení</span>
+</p>
+
+    </div>
+
+    <footer class="site-footer">
+        <p>Doporučení nejsou závazná; konečné slovo ohledně výběru zpěvů má vždy kněz, který mši slouží.
+           Aplikace je stále ve vývoji – za nesrovnalosti se omlouváme.</p>
+        <p>Dotazy a připomínky: <a href="mailto:frantahluchnik@gmail.com">frantahluchnik@gmail.com</a> · &copy; 2024–2026 František Hluchník</p>
+    </footer>
+    
+</body>
+</html>

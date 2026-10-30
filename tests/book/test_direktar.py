@@ -115,7 +115,7 @@ class LentTests(unittest.TestCase):
         palm = mass(date(2027, 3, 21))
         self.assertEqual(plan(palm, 'procession')[1], ['318A'])
         self.assertIn(plan(palm, 'mass')[1][0], ('303', '305', '308'))
-        self.assertEqual(plan(palm, 'after_mass')[1], ['315'])
+        self.assertEqual(plan(palm, 'recessional')[1], ['315'])  # "po mši" = na závěr
         monday = mass(date(2027, 3, 22))
         self.assertEqual(candidates(monday, 'mass')[:4], ['303', '305', '306', '308'])
 
@@ -186,7 +186,9 @@ class EasterTests(unittest.TestCase):
 class OrdinaryTimeTests(unittest.TestCase):
     def test_ordinary_sunday_is_honest_about_gaps(self) -> None:  # p. 25
         m = mass(date(2027, 1, 31))
-        self.assertTrue(m.gap)
+        self.assertFalse(m.gap)  # no gap message on Sundays: the general songs are what the book says
+        self.assertEqual([i.label for s in m.summary for i in s.items], ['mešní písně obecné'])
+        self.assertIn('707', candidates(m, 'mass'))  # the other general groups still feed the plan
         self.assertEqual(tier_of(m, 'mass'), '●')
         self.assertIn('523', candidates(m, 'mass'))
         self.assertNotIn('510A', candidates(m, 'mass'))
@@ -229,6 +231,8 @@ class OrdinaryTimeTests(unittest.TestCase):
         weekday = mass(date(2027, 1, 27), title='Středa')
         self.assertFalse(any(c.startswith(('8', '9')) for c in candidates(weekday, 'communion')))
         self.assertTrue({'813A', '902'} <= set(candidates(weekday, 'thanksgiving')))
+        self.assertEqual(plan(weekday, 'thanksgiving'), ('', []))  # not a standard part: only when specific
+        self.assertEqual(plan(mass(date(2027, 5, 31)), 'thanksgiving')[1], ['813A'])  # Navštívení Panny Marie
         visitation = mass(date(2027, 5, 31))  # Navštívení Panny Marie: "po přijímání je vhodná 813" (p. 8)
         self.assertNotIn('813A', candidates(visitation, 'communion'))
         self.assertIn('813A', candidates(visitation, 'thanksgiving'))
@@ -271,6 +275,63 @@ class CategoryTests(unittest.TestCase):
     def test_pentecost_is_not_a_saints_day(self) -> None:
         m = mass(date(2027, 5, 16))
         self.assertFalse({'840', '841'} & set(candidates(m, 'mass')))
+
+
+def summary(m: MassResult) -> dict[str, list[str]]:
+    return {line.part: [x for i in line.items for x in ([i.label] if i.kind == 'group' else [s.code for s in i.songs])]
+            for line in m.summary}
+
+
+class ReviewM5Tests(unittest.TestCase):
+    """The author's review before M5."""
+
+    def test_mass_song_continues_at_communion(self) -> None:  # 827 for sv. Ondřej is sung at communion too
+        m = mass(date(2026, 11, 30))
+        self.assertEqual(plan(m, 'mass')[1], ['827'])
+        self.assertEqual(plan(m, 'communion'), ('', []))
+        epiphany = mass(harness.date_of('zjeveni-pane', 2027))  # but a ▲ communion song is named (p. 19)
+        self.assertIn(plan(epiphany, 'communion')[1][0], ('213', '219'))
+
+    def test_season_label_every_day_but_no_single_general_songs(self) -> None:  # p. 17
+        feria = mass(date(2026, 12, 1), title='Úterý')
+        self.assertEqual(summary(feria), {'mass': ['Adventní písně']})
+        self.assertIn(plan(feria, 'mass')[1][0], ('121', '123', '126', '129', '101A', '109', '127', '128'))
+        memorial = mass(date(2026, 12, 1), title='Edmunda')
+        self.assertIn('Adventní písně', summary(memorial)['mass'])
+        self.assertIn('842', summary(memorial)['mass'])
+
+    def test_prescribed_and_own_song_is_specific(self) -> None:  # p. 30: 910 on 18. 1.
+        m = mass(date(2027, 1, 18), title='Panny Marie')
+        entry = next(e for e in next(p for p in m.parts if p.part == 'recessional').entries if e.code == '910')
+        self.assertEqual((entry.tier, entry.strength), ('▲', 'prescribed'))
+
+    def test_feasts_take_no_neighbour_songs(self) -> None:  # p. 27 is about ordinary days and Sundays
+        for day in (date(2027, 2, 2), date(2027, 11, 2)):
+            m = mass(day)
+            with self.subTest(day=day):
+                self.assertFalse(any(e.neighbour for p in m.parts for e in p.entries))
+
+    def test_short_ranges_are_songs_long_ones_a_label(self) -> None:
+        self.assertEqual(summary(mass(date(2027, 5, 1), title='Josefa'))['mass'], ['821', '822', '823', 'velikonoční písně'])
+        self.assertEqual(summary(mass(date(2027, 11, 2)))['mass'], ['921', '922', '923', '924', '925'])
+        self.assertEqual(summary(mass(date(2027, 4, 14), title='Středa')), {'mass': ['velikonoční písně']})
+
+    def test_general_notes_belong_to_the_day(self) -> None:  # p. 24, 34
+        day = harness.day(date(2027, 5, 4), 'czech')
+        self.assertTrue(any('V květnu' in n for n in day.notes))
+        self.assertTrue(any('415' in n for n in day.notes))
+        self.assertFalse(any('V květnu' in n for m in day.masses for e in m.plan for n in e.notes))
+
+    def test_first_friday_votive_mass(self) -> None:
+        titles = [m.title for m in harness.day(date(2027, 7, 2), 'czech').masses]
+        self.assertTrue(any(t.startswith('První pátek') for t in titles), titles)
+        votive = mass(date(2027, 7, 2), title='První pátek')
+        self.assertEqual(votive.rank_label, 'votivní mše')
+        self.assertIn(plan(votive, 'mass')[1][0], ('702', '709', '715', '728'))
+        self.assertEqual(tier_of(votive, 'mass'), '▲')
+        for day in (date(2027, 10, 1), date(2027, 3, 5), date(2027, 7, 9)):  # memorial · Lent · 2nd Friday
+            with self.subTest(day=day):
+                self.assertFalse(any('První pátek' in m.title for m in harness.day(day, 'czech').masses))
 
 
 class KalendariumTests(unittest.TestCase):
@@ -330,8 +391,8 @@ class KalendariumTests(unittest.TestCase):
         self.assertIn(plan(m, 'communion')[1][0], ('106', '107', '108', '114', '115', '116', '127'))
 
     def test_seasonal_notes(self) -> None:  # p. 31, 44
-        self.assertIn('811', candidates(mass(date(2027, 2, 11)), 'after_mass'))
-        self.assertIn(plan(mass(date(2027, 11, 4)), 'after_mass')[1][0], ('922', '924'))
+        self.assertIn('811', candidates(mass(date(2027, 2, 11)), 'recessional'))
+        self.assertIn(plan(mass(date(2027, 11, 4)), 'recessional')[1][0], ('922', '924'))
 
     def test_authors_of_texts(self) -> None:  # p. 30, 39, 42
         self.assertEqual(plan(mass(date(2027, 7, 31)), 'communion')[1], ['929'])

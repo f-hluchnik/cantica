@@ -1,0 +1,42 @@
+{% extends 'web/base.html' %}
+
+{% block title %}{% if result %}{{ result.label }} – {% endif %}Příležitosti – Directus Cantica{% endblock %}
+
+{% block content %}
+<div class="settings">
+    <span></span>
+    <label class="sources-switch"><input type="checkbox" id="zdroje"> zdroje</label>
+</div>
+
+<h1 class="day-heading">Svátosti a jiné bohoslužby</h1>
+<nav class="chips" aria-label="příležitosti">
+    {% for key, label in occasions %}
+        <a href="{% url 'occasion' key %}" class="chip"{% if key == selected %} aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+</nav>
+
+{% if result %}
+    <article class="mass">
+        <h2 class="mass-title">{{ result.label }}</h2>
+        {% for note in result.notes %}<p class="note">{{ note }}</p>{% endfor %}
+        {% if result.parts %}
+            <div class="summary">
+                {% for part in result.parts %}
+                    <div class="line line-{{ part.part }}">
+                        <div class="part">{{ part.label }}</div>
+                        <ul class="items">
+                            {% for item in part.items %}<li>{% include 'web/_item.html' %}</li>{% endfor %}
+                        </ul>
+                        {% for note in part.notes %}<p class="part-note">{{ note }}</p>{% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="hint gap">Direktář pro tuto příležitost žádnou konkrétní píseň neuvádí.</p>
+        {% endif %}
+    </article>
+    <p class="hint">Podle Direktáře pro varhaníky, s. 47–48. V neděle adventní, postní a velikonoční, o slavnostech, na Popeleční středu a ve Svatém týdnu se slaví mše z daného dne – pak platí doporučení pro tento den.</p>
+{% else %}
+    <p class="empty-message">Vyberte příležitost.</p>
+{% endif %}
+{% endblock %}

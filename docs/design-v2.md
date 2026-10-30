@@ -64,7 +64,7 @@ Process: create branch `v2`, delete the old apps, build the new layout (§4). Wh
 | `sequence` | sekvence | 406, 422, 717 |
 | `gospel` | před evangeliem | |
 | `offertory` | k obětnímu průvodu | |
-| `communion` | k přijímání | **includes díkůvzdání** (your practice; M5 is not a separate part) |
+| `communion` | k přijímání | díkůvzdání is its own part `thanksgiving` since M4; *po mši* = *na závěr* since M5 |
 | `recessional` | na závěr | convention, not part of the mass |
 | `after_mass` | po mši | e.g. 811 at Lourdes, 922/924 2.–8. 11., 912/913 around sv. Marek |
 | `ashes`, `procession`, `veneration`, `transfer`, `adoration`, `baptismal_water`, `litany` | special rites | Ash Wednesday, Hromnice, Palm Sunday, Holy Week, Corpus Christi, Easter Vigil |
@@ -660,4 +660,31 @@ Where the implementation deviates from §3–§8, this section wins.
 2. *Zvěstování Páně* avoids the Lent section (it usually falls in Lent, the book says Lenten songs don't fit) and 817 (p. 32: a feast of the Lord, not of Mary).
 3. Gorazd, Hroznata and Radim all get 838/9 ke vstupu — worth a check against the Kancionál.
 4. ~~Ordinary-Time communion: 813 avoided as an author rule~~ — superseded by the `thanksgiving` part.
+
+## 17. Changes made in M5
+
+Engine:
+- **"po mši" = "na závěr"**: the part `after_mass` is gone; old rules are read as `recessional` (`PART_ALIASES`).
+- **The mass song continues**: k přijímání (and na závěr) get their own line only when a song fits better — a prescribed or more specific rule, or a ▲/■ rule at least as specific as the mass song (Zjevení Páně: 202 + 213/219). Otherwise the mass song is sung there too and is not repeated. The "sloka mešní písně" plan entries are gone.
+- **Merging**: a song named by several rules takes the highest tier of the rules that recommend it (910 on 18. 1.: ▲ předepsáno); a *možno též* mention does not lift the tier.
+- **No neighbour songs on feasts and solemnities** (and All Souls): p. 27 is about ordinary days and Sundays.
+- **Ranges** of up to 5 songs (821–823, 921–925) are shown as songs; longer ones as one item. 401–413 is the group *velikonoční písně*.
+- **Summary**: ▲/■ and prescribed items, plus — for the mass song — the general labels (Adventní písně, mešní písně obecné, …) on every day of the season. Single ● songs (121, 123, … in early Advent; 706, 911 in the unity week) only steer the detailní doporučení. Songs named together by one rule are one line. Grouped by part (k přijímání, na závěr, …).
+- **Notes of ● rules** (season, period: Advent organ style, May, "415 před Nanebevstoupením ne") are the day's notes, shown once above the masses; ▲/■ notes stay with their mass or part.
+- **Gap message** not on Sundays (there the general songs are what the book says), still on feasts and memorials with nothing specific.
+- **První pátek**: in Ordinary Time, on a first Friday without an obligatory memorial or higher, a synthetic mass option *První pátek v měsíci – votivní mše o Nejsvětějším Srdci Ježíšově* (catalog key `prvni-patek`, rank *votivní mše*) with 702, 709, 715, 728 (author rule after p. 27). Votive masses are not said on weekdays of the strong seasons.
+- All Souls: the general Ordinary-Time mass songs are avoided (author rule): only 921–925.
+
+Web:
+- **Evening mass**: Saturdays and 24 December show the next day's masses below the day ("Večerní mše z neděle" / "z vigilie Narození Páně").
+- **Fragment navigation** (§9.2): arrows, *dnes* and the date picker fetch `?fragment=1` and swap `#day`; the linked days are prefetched; `ETag` + `Cache-Control: private, max-age=300`, `Vary: Cookie`.
+- **Sources switch** (*zdroje*): each song shows its source line(s) ("Direktář s. 46: Vhodná adventní píseň."), hidden by default; remembered in localStorage, works without JS through `:has()`. Hover tooltips are gone (they don't exist on phones). Only the deciding reason and reasons with a note are shown.
+- **UI**: mobile first, system fonts (no web fonts, nothing loaded from Google — replaces the "self-host Fira Sans" plan), native date and select controls, tier symbols as a coloured scale (▲ dark red, ■ brown, ● light), no *Před evangeliem* badge, no plan hint (moved to the about page), Buy Me a Coffee as a plain local link.
+- **JSON API**: `/api/v1/days/YYYY-MM-DD.json?dieceze=olm` (unstable until v2.1): date, season, cycles, day notes, masses with summary, parts and plan, commemorations.
+
+**Review after M5 (author):**
+- *Díkůvzdání po přijímání* is not a standard part: it appears in the plan only with a ▲/■ or prescribed song (e.g. 813 on Marian days), never from the general p. 25 list (`OCCASIONAL_PARTS`).
+- In the summary a general rule shows only its first label (*mešní písně obecné*, not *písně k Pánu Ježíši pro mši* / *příležitostné písně pro mši*); the other groups still feed the plan.
+- UI back to the v1 look: every song is a label (pod) with its coloured tier symbol, Sláva/Věřím badges, 10 px liturgical stripe, header band, brown buttons; part names in lowercase (*k přijímání:*); the calendar selector is one small line. The first M5 design is archived in `docs/design-archive/m5-minimal/`.
+- Font: Fira Sans when the WOFF2 files are in `web/static/web/fonts/` (self-hosted, no Google Fonts); until then the system font.
 

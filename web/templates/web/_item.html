@@ -1,10 +1,13 @@
-<div class="item item-{{ item.kind }}{% if item.strength == 'alternative' %} item-alternative{% endif %}" title="{% for reason in item.reasons %}{{ reason.text }}{% if not forloop.last %} · {% endif %}{% endfor %}">
-    <span class="song-icon">{{ item.tier }}</span>
-    {% if item.kind == 'song' %}
-        {% include 'web/_song.html' with song=item.songs.0 %}
-    {% else %}
-        <span class="song-pod">{{ item.label }}</span>
-    {% endif %}
-    {% if show_part and item.part != 'mass' %}<span class="part-label">{{ item.part_label }}</span>{% endif %}
-    {% if item.strength == 'prescribed' %}<span class="strength">předepsáno</span>{% endif %}
-</div>
+{% if item.kind == 'song' %}{% for song in item.songs %}
+    <li class="pod-item{% if item.strength == 'alternative' %} is-alternative{% endif %}">
+        <a href="{{ song.url }}" class="pod song" target="_blank" rel="noopener">{% include 'web/_tier.html' with tier=item.tier %}{% include 'web/_song.html' %}</a>
+        {% if item.strength == 'prescribed' %}<span class="tag">předepsáno</span>{% endif %}
+        {% if forloop.last %}{% include 'web/_sources.html' with reasons=item.shown_reasons %}{% endif %}
+    </li>
+{% endfor %}{% else %}
+    <li class="pod-item{% if item.strength == 'alternative' %} is-alternative{% endif %}">
+        <span class="pod group">{% include 'web/_tier.html' with tier=item.tier %}{{ item.label }}</span>
+        {% if item.strength == 'prescribed' %}<span class="tag">předepsáno</span>{% endif %}
+        {% include 'web/_sources.html' with reasons=item.shown_reasons %}
+    </li>
+{% endif %}

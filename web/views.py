@@ -1,20 +1,24 @@
 from __future__ import annotations
 
+import hashlib
+import os
+import time
 from datetime import date, timedelta
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotModified, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.cache import patch_vary_headers
 
 from engine.vocab import OCCASION_LABELS, OCCASIONS
 from liturgy.constants import DEFAULT_DIOCESE, SEASON_LABELS
 from liturgy.dbbuild import latest_build
 from liturgy.models import Diocese
 from liturgy.services import health
-from rules.services import day_result, occasion_page
+from rules.services import cache_key, day_result, occasion_page
 
 COOKIE_MAX_AGE = 365 * 24 * 3600
 
@@ -30,6 +34,52 @@ def _requested_diocese(request: HttpRequest, dioceses: dict[str, Diocese]) -> tu
     return dioceses.get(DEFAULT_DIOCESE) or next(iter(dioceses.values())), False
 
 
+def _evening(day: date, diocese: str) -> tuple[str, object] | None:
+    """Saturday and 24 December: the evening mass is already of the next day (Sunday / Christmas vigil)."""
+    if day.weekday() == 5:
+        label = 'Večerní mše z neděle'
+    elif (day.month, day.day) == (12, 24):
+        label = 'Večerní mše z vigilie Narození Páně'
+    else:
+        return None
+    following = day_result(diocese, day + timedelta(days=1))
+    return (label, following) if following and following.masses else None
+
+
+# Changes with every deploy (new process): cached pages never outlive the templates and the hashed CSS they use.
+CODE_VERSION = os.environ.get('FLY_IMAGE_REF') or str(time.time())
+
+
+def _etag(request: HttpRequest, day: date) -> str:
+    diocese = request.GET.get('dieceze') or request.COOKIES.get(settings.CANTICA_DIOCESE_COOKIE, '')
+    raw = '|'.join(str(p) for p in (
+        day, diocese, request.GET.get('fragment', ''), timezone.localdate(), *cache_key(), CODE_VERSION,
+    ))
+    return '"' + hashlib.sha256(raw.encode()).hexdigest()[:20] + '"'
+
+
+def _day_context(request: HttpRequest, day: date, diocese: Diocese, dioceses: dict[str, Diocese]) -> dict:
+    today = timezone.localdate()
+    build = latest_build()
+    result = day_result(diocese.code, day)
+    evening = _evening(day, diocese.code) if result else None
+    return {
+        'day': day,
+        'today': today,
+        'is_today': day == today,
+        'previous_day': day - timedelta(days=1),
+        'next_day': day + timedelta(days=1),
+        'diocese': diocese,
+        'dioceses': list(dioceses.values()),
+        'result': result,
+        'evening_label': evening[0] if evening else '',
+        'evening': evening[1] if evening else None,
+        'season_label': SEASON_LABELS.get(result.ctx.season, '') if result else '',
+        'data_first': build.first_date if build else None,
+        'data_last': build.last_date if build else None,
+    }
+
+
 def day_page(request: HttpRequest, day: date | None = None) -> HttpResponse:
     # Date picker (and v1 links ?date=...) -> clean URL /YYYY-MM-DD/
     picked = request.GET.get('datum') or request.GET.get('date')
@@ -43,30 +93,26 @@ def day_page(request: HttpRequest, day: date | None = None) -> HttpResponse:
             url += '?' + urlencode({'dieceze': request.GET['dieceze']})
         return redirect(url)
 
-    today = timezone.localdate()
-    day = day or today
+    day = day or timezone.localdate()
     dioceses = {d.code: d for d in Diocese.objects.all()}
     if not dioceses:
         return HttpResponse('Aplikace se připravuje.', status=503, content_type='text/plain; charset=utf-8')
     diocese, store_cookie = _requested_diocese(request, dioceses)
 
-    build = latest_build()
-    result = day_result(diocese.code, day)
-    context = {
-        'day': day,
-        'today': today,
-        'is_today': day == today,
-        'previous_day': day - timedelta(days=1),
-        'next_day': day + timedelta(days=1),
-        'is_saturday': day.weekday() == 5,
-        'diocese': diocese,
-        'dioceses': list(dioceses.values()),
-        'result': result,
-        'season_label': SEASON_LABELS.get(result.ctx.season, '') if result else '',
-        'data_first': build.first_date if build else None,
-        'data_last': build.last_date if build else None,
-    }
-    response = render(request, 'web/day.html', context)
+    # Always revalidate (cheap 304); in development never cache, so template and CSS edits show at once.
+    etag = None if settings.DEBUG else _etag(request, day)
+    if etag and not store_cookie and etag in request.headers.get('If-None-Match', ''):
+        response = HttpResponseNotModified()
+    else:
+        context = _day_context(request, day, diocese, dioceses)
+        template = 'web/_day.html' if request.GET.get('fragment') else 'web/day.html'
+        response = render(request, template, context)
+    if etag:
+        response['ETag'] = etag
+        response['Cache-Control'] = 'private, no-cache'
+    else:
+        response['Cache-Control'] = 'no-store'
+    patch_vary_headers(response, ('Cookie',))
     if store_cookie:
         response.set_cookie(
             settings.CANTICA_DIOCESE_COOKIE,

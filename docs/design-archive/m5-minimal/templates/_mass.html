@@ -1,0 +1,56 @@
+<article class="mass colour-{{ mass.colour }}">
+    <h2 class="mass-title">{{ mass.title }}</h2>
+    <p class="meta">
+        {% if mass.rank_label %}<span>{{ mass.rank_label }}</span>{% endif %}
+        <span>barva {{ mass.colour_label }}</span>
+        {% if mass.norms.gloria is not None %}<span class="norm norm-{{ mass.norms.gloria|yesno:'yes,no' }}">Sláva na výsostech: {{ mass.norms.gloria|yesno:"ano,ne" }}</span>{% endif %}
+        {% if mass.norms.credo is not None %}<span class="norm norm-{{ mass.norms.credo|yesno:'yes,no' }}">Věřím: {{ mass.norms.credo|yesno:"ano,ne" }}</span>{% endif %}
+    </p>
+    {% if mass.norms.note %}<p class="note">{{ mass.norms.note }}</p>{% endif %}
+    {% for note in mass.notes %}<p class="note">{{ note }}</p>{% endfor %}
+
+    {% if mass.summary %}
+        <div class="summary">
+            {% for line in mass.summary %}
+                <div class="line line-{{ line.part }}">
+                    {% if line.part != 'mass' %}<div class="part">{{ line.label }}</div>{% endif %}
+                    <ul class="items">
+                        {% for item in line.items %}<li>{% include 'web/_item.html' %}</li>{% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if mass.gap %}
+        <p class="hint gap">Pro tento den Direktář žádnou konkrétní píseň neuvádí; platí obecná doporučení.</p>
+    {% endif %}
+
+    {% if mass.plan %}
+        <details class="plan">
+            <summary>detailní doporučení</summary>
+            <dl>
+                {% for entry in mass.plan %}
+                    <div class="line line-{{ entry.part }} plan-{{ entry.kind }}">
+                        <dt class="part">{{ entry.label }}</dt>
+                        <dd>
+                            {% if entry.kind == 'silence' %}
+                                <em>{{ entry.note }}</em>
+                            {% elif entry.kind == 'gap' %}
+                                <em class="gap">{{ entry.note }}</em>
+                            {% else %}
+                                <div class="item">
+                                    <span class="tier {% if entry.tier == '▲' %}tier-celebration{% elif entry.tier == '■' %}tier-category{% else %}tier-general{% endif %}" title="{% if entry.tier == '▲' %}píseň podle svátku{% elif entry.tier == '■' %}píseň podle typu svátku{% else %}obecné doporučení{% endif %}">{{ entry.tier }}</span>
+                                    <span class="what">
+                                        {% for song in entry.songs %}{% include 'web/_song.html' %}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                        {% include 'web/_sources.html' with reasons=entry.shown_reasons %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            {% for note in entry.notes %}<p class="part-note">{{ note }}</p>{% endfor %}
+                        </dd>
+                    </div>
+                {% endfor %}
+            </dl>
+        </details>
+    {% endif %}
+</article>

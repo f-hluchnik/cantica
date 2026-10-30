@@ -1,0 +1,59 @@
+<article class="celebration-info colour-{{ mass.colour }}">
+    <h3>{{ mass.title }}</h3>
+    <p class="meta">
+        {% if mass.rank_label %}<span class="rank">{{ mass.rank_label }}</span>{% endif %}
+        <span>barva: {{ mass.colour_label }}</span>
+    </p>
+    {% if mass.norms.gloria is not None or mass.norms.credo is not None %}
+        <ul class="norms">
+            {% if mass.norms.gloria is not None %}<li class="badge {{ mass.norms.gloria|yesno:'yes,no' }}">Sláva na výsostech: {{ mass.norms.gloria|yesno:"ano,ne" }}</li>{% endif %}
+            {% if mass.norms.credo is not None %}<li class="badge {{ mass.norms.credo|yesno:'yes,no' }}">Věřím: {{ mass.norms.credo|yesno:"ano,ne" }}</li>{% endif %}
+        </ul>
+    {% endif %}
+    {% if mass.norms.note %}<p class="description-text">{{ mass.norms.note }}</p>{% endif %}
+    {% for note in mass.notes %}<p class="description-text">{{ note }}</p>{% endfor %}
+
+    {% if mass.summary %}
+        <div class="summary">
+            {% for line in mass.summary %}
+                <div class="line line-{{ line.part }}">
+                    {% if line.part != 'mass' %}<div class="part">{{ line.label }}:</div>{% endif %}
+                    <ul class="pods">
+                        {% for item in line.items %}{% include 'web/_item.html' %}{% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if mass.gap %}
+        <p class="hint gap">Pro tento den Direktář žádnou konkrétní píseň neuvádí; platí obecná doporučení.</p>
+    {% endif %}
+
+    {% if mass.plan %}
+        <details class="details">
+            <summary class="toggle-details">detailní doporučení</summary>
+            <div class="celebration-details">
+                {% for entry in mass.plan %}
+                    <div class="line plan-line plan-{{ entry.kind }}">
+                        <div class="part">{{ entry.label }}:</div>
+                        {% if entry.kind == 'silence' %}
+                            <p class="plan-text"><em>{{ entry.note }}</em></p>
+                        {% elif entry.kind == 'gap' %}
+                            <p class="plan-text gap">{{ entry.note }}</p>
+                        {% else %}
+                            <ul class="pods">
+                                {% for song in entry.songs %}
+                                    <li class="pod-item">
+                                        <a href="{{ song.url }}" class="pod song" target="_blank" rel="noopener">{% include 'web/_tier.html' with tier=entry.tier %}{% include 'web/_song.html' %}</a>
+                                        {% if forloop.last %}{% include 'web/_sources.html' with reasons=entry.shown_reasons %}{% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% for note in entry.notes %}<p class="part-note">{{ note }}</p>{% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </details>
+    {% endif %}
+</article>

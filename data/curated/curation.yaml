@@ -1,7 +1,7 @@
 # Curated data exported from the DB (source of truth: the admin).
 # Import into an empty DB: python manage.py curation_import --if-empty
 # Song verse fields: null = not verified, "-" = none, "*" = as dedicated in Kancionál, "4,5" = these verses.
-version: 6
+version: 7
 groups:
 - key: advent_k_prijimani
   name: adventní písně k přijímání
@@ -18,7 +18,7 @@ groups:
   source_page: 17
   members: [101A, 101B, 101C, '109', '121', '123', '126', '127', '128', '129']
 - key: dekovne
-  name: děkovné písně po přijímání (M5)
+  name: děkovné písně
   description: Direktář uvádí také „z odd. 701 ad.“ a responsoriální žalmy děkovného charakteru; ty řeší pravidla zvlášť.
   source_page: 25
   members: [813A, 813B, '902', '903', '907', '908', '909', '927', '928', '929']
@@ -67,6 +67,11 @@ groups:
   description: 842 mučedníci, 843 duchovní pastýři, 844, 845.
   source_page: 9
   members: ['842', '843', '844', '845']
+- key: velikonocni
+  name: velikonoční písně
+  description: 'Direktář: „Hrajeme písně z odd. 401–413.“'
+  source_page: 23
+  members: ['401', 402A, 402B, '403', '404', '405', 406A, 406B, '407', '408', '409', '410', '411', '412', '413']
 - key: zaver_obecne
   name: obecné písně na závěr
   description: 'Direktář: „… nebo např. 905, 910 a zvl. 930“.'
@@ -833,12 +838,12 @@ rules:
   page: 18
   position: 1812
 - when: {season: advent}
-  parts: [after_mass]
+  parts: [recessional]
   songs: '117'
   page: 18
   position: 1813
 - when: {season: advent}
-  parts: [after_mass]
+  parts: [recessional]
   strength: alternative
   songs: 124, 140
   page: 18
@@ -995,12 +1000,12 @@ rules:
   page: 21
   position: 2102
 - when: {celebration: kvetna-nedele}
-  parts: [after_mass]
+  parts: [recessional]
   songs: '315'
   page: 21
   position: 2103
 - when: {celebration: kvetna-nedele}
-  parts: [after_mass]
+  parts: [recessional]
   strength: alternative
   songs: '316'
   page: 21
@@ -1012,12 +1017,12 @@ rules:
   page: 21
   position: 2110
 - when: {period: holy_week_mon_wed}
-  parts: [after_mass]
+  parts: [recessional]
   songs: '315'
   page: 21
   position: 2111
 - when: {period: holy_week_mon_wed}
-  parts: [after_mass]
+  parts: [recessional]
   strength: alternative
   songs: '316'
   page: 21
@@ -1164,7 +1169,7 @@ rules:
   position: 2313
 - when: {season: easter}
   parts: [mass]
-  songs: 401-413
+  songs: '@velikonocni'
   page: 23
   position: 2320
 - when: {season: easter}
@@ -1228,7 +1233,7 @@ rules:
   page: 24
   position: 2421
 - when: {period: before_ascension}
-  parts: [mass, entrance, gospel, offertory, communion, recessional, after_mass]
+  parts: [mass, entrance, gospel, offertory, communion, recessional]
   strength: avoid
   songs: '415'
   note: Před slavností Nanebevstoupení Páně píseň 415 zásadně nezpíváme.
@@ -1499,6 +1504,11 @@ rules:
   note: Olomoucká verze Kancionálu.
   page: 27
   position: 2742
+- when: {celebration: prvni-patek}
+  parts: [mass]
+  songs: 702, 709, 715, 728
+  internal: Votivní mše o Nejsvětějším Srdci Ježíšově; písně jako o slavnosti (s. 27).
+  position: 2745
 - when: {celebration: oktav-narozeni-pane-matky-bozi-panny-marie}
   parts: [mass]
   songs: '#christmas'
@@ -1607,7 +1617,7 @@ rules:
   page: 31
   position: 3107
 - when: {period: lourdes_day}
-  parts: [after_mass]
+  parts: [recessional]
   strength: alternative
   songs: '811'
   note: Neslaví-li se památka Panny Marie Lurdské, možno zahrát po mši několik slok písně 811.
@@ -1669,7 +1679,7 @@ rules:
   page: 32
   position: 3207
 - when: {period: st_mark_days}
-  parts: [after_mass]
+  parts: [recessional]
   songs: 912/1, 913
   note: Ve dnech kolem svátku sv. Marka se tradičně konají prosby za úrodu.
   page: 33
@@ -1951,7 +1961,7 @@ rules:
   page: 41
   position: 4106
 - when: {celebration: povyseni-svateho-krize}
-  parts: [after_mass]
+  parts: [recessional]
   strength: alternative
   songs: 317, 306, 304
   note: 'Koná-li se po mši uctívání sv. kříže: další sloky z písně 317 a 306, nebo též 304.'
@@ -2133,7 +2143,7 @@ rules:
   page: 43
   position: 4309
 - when: {period: all_souls_days}
-  parts: [after_mass]
+  parts: [recessional]
   songs: 922, 924
   note: Ve dnech modliteb za zemřelé.
   page: 44
@@ -2330,3 +2340,9 @@ rules:
   note: 'Mše nekončí obvyklým závěrem: následuje přenesení Nejsvětější svátosti.'
   internal: Liturgická norma (misál), v Direktáři výslovně neuvedeno.
   position: 9003
+- when: {celebration: vzpominka-na-vsechny-verne-zemrele}
+  parts: [mass]
+  strength: avoid
+  songs: '@mesni_obecne, @k_panu_jezisi_mesni, @prilezitostne_mesni'
+  internal: Na Památku všech věrných zemřelých jen písně za zemřelé (s. 44), ne obecné mešní písně mezidobí.
+  position: 9004

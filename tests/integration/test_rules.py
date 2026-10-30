@@ -35,7 +35,7 @@ class RecommendationPageTests(DataDirMixin, TestCase):
         self.assertContains(response, '707: Ježíši, Králi')
         self.assertContains(response, 'Direktář s. 26')
         self.assertContains(response, 'detailní doporučení')
-        self.assertContains(response, 'Jedna z možných sestav podle Direktáře')
+        self.assertNotContains(response, 'Jedna z možných sestav podle Direktáře')  # moved to the about page
 
     def test_first_sunday_of_advent(self) -> None:  # p. 17
         response = self.client.get('/2027-11-28/')
@@ -46,8 +46,9 @@ class RecommendationPageTests(DataDirMixin, TestCase):
     def test_general_day_is_honest(self) -> None:
         response = self.client.get('/2027-11-14/')  # 33. neděle v mezidobí, year C (519 is for all cycles)
         self.assertContains(response, '519: Buďte bdělí')
-        response = self.client.get('/2027-11-07/')  # 32. neděle, year C: nothing specific
-        self.assertContains(response, 'Direktář žádnou konkrétní píseň neuvádí')
+        response = self.client.get('/2027-11-07/')  # 32. neděle, year C: nothing specific, but no gap note on Sundays
+        self.assertNotContains(response, 'Direktář žádnou konkrétní píseň neuvádí')
+        self.assertContains(response, 'mešní písně obecné')
 
     def test_commemoration_and_silence_markup(self) -> None:
         response = self.client.get('/2027-12-21/')
@@ -61,6 +62,49 @@ class RecommendationPageTests(DataDirMixin, TestCase):
         response = self.client.get('/2027-11-21/')
         self.assertContains(response, '523: Ty jsi, Pane, v každém chrámě')
         self.assertTrue(CurationState.current().has_unexported_changes)
+
+
+class DayPageM5Tests(DataDirMixin, TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.build()
+        import_curation(Curation.load(COMMITTED))
+        reset_caches()
+
+    def test_fragment_and_caching(self) -> None:
+        full = self.client.get('/2027-11-21/')
+        self.assertContains(full, '<div id="day">')
+        fragment = self.client.get('/2027-11-21/?fragment=1')
+        self.assertContains(fragment, 'class="day-view"')
+        self.assertNotContains(fragment, '<html')
+        self.assertIn('Cookie', fragment['Vary'])
+        again = self.client.get('/2027-11-21/?fragment=1', HTTP_IF_NONE_MATCH=fragment['ETag'])
+        self.assertEqual(again.status_code, 304)
+
+    def test_saturday_and_christmas_eve_show_the_evening_mass(self) -> None:
+        saturday = self.client.get('/2027-11-27/')
+        self.assertContains(saturday, 'Večerní mše z neděle')
+        self.assertContains(saturday, '1. neděle adventní')
+        eve = self.client.get('/2027-12-24/')
+        self.assertContains(eve, 'Večerní mše z vigilie Narození Páně')
+        self.assertNotContains(self.client.get('/2027-11-26/'), 'Večerní mše')
+
+    def test_no_acclamation_badge_and_sources_markup(self) -> None:
+        response = self.client.get('/2027-11-21/')
+        self.assertNotContains(response, 'Před evangeliem: Aleluja')
+        self.assertContains(response, 'class="source">Direktář s. 26')
+        self.assertContains(response, 'id="zdroje"')
+
+    def test_json_api(self) -> None:
+        response = self.client.get('/api/v1/days/2027-11-21.json?dieceze=czech')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual((data['date'], data['diocese'], data['season']), ('2027-11-21', 'czech', 'ordinary'))
+        mass = data['masses'][0]
+        self.assertEqual(mass['summary'][0]['items'][0]['songs'][0]['code'], '707')
+        self.assertTrue(mass['plan'])
+        self.assertEqual(self.client.get('/api/v1/days/2027-11-21.json?dieceze=xx').status_code, 400)
+        self.assertEqual(self.client.get('/api/v1/days/2031-01-01.json').status_code, 404)
 
 
 class OccasionPageTests(DataDirMixin, TestCase):

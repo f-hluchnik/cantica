@@ -26,8 +26,9 @@ PARTS: tuple[tuple[str, str], ...] = (
     ('transfer', 'přenášení eucharistie'),
     ('adoration', 'adorace'),
     ('recessional', 'na závěr'),
-    ('after_mass', 'po mši'),
 )
+# Old part keys still accepted when reading rules ("po mši" in the Direktář means the same as "na závěr").
+PART_ALIASES = {'after_mass': 'recessional'}
 PART_KEYS = tuple(key for key, _ in PARTS)
 PART_LABELS = dict(PARTS)
 PART_INDEX = {key: i for i, key in enumerate(PART_KEYS)}
@@ -36,6 +37,8 @@ PART_INDEX = {key: i for i, key in enumerate(PART_KEYS)}
 COVERED_BY_MASS_SONG = ('entrance', 'gospel', 'offertory')
 # Parts for which a missing recommendation is shown as a gap.
 CORE_PARTS = ('mass', 'communion', 'recessional')
+# Not a standard part of the mass: in the plan only when something specific (▲/■) or prescribed is said about it.
+OCCASIONAL_PARTS = ('thanksgiving',)
 
 STRENGTHS: tuple[tuple[str, str], ...] = (
     ('prescribed', 'předepsáno'),

@@ -1,0 +1,26 @@
+{% extends 'web/base.html' %}
+
+{% block title %}{{ day|date:"j. n. Y" }} – Directus Cantica{% endblock %}
+
+{% block content %}
+<div class="settings">
+    <form method="get" class="diocese-form" action="{% url 'day' day %}">
+        <label for="dieceze" class="visually-hidden">diecéze</label>
+        <select name="dieceze" id="dieceze">
+            {% for d in dioceses %}
+                <option value="{{ d.code }}"{% if d.code == diocese.code %} selected{% endif %}>{{ d.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn js-hide">nastavit</button>
+    </form>
+    <label class="sources-switch"><input type="checkbox" id="zdroje"> zdroje</label>
+</div>
+
+<div id="day">{% include 'web/_day.html' %}</div>
+
+<p class="legend">
+    <span><span class="tier tier-celebration">▲</span> podle svátku</span>
+    <span><span class="tier tier-category">■</span> podle typu svátku</span>
+    <span><span class="tier tier-general">●</span> obecné doporučení</span>
+</p>
+{% endblock %}

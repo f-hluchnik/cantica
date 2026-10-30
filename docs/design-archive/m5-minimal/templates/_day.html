@@ -1,0 +1,46 @@
+<div class="day-view" data-title="{{ day|date:'j. n. Y' }} – Directus Cantica" data-url="{% url 'day' day %}">
+    <nav class="day-nav" aria-label="výběr dne">
+        <a class="btn icon" href="{% url 'day' previous_day %}" data-nav aria-label="předchozí den">&#8249;</a>
+        <form method="get" class="date-form" action="{% url 'today' %}">
+            <input type="date" name="datum" value="{{ day|date:'Y-m-d' }}" aria-label="datum">
+            <button type="submit" class="btn js-hide">zobrazit</button>
+        </form>
+        <a class="btn icon" href="{% url 'day' next_day %}" data-nav aria-label="následující den">&#8250;</a>
+        <a class="btn today{% if is_today %} is-today{% endif %}" href="{% url 'today' %}" data-nav>dnes</a>
+    </nav>
+
+    <h1 class="day-heading">{{ day|date:"l j. E Y" }}</h1>
+
+    {% if result %}
+        <p class="season-line">
+            {{ season_label }}{% if result.ctx.season_week %} · {{ result.ctx.season_week }}. týden{% endif %}
+            · cyklus {{ result.ctx.sunday_cycle }}/{% if result.ctx.ferial_cycle == 1 %}I{% else %}II{% endif %}
+        </p>
+
+        {% if result.notes %}
+            <aside class="day-notes">
+                {% for note in result.notes %}<p>{{ note }}</p>{% endfor %}
+            </aside>
+        {% endif %}
+
+        {% if result.masses|length > 1 %}
+            <p class="hint">Tento den lze slavit mši z kteréhokoli z uvedených formulářů.</p>
+        {% endif %}
+
+        {% for mass in result.masses %}{% include 'web/_mass.html' %}{% endfor %}
+
+        {% if result.commemorations %}
+            <p class="hint">Připomínka: {{ result.commemorations|join:", " }}</p>
+        {% endif %}
+
+        {% if evening %}
+            <h2 class="evening-heading"><a href="{% url 'day' next_day %}" data-nav>{{ evening_label }}</a></h2>
+            {% for mass in evening.masses %}{% include 'web/_mass.html' %}{% endfor %}
+        {% endif %}
+    {% else %}
+        <p class="empty-message">
+            Pro tento den zatím nemáme liturgický kalendář.
+            {% if data_first and data_last %}<br>Kalendář je k dispozici od {{ data_first|date:"j. n. Y" }} do {{ data_last|date:"j. n. Y" }}.{% endif %}
+        </p>
+    {% endif %}
+</div>

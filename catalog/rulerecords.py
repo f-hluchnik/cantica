@@ -20,7 +20,15 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from engine.refs import RefError, parse_targets, unknown_references
-from engine.vocab import DAY_KIND_KEYS, KIND_KEYS, MIN_RANK_KEYS, OCCASION_KEYS, PART_KEYS, STRENGTH_KEYS
+from engine.vocab import (
+    DAY_KIND_KEYS,
+    KIND_KEYS,
+    MIN_RANK_KEYS,
+    OCCASION_KEYS,
+    PART_ALIASES,
+    PART_KEYS,
+    STRENGTH_KEYS,
+)
 from liturgy.constants import CATEGORY_KEYS, DIOCESES, SEASON_KEYS
 
 DIOCESE_CODES = frozenset(d.code for d in DIOCESES)
@@ -50,6 +58,9 @@ class RuleRecord:
     position: int = 0
     active: bool = True
     id: int | None = None  # DB id; never written to YAML
+
+    def __post_init__(self) -> None:
+        self.parts = list(dict.fromkeys(PART_ALIASES.get(p, p) for p in self.parts))
 
     def sort_key(self) -> tuple:
         return (self.position, self.occasion, self.celebration, self.category, self.period, self.season, self.songs)

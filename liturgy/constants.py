@@ -70,6 +70,7 @@ RANK_FERIA = 'ferie'
 RANK_MEMORIAL = 'památka'
 RANK_OPTIONAL_MEMORIAL = 'nezávazná památka'
 RANK_COMMEMORATION = 'připomínka'
+RANK_VOTIVE = 'votivní mše'  # synthetic (first Friday), never from calapi
 RANK_LABELS = frozenset({
     RANK_TRIDUUM,
     RANK_PRIMARY,
