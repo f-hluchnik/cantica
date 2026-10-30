@@ -568,7 +568,7 @@ Book assertion format:
 |---|---|---|
 | **M1 Foundation** ✅ code | skeleton, CI, settings, calendar sync/build, dioceses, norms, day page showing calendar only (ranked celebrations, colours, badges) | deployed to `test.directuscantica.cz` with 24 months of data |
 | **M2 Catalog** ✅ code | catalog import, v1 flag prefill, groups, curation admin | every song in sections 100–900 present; groups defined for the book's lists |
-| **M3 Rules + engine** | models, admin, YAML I/O, lint, engine incl. the plan (§8.3), book-assertion harness; transcription of *Obecné zásady* and *Liturgické doby* (pp. 6–28) | assertions for pp. 6–28 pass |
+| **M3 Rules + engine** ✅ code | models, admin, YAML I/O, lint, engine incl. the plan (§8.3), book-assertion harness; transcription of *Obecné zásady* and *Liturgické doby* (pp. 6–28) | assertions for pp. 6–28 pass |
 | **M4 Kalendárium + occasions** | transcription of pp. 29–46 (months) and 47–48 (occasions page), category review, coverage report | coverage report reviewed by you |
 | **M5 Launch** | fragment navigation + prefetch, diocese selector, JSON API, self-hosted fonts, wording, about page | v2 replaces v1 on `directuscantica.cz` |
 | later | responsorial psalm table (pp. 51–59), readings matching | — |
@@ -606,3 +606,35 @@ Book assertion format:
 | D10 | Transcription | I draft the YAML from the scan at M3; you review it (§12). |
 
 No open questions right now. Next step: start M1.
+
+---
+
+## 15. Changes made in M3
+
+Where the implementation deviates from §3–§8, this section wins.
+
+- **Mass parts are a code list** (`engine/vocab.py`), not a DB table: a new part needs template work anyway. Added `psalm` (žalm), used for 613, 627.
+- **Periods live in git** (`data/liturgy/periods.yaml`), like celebrations. Kinds: `fixed` (MM-DD range, may wrap the year), `easter` (offsets), `season_week`; each may also require a season (`advent_early` = 11-27..12-16 in Advent).
+- **Rules reference calendar-side data by key, not by FK** (celebration, category, period, season). Every field that is set must match; the most specific one decides the tier. The admin validates references, and `rules_lint` (CI) catches dangling ones.
+- **Parts, dioceses and cycles are stored as short text** (`mass,entrance`; `olm,brn`; `AC`) and edited as checkbox lists.
+- **Song references are one text field** with a small syntax: `523`, `813B`, `838/5`, `838/1+3`, `691-695`, `@group`, `#section`. A `#section` is filtered per part: *mešní píseň* only songs marked as mass songs, communion/závěr only songs with a verified verse. Explicit songs are never filtered, except that a song marked "not a mass song" is never offered as *mešní píseň*.
+- **New rule kind `silence`** ("nic se nezpívá", Velký pátek): suppresses all candidates for the part at the same or lower specificity and shows its note.
+- **No page = doporučení autora.** Lint treats an author `avoid` overriding a Direktář recommendation at the same level as a deliberate override (reported, not an error); two rules of the same source contradicting each other is an error.
+- **Neighbour rules** use only *slavnosti, svátky a památky* (the book's words; not Sundays, Holy Week or the Triduum, so no Easter Vigil songs on Maundy Thursday) of the same season, with rank ≥ obligatory memorial.
+- **Plan details:**
+  - a part the mass song covers gets its own song when a rule for that part is at least as specific as the mass song (not only "more specific"): Czech patrons get 838 at the entrance, late Advent gets the rorate songs per part;
+  - for the závěr, prescribed or period-level (and higher) songs come first, then songs from nearby celebrations, then the general seasonal list;
+  - variants of one number (422A/B/C, 704A/B) count as one song: a prescribed 422 shows once, variety is between songs, not variants, and lists show each number once;
+  - *either* a mešní píseň (with single parts replaced where a rule says so, e.g. 838 ke vstupu) *or*, when every part the mass song would cover has its own song (late Advent), one song per part and no mešní píseň (review round 2).
+- **Minimal UI (review round 2):** groups are shown as one label without listing their songs; no "možno též" labels (alternatives are only styled lighter); the detailní doporučení shows one line per part with its source, without "další možnosti" or the list of parts the mass song covers. The engine still computes the alternatives, for a possible "jiná sestava" button later.
+- **Maundy Thursday has no závěr** (author rule, liturgical norm): the Mass ends with the transfer of the Blessed Sacrament.
+- **The summary** shows ▲/■ items, prescribed items, and the general *mešní píseň* options (without the *možno též* ones). The gap message appears for catalogued celebrations and Sundays (memorial or higher) with no ▲/■ recommendation.
+- **Categories** were pre-filled by a title heuristic (`calendar_catalog --suggest-categories`), all `categories_reviewed: false`. Apostles and evangelists don't get the generic `saint` category (the Direktář gives them 827 separately); *Svaté rodiny* and the Holy Week days get none.
+- **Caching:** one snapshot per process, keyed by (curation version, calendar build); day results are kept in an LRU of 512 entries. An admin save shows on the next request.
+
+**Transcription decisions to review** (in `data/curated/curation.yaml`, rules sorted by page):
+1. Lent: *upřednostňovat kající písně* (p. 20) is encoded as "doporučeno" for 322, 321, 320, 319, 312, 309 and "možno též" for the rest of 301 ad.
+2. Late Advent (p. 17): the list 102–117 is split into parts following the Kancionál structure (vstup 102, 110; před evangeliem 103, 104, 111, 112; obětní průvod 105, 113; přijímání 106–108, 114–116; závěr 109, 117), as in v1.
+3. Saints (p. 9): martyrs → 842, duchovní pastýři → 843 (doporučeno), all saints → 840, 841 (možno též). 844 and 845 have no category mapping yet.
+4. *OL též 381* (p. 20) is not transcribed: kancional.cz has both 381 and Z381, and it isn't clear which one the footnote means. The other OL footnotes (481–485, 485, 784–789, 781 ad.) have only one candidate and are in as "možno též" with the note *olomoucká verze Kancionálu*.
+5. The Easter Vigil rules hang on *Bílá sobota* (the calendar has no separate vigil), with a note that they apply to the vigil.

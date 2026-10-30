@@ -27,3 +27,5 @@ jobs:
         run: |
           python manage.py calendar_catalog
           python manage.py calendar_build --check
+      - name: Rules lint
+        run: python manage.py rules_lint --file

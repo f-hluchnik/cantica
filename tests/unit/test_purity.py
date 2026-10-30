@@ -7,6 +7,18 @@ ROOT = Path(__file__).resolve().parents[2]
 PURE_MODULES = (
     'catalog/codes.py',
     'catalog/curation.py',
+    'catalog/rulerecords.py',
+    'engine/context.py',
+    'engine/lint.py',
+    'engine/load.py',
+    'engine/model.py',
+    'engine/plan.py',
+    'engine/recommend.py',
+    'engine/refs.py',
+    'engine/resolve.py',
+    'engine/vocab.py',
+    'liturgy/categorize.py',
+    'liturgy/periods.py',
     'liturgy/calapi.py',
     'liturgy/catalog.py',
     'liturgy/constants.py',
@@ -20,6 +32,7 @@ FORBIDDEN = (
     'django',
     'liturgy.models', 'liturgy.dbbuild', 'liturgy.services',
     'catalog.models', 'catalog.admin', 'catalog.dbsync', 'catalog.signals',
+    'rules',
     'web',
 )
 

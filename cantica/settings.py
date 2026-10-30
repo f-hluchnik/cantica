@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'liturgy',
     'catalog',
+    'rules',
     'web',
 ]
 
@@ -140,6 +141,7 @@ CANTICA_DATA_DIR = Path(os.environ.get('CANTICA_DATA_DIR', str(BASE_DIR / 'data'
 CANTICA_RAW_CALENDAR_DIR = CANTICA_DATA_DIR / 'calendar' / 'raw'
 CANTICA_CELEBRATIONS_FILE = CANTICA_DATA_DIR / 'liturgy' / 'celebrations.yaml'
 CANTICA_CURATION_FILE = CANTICA_DATA_DIR / 'curated' / 'curation.yaml'
+CANTICA_PERIODS_FILE = CANTICA_DATA_DIR / 'liturgy' / 'periods.yaml'
 # /health reports 'warn' when fewer days of calendar data remain.
 CANTICA_HEALTH_MIN_DAYS_AHEAD = 180
 CANTICA_DIOCESE_COOKIE = 'dieceze'

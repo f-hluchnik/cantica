@@ -1,4 +1,4 @@
-"""Export curated data (songs, groups) from the DB to data/curated/curation.yaml."""
+"""Export curated data (songs, groups, rules) from the DB to data/curated/curation.yaml."""
 from __future__ import annotations
 
 from argparse import ArgumentParser
@@ -52,5 +52,6 @@ class Command(BaseCommand):
         changed = curation.save(path)
         state = 'written' if changed else 'unchanged'
         self.stdout.write(self.style.SUCCESS(
-            f'{path}: {state} (version {curation.version}, {len(curation.songs)} songs, {len(curation.groups)} groups)',
+            f'{path}: {state} (version {curation.version}, {len(curation.songs)} songs, '
+            f'{len(curation.groups)} groups, {len(curation.rules)} rules)',
         ))

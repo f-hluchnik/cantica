@@ -7,7 +7,7 @@ target-version = "py313"
 # Awailable rule-sets https://docs.astral.sh/ruff/rules/#legend
 [lint]
 # Czech typography in user-facing strings (and the en dash) is intentional.
-allowed-confusables = ["–", "„", "“", "”", "×"]
+allowed-confusables = ["–", "—", "„", "“", "”", "×", "·"]
 
 select = [
     # Pyflakes (F)

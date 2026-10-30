@@ -1,4 +1,4 @@
-"""Curated data file data/curated/curation.yaml: songs and song groups (rules join in M3).
+"""Curated data file data/curated/curation.yaml: songs, song groups and rules.
 
 The DB is the source of truth (edited in the admin); this file is its export, kept in git for
 review, backup and tests. Pure module: must not import Django.
@@ -14,6 +14,7 @@ from pathlib import Path
 import yaml
 
 from catalog.codes import SECTION_KEYS, code_sort_key, is_valid_code, is_valid_verses, verse_numbers
+from catalog.rulerecords import RuleRecord
 
 _KEY_RE = re.compile(r'^[a-z0-9]+(?:_[a-z0-9]+)*$')
 
@@ -76,10 +77,13 @@ class Curation:
     version: int = 0
     songs: list[SongRecord] = field(default_factory=list)
     groups: list[GroupRecord] = field(default_factory=list)
+    rules: list[RuleRecord] = field(default_factory=list)
 
     def problems(self) -> list[str]:
         codes = {s.code for s in self.songs}
-        return self._song_problems() + self._group_problems(codes)
+        groups = {g.key: g.members for g in self.groups}
+        rule_problems = [p for r in self.rules for p in r.problems(codes, groups)]
+        return self._song_problems() + self._group_problems(codes) + rule_problems
 
     def _song_problems(self) -> list[str]:
         problems: list[str] = []
@@ -136,6 +140,7 @@ class Curation:
             'version': self.version,
             'groups': [g.to_dict() for g in sorted(self.groups, key=lambda g: g.key)],
             'songs': [s.to_dict() for s in sorted(self.songs, key=lambda s: code_sort_key(s.code))],
+            'rules': [r.to_dict() for r in sorted(self.rules, key=RuleRecord.sort_key)],
         }
         body = yaml.safe_dump(data, allow_unicode=True, sort_keys=False, width=1000, default_flow_style=None)
         return HEADER + body
@@ -181,10 +186,11 @@ class Curation:
                 )
                 for g in data.get('groups') or []
             ]
+            rules = [RuleRecord.from_dict(r) for r in data.get('rules') or []]
             version = int(data.get('version', 0))
         except (KeyError, TypeError, ValueError, AttributeError) as exc:
             raise CurationError(f'{origin}: malformed entry ({exc})') from exc
-        return cls(version=version, songs=songs, groups=groups)
+        return cls(version=version, songs=songs, groups=groups, rules=rules)
 
     @classmethod
     def load(cls, path: Path) -> Curation:

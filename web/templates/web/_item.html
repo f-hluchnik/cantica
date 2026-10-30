@@ -1,0 +1,10 @@
+<div class="item item-{{ item.kind }}{% if item.strength == 'alternative' %} item-alternative{% endif %}" title="{% for reason in item.reasons %}{{ reason.text }}{% if not forloop.last %} · {% endif %}{% endfor %}">
+    <span class="song-icon">{{ item.tier }}</span>
+    {% if item.kind == 'song' %}
+        {% include 'web/_song.html' with song=item.songs.0 %}
+    {% else %}
+        <span class="song-pod">{{ item.label }}</span>
+    {% endif %}
+    {% if show_part and item.part != 'mass' %}<span class="part-label">{{ item.part_label }}</span>{% endif %}
+    {% if item.strength == 'prescribed' %}<span class="strength">předepsáno</span>{% endif %}
+</div>

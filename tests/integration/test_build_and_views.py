@@ -17,6 +17,7 @@ from liturgy.constants import CATEGORIES, DIOCESES
 from liturgy.days import unknown_titles
 from liturgy.models import CalendarBuild, CalendarDay, Celebration, Diocese, Occurrence
 from liturgy.snapshot import write_snapshot
+from rules.services import reset_caches
 from tests.helpers import fixture_snapshot
 
 FIXTURE_MONTHS = (('czech', 2027, 11), ('czech', 2027, 12), ('czech-olm', 2027, 7), ('czech-pha', 2027, 7))
@@ -43,10 +44,12 @@ class DataDirMixin:
             CANTICA_CELEBRATIONS_FILE=self.catalog_file,
         )
         self._settings.enable()
+        reset_caches()
 
     def tearDown(self) -> None:
         self._settings.disable()
         self._tmp.cleanup()
+        reset_caches()
         super().tearDown()
 
     def build(self, *args: str) -> str:

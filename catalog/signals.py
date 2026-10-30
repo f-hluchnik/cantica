@@ -1,4 +1,4 @@
-"""Bump CurationState.version on every change to curated data (suspended during imports)."""
+"""Bump CurationState.version on every change to curated data: songs, groups, rules (not during imports)."""
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -31,7 +31,8 @@ def bump_version(**kwargs: object) -> None:
 
 def connect() -> None:
     from catalog.models import Song, SongGroup, SongGroupMember
+    from rules.models import Rule
 
-    for model in (Song, SongGroup, SongGroupMember):
+    for model in (Song, SongGroup, SongGroupMember, Rule):
         post_save.connect(bump_version, sender=model, dispatch_uid=f'curation_bump_save_{model.__name__}')
         post_delete.connect(bump_version, sender=model, dispatch_uid=f'curation_bump_delete_{model.__name__}')

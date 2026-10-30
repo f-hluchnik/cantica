@@ -30,17 +30,17 @@
 <main id="day">
     <h2 class="day-heading">{{ day|date:"l j. E Y" }}{% if is_today %} <span class="today-mark">dnes</span>{% endif %}</h2>
 
-    {% if view %}
+    {% if result %}
         <p class="season-line">
-            {{ view.season_label }}{% if view.season_week %} · {{ view.season_week }}. týden{% endif %}
-            · cyklus {{ view.sunday_cycle }} / {% if view.ferial_cycle == 1 %}I{% else %}II{% endif %}
+            {{ season_label }}{% if result.ctx.season_week %} · {{ result.ctx.season_week }}. týden{% endif %}
+            · cyklus {{ result.ctx.sunday_cycle }} / {% if result.ctx.ferial_cycle == 1 %}I{% else %}II{% endif %}
         </p>
 
-        {% if view.masses|length > 1 %}
+        {% if result.masses|length > 1 %}
             <p class="hint">Tento den lze slavit mši z kteréhokoli z uvedených formulářů.</p>
         {% endif %}
 
-        {% for mass in view.masses %}
+        {% for mass in result.masses %}
             <article class="celebration-info colour-{{ mass.colour }}">
                 <h3>{{ mass.title }}</h3>
                 <p class="meta">
@@ -61,17 +61,62 @@
                     {% endif %}
                 </ul>
                 {% if mass.norms.note %}<p class="description-text">{{ mass.norms.note }}</p>{% endif %}
-                <p class="placeholder">Doporučení písní se připravuje.</p>
+                {% for note in mass.notes %}<p class="description-text">{{ note }}</p>{% endfor %}
+
+                {% if mass.summary %}
+                    <ul class="songs-list">
+                        {% for item in mass.summary %}
+                            <li>{% include 'web/_item.html' with item=item show_part=True %}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if mass.gap %}
+                    <p class="hint gap">Pro tento den Direktář žádnou konkrétní píseň neuvádí; platí obecná doporučení ({{ season_label }}).</p>
+                {% endif %}
+
+                {% if mass.plan %}
+                    <details class="details">
+                        <summary class="toggle-details">detailní doporučení</summary>
+                        <div class="celebration-details">
+                            <p class="hint">Jedna z možných sestav podle Direktáře – výběr je na vás.</p>
+                            <ul class="plan">
+                                {% for entry in mass.plan %}
+                                    <li class="plan-entry plan-{{ entry.kind }}">
+                                        <span class="plan-part">{{ entry.label }}:</span>
+                                        {% if entry.kind == 'silence' %}
+                                            <em>{{ entry.note }}</em>
+                                        {% elif entry.kind == 'gap' %}
+                                            <em class="gap">— {{ entry.note }}</em>
+                                        {% else %}
+                                            <span class="song-icon">{{ entry.tier }}</span>
+                                            {% for song in entry.songs %}
+                                                {% include 'web/_song.html' with song=song %}
+                                            {% endfor %}
+                                            <span class="reason">{% for reason in entry.reasons %}{{ reason.text }}{% if not forloop.last %} · {% endif %}{% endfor %}</span>
+                                        {% endif %}
+                                        {% for note in entry.notes %}<div class="part-note">{{ note }}</div>{% endfor %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </details>
+                {% endif %}
             </article>
         {% endfor %}
 
-        {% if view.commemorations %}
-            <p class="hint">Připomínka: {{ view.commemorations|join:", " }}</p>
+        {% if result.commemorations %}
+            <p class="hint">Připomínka: {{ result.commemorations|join:", " }}</p>
         {% endif %}
 
         {% if is_saturday %}
             <p class="hint"><a href="{% url 'day' next_day %}">Večerní mše z neděle &rarr;</a></p>
         {% endif %}
+
+        <div class="song-icons">
+            <div class="song-icon">▲ píseň podle svátku</div>
+            <div class="song-icon">■ píseň podle typu svátku</div>
+            <div class="song-icon">● obecné doporučení</div>
+        </div>
     {% else %}
         <p class="empty-message">
             Pro tento den zatím nemáme liturgický kalendář.

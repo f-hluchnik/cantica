@@ -1,0 +1,69 @@
+# Periods: named date ranges that rules can target (see liturgy/periods.py for the kinds).
+# Pages refer to Direktář pro varhaníky.
+- key: advent_early
+  name: advent do 16. prosince
+  kind: fixed
+  from: 11-27
+  to: 12-16
+  season: advent
+  source_page: 17
+- key: advent_late
+  name: předvánoční týden (17.–24. prosince)
+  kind: fixed
+  from: 12-17
+  to: 12-24
+  source_page: 17
+- key: christmas_octave
+  name: vánoční oktáv
+  kind: fixed
+  from: 12-25
+  to: 01-01
+  source_page: 19
+- key: new_year
+  name: přelom roku
+  kind: fixed
+  from: 12-31
+  to: 01-01
+  source_page: 19
+- key: holy_week_mon_wed
+  name: pondělí až středa Svatého týdne
+  kind: easter
+  from: -6
+  to: -4
+  source_page: 21
+- key: easter_octave
+  name: velikonoční oktáv
+  kind: easter
+  from: 0
+  to: 7
+  source_page: 24
+- key: before_ascension
+  name: doba velikonoční před Nanebevstoupením Páně
+  kind: easter
+  from: 0
+  to: 38
+  source_page: 24
+- key: pentecost_novena
+  name: svatodušní novéna (po Nanebevstoupení Páně)
+  kind: easter
+  from: 40
+  to: 48
+  source_page: 24
+- key: sunday_after_corpus_christi
+  name: neděle po slavnosti Těla a Krve Páně
+  kind: easter
+  from: 63
+  to: 63
+  source_page: 26
+- key: sunday_after_sacred_heart
+  name: neděle po slavnosti Nejsvětějšího Srdce Ježíšova
+  kind: easter
+  from: 70
+  to: 70
+  source_page: 26
+- key: ordinary_week_34
+  name: 34. týden liturgického mezidobí
+  kind: season_week
+  season: ordinary
+  weeks: [34]
+  source_page: 26

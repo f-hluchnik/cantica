@@ -1,4 +1,4 @@
-"""Import data/curated/curation.yaml into the DB (songs, groups)."""
+"""Import data/curated/curation.yaml into the DB (songs, groups, rules)."""
 from __future__ import annotations
 
 from argparse import ArgumentParser
@@ -39,5 +39,6 @@ class Command(BaseCommand):
         except ProtectedError as exc:
             raise CommandError(f'cannot delete songs still in use: {exc.protected_objects}') from exc
         self.stdout.write(self.style.SUCCESS(
-            f'{path}: {result} ({len(curation.songs)} songs, {len(curation.groups)} groups)',
+            f'{path}: {result} ({len(curation.songs)} songs, {len(curation.groups)} groups, '
+            f'{len(curation.rules)} rules)',
         ))

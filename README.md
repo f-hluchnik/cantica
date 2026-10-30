@@ -3,8 +3,9 @@
 Online direktář pro varhaníky: the liturgical calendar plus song recommendations from Kancionál,
 following *Direktář pro varhaníky*. Design: [docs/design-v2.md](docs/design-v2.md).
 
-Status: **v2, milestone M2** — calendar (M1) and the song catalog with curation in the admin (M2).
-Song recommendations arrive in M3.
+Status: **v2, milestone M3** — calendar (M1), song catalog (M2), rules + engine with recommendations on the
+day page (M3). The rules cover *Obecné zásady* and *Liturgické doby* (Direktář pp. 6–28); the kalendárium
+(pp. 29–46) follows in M4.
 
 ## Local development
 
@@ -56,7 +57,7 @@ python manage.py calendar_build
 git add data && git commit -m "calendar: initial data"
 ```
 
-## Curated data (songs, groups; rules from M3)
+## Curated data (songs, groups, rules)
 
 Unlike the calendar, curated data is **edited in the admin**; the DB is the source of truth and
 `data/curated/curation.yaml` is its export (backup, review, tests).
@@ -77,16 +78,47 @@ The catalog (511 entries, codes as on kancional.cz) was transcribed from kancion
 2026-10-30; the v1 communion/recessional flags were carried over as `*`, and *mešní píseň* was pre-set for
 131 songs (members of the mass groups plus every song v1 used as the main mass song). All of it is `reviewed: false`.
 
+## Rules and the engine
+
+A rule is one clause of the Direktář (or an author's convention, shown as *doporučení autora*):
+**when** (celebration ▲ / category ■ / period ● / season ● / always ●, plus filters: Sunday cycles, day,
+minimal rank, dioceses), **which parts** of the mass, **what** (songs, songs from celebrations of the
+surrounding days, a note, or "nic se nezpívá"), **how strongly** (předepsáno / doporučeno / možno též /
+nevhodné), and the **page**. Edit them in the admin (*Pravidla*); the change form shows the next dates the rule
+applies to.
+
+Song references: `523`, `813B`, `Z781`, `838/5` (verse), `838/1+3`, `691-695` (range), `@mesni_obecne`
+(group), `#advent` (Kancionál section; for *mešní píseň* only songs marked as mass songs, for communion and
+závěr only songs with a verified verse).
+
+The engine (`engine/`, pure Python) turns the day's calendar + rules into, per mass: candidates per part with
+their tier and source, the always-visible summary, and *detailní doporučení* (one deterministic combination
+that changes from week to week). Design: §7–8 of the design doc.
+
+| command | what it does |
+|---|---|
+| `rules_lint [--file] [--coverage]` | check the rules against the calendar: unknown references, recommend/avoid contradictions, rules that never apply; `--coverage` lists celebrations without a ▲/■ mass song |
+| `calendar_catalog --suggest-categories` | guess categories for unreviewed celebrations (drive the ■ tier) |
+
+Calendar-side data used by rules: `data/liturgy/periods.yaml` (named date ranges) and the categories in
+`data/liturgy/celebrations.yaml` (pre-filled by a title heuristic, `categories_reviewed: false`).
+
+Tests: `tests/book/` runs the real engine on the committed data without Django (book assertions + lint).
+
 ## Deployment (Fly.io)
 
 - `fly.toml` = production (`directuscantica.cz`), `fly.test.toml` = test instance (`test.directuscantica.cz`).
 - SQLite lives on a Fly volume mounted at `/data`; one machine, always on.
-- `bin/start.sh` runs `migrate`, `curation_import --if-empty` and `calendar_build` on start (Fly's release
+- `bin/start.sh` runs `migrate`, `calendar_build` and `curation_import --if-empty` on start (Fly's release
   machine cannot see the volume), then gunicorn. A failing build keeps the previous data and the site stays up.
 - Run management commands on Fly **as appuser** (`gosu appuser python /app/manage.py …`), never as root:
   SQLite files created by root would make the database read-only for the app.
 - Push to `main` → CI → deploy. Any branch can go to the test instance via the "Deploy test instance" workflow.
 - `/live` is the Fly health check; `/health` reports calendar freshness and is checked daily by an Action.
+
+Upgrading an instance that already has curated data (e.g. the test instance after M2 → M3): `--if-empty` does
+nothing there, so load the new file once with
+`fly ssh console --app <app> -C "gosu appuser python /app/manage.py curation_import"`.
 
 One-time setup:
 - per Fly app: `fly volumes create …`, `fly secrets set SECRET_KEY=…` (see the comments in the toml files);

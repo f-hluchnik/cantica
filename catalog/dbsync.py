@@ -1,4 +1,4 @@
-"""DB <-> data/curated/curation.yaml.
+"""DB <-> data/curated/curation.yaml (songs, groups, rules).
 
 Export is always allowed. Import replaces the curated tables with the file, but refuses when the
 DB has changes that were never exported (they would be lost), unless forced.
@@ -10,6 +10,7 @@ from django.db import transaction
 from catalog.curation import Curation, GroupRecord, SongRecord
 from catalog.models import CurationState, Song, SongGroup, SongGroupMember
 from catalog.signals import bumps_suspended
+from rules.models import Rule
 
 SONG_FIELDS = (
     'title', 'section', 'mass_song', 'communion_verses', 'recessional_verses', 'verse_count', 'reviewed', 'note',
@@ -49,7 +50,8 @@ def db_to_curation() -> Curation:
         )
         for g in SongGroup.objects.all()
     ]
-    return Curation(version=state.version, songs=songs, groups=groups)
+    rules = [rule.to_record() for rule in Rule.objects.all()]
+    return Curation(version=state.version, songs=songs, groups=groups, rules=rules)
 
 
 def export_curation(mark: bool = True) -> Curation:
@@ -72,7 +74,7 @@ def mark_exported(version: int) -> CurationState:
 
 
 def _content(curation: Curation) -> str:
-    return Curation(version=0, songs=curation.songs, groups=curation.groups).dumps()
+    return Curation(version=0, songs=curation.songs, groups=curation.groups, rules=curation.rules).dumps()
 
 
 def is_empty() -> bool:
@@ -127,6 +129,9 @@ def import_curation(curation: Curation, force: bool = False) -> str:
             for g in curation.groups
             for position, code in enumerate(g.members, start=1)
         ])
+
+        Rule.objects.all().delete()  # rules have no dependents; recreate in file order
+        Rule.objects.bulk_create([Rule.from_record(r) for r in sorted(curation.rules, key=lambda r: r.sort_key())])
 
     new_version = max(state.version + 1, curation.version)
     CurationState.objects.filter(pk=1).update(version=new_version, exported_version=new_version)

@@ -9,10 +9,11 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from liturgy.constants import DEFAULT_DIOCESE
+from liturgy.constants import DEFAULT_DIOCESE, SEASON_LABELS
 from liturgy.dbbuild import latest_build
 from liturgy.models import Diocese
-from liturgy.services import day_view, health
+from liturgy.services import health
+from rules.services import day_result
 
 COOKIE_MAX_AGE = 365 * 24 * 3600
 
@@ -49,6 +50,7 @@ def day_page(request: HttpRequest, day: date | None = None) -> HttpResponse:
     diocese, store_cookie = _requested_diocese(request, dioceses)
 
     build = latest_build()
+    result = day_result(diocese.code, day)
     context = {
         'day': day,
         'today': today,
@@ -58,7 +60,8 @@ def day_page(request: HttpRequest, day: date | None = None) -> HttpResponse:
         'is_saturday': day.weekday() == 5,
         'diocese': diocese,
         'dioceses': list(dioceses.values()),
-        'view': day_view(diocese.code, day),
+        'result': result,
+        'season_label': SEASON_LABELS.get(result.ctx.season, '') if result else '',
         'data_first': build.first_date if build else None,
         'data_last': build.last_date if build else None,
     }

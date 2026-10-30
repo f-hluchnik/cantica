@@ -1,7 +1,7 @@
 # Curated data exported from the DB (source of truth: the admin).
 # Import into an empty DB: python manage.py curation_import --if-empty
 # Song verse fields: null = not verified, "-" = none, "*" = as dedicated in Kancionál, "4,5" = these verses.
-version: 2
+version: 4
 groups:
 - key: advent_k_prijimani
   name: adventní písně k přijímání
@@ -584,3 +584,916 @@ songs:
 - {code: '988', title: 'Vezmi, Pane, život můj', section: occasional, recessional_verses: '*'}
 - {code: '989', title: Můj kříži, section: occasional, recessional_verses: '*'}
 - {code: Z991, title: Kde domov můj, section: occasional}
+rules:
+- parts: [gospel]
+  songs: 691-695
+  note: Zvl. o nedělích a slavnostech zpěv Aleluja s příslušným veršem.
+  page: 7
+  position: 701
+- when: {season: lent}
+  parts: [gospel]
+  strength: avoid
+  songs: 691-695
+  page: 7
+  position: 702
+- when: {season: lent}
+  parts: [gospel]
+  songs: 696, 697
+  note: Chvála tobě, Kriste s příslušným veršem.
+  page: 7
+  position: 703
+- when: {season: advent}
+  parts: [mass]
+  songs: '#advent'
+  page: 8
+  position: 801
+- when: {category: lord}
+  parts: [mass]
+  songs: '#jesus'
+  page: 8
+  position: 810
+- when: {category: virgin_mary}
+  parts: [mass]
+  songs: '@marianske'
+  page: 8
+  position: 811
+- when: {category: virgin_mary}
+  parts: [communion]
+  songs: '813'
+  note: Po přijímání.
+  page: 8
+  position: 812
+- when: {category: apostle_evangelist}
+  parts: [mass]
+  songs: '827'
+  page: 8
+  position: 813
+- when: {category: czech_patron}
+  parts: [entrance]
+  songs: '838'
+  note: Příslušná sloka; od sloky před evangeliem pak mešní píseň ke skupině svatých.
+  page: 8
+  position: 814
+- when: {category: dedication}
+  parts: [mass]
+  songs: 917, 918
+  page: 8
+  position: 815
+- when: {category: martyr}
+  parts: [mass]
+  songs: '842'
+  page: 9
+  position: 901
+- when: {category: pastor}
+  parts: [mass]
+  songs: '843'
+  page: 9
+  position: 902
+- when: {category: saint}
+  parts: [mass]
+  strength: alternative
+  songs: 840, 841
+  note: Nebo obecně ke svatým.
+  page: 9
+  position: 903
+- when: {season: christmas}
+  parts: [communion]
+  songs: '#christmas'
+  page: 9
+  position: 910
+- when: {season: christmas}
+  parts: [communion]
+  strength: alternative
+  songs: '#jesus'
+  page: 9
+  position: 911
+- when: {season: easter}
+  parts: [communion]
+  songs: '#easter'
+  page: 9
+  position: 912
+- when: {season: easter}
+  parts: [communion]
+  strength: alternative
+  songs: '#jesus'
+  page: 9
+  position: 913
+- when: {season: lent}
+  parts: [communion]
+  strength: alternative
+  songs: '#lent'
+  page: 9
+  position: 914
+- when: {season: ordinary}
+  parts: [communion]
+  songs: '#jesus'
+  page: 9
+  position: 915
+- parts: [recessional]
+  kind: neighbours
+  page: 10
+  position: 1001
+- parts: [recessional]
+  strength: alternative
+  songs: '930'
+  note: Staletí se zpívala na závěr.
+  page: 10
+  position: 1002
+- when: {season: advent}
+  parts: [recessional]
+  songs: '#advent'
+  page: 10
+  position: 1010
+- when: {season: christmas}
+  parts: [recessional]
+  songs: '#christmas'
+  page: 10
+  position: 1011
+- when: {season: lent}
+  parts: [recessional]
+  songs: '#lent'
+  page: 10
+  position: 1012
+- when: {season: easter}
+  parts: [recessional]
+  songs: '#easter'
+  page: 10
+  position: 1013
+- when: {period: advent_early, day: weekday}
+  parts: [mass]
+  songs: 121, 123, 126, 129
+  page: 17
+  position: 1701
+- when: {period: advent_early, day: weekday}
+  parts: [communion]
+  songs: '127'
+  page: 17
+  position: 1702
+- when: {period: advent_early, day: weekday}
+  parts: [recessional]
+  songs: '109'
+  page: 17
+  position: 1703
+- when: {period: advent_late, day: weekday}
+  parts: [mass]
+  songs: 122, 124, 130
+  page: 17
+  position: 1710
+- when: {period: advent_late, day: weekday}
+  parts: [entrance]
+  songs: 102, 110
+  internal: Zpěvy 102–117 přiřazeny k částem mše podle Kancionálu (a dat v1).
+  page: 17
+  position: 1711
+- when: {period: advent_late, day: weekday}
+  parts: [gospel]
+  songs: 103, 104, 111, 112
+  page: 17
+  position: 1712
+- when: {period: advent_late, day: weekday}
+  parts: [offertory]
+  songs: 105, 113
+  page: 17
+  position: 1713
+- when: {period: advent_late, day: weekday}
+  parts: [communion]
+  songs: 106, 107, 108, 114, 115, 116
+  page: 17
+  position: 1714
+- when: {period: advent_late, day: weekday}
+  parts: [recessional]
+  songs: 109, 117
+  page: 17
+  position: 1715
+- when: {celebration: 1-nedele-adventni}
+  parts: [mass]
+  songs: 129, 126
+  note: Příchod Krista na konci věků.
+  page: 17
+  position: 1720
+- when: {celebration: 2-nedele-adventni}
+  parts: [mass]
+  songs: 121, 125
+  note: Jan Křtitel volá k obrácení.
+  page: 17
+  position: 1721
+- when: {celebration: 2-nedele-adventni}
+  parts: [mass]
+  strength: alternative
+  songs: 122, 123
+  page: 17
+  position: 1722
+- when: {celebration: 3-nedele-adventni}
+  parts: [mass]
+  songs: 121, 125
+  note: Jan Křtitel volá k obrácení.
+  page: 17
+  position: 1723
+- when: {celebration: 3-nedele-adventni}
+  parts: [mass]
+  strength: alternative
+  songs: 122, 123
+  page: 17
+  position: 1724
+- when: {celebration: 4-nedele-adventni}
+  parts: [mass]
+  songs: 130, 111
+  note: Mariánská neděle (zvěstování, navštívení).
+  page: 18
+  position: 1801
+- when: {celebration: 4-nedele-adventni}
+  parts: [mass]
+  strength: alternative
+  songs: '124'
+  page: 18
+  position: 1802
+- when: {season: advent, day: weekday}
+  parts: [before_mass]
+  songs: '101'
+  note: Dobrá tradice ve všední dny.
+  page: 18
+  position: 1810
+- when: {season: advent, day: sunday}
+  parts: [before_mass]
+  songs: '128'
+  note: Dobrá tradice v neděle.
+  page: 18
+  position: 1811
+- when: {season: advent}
+  parts: [communion]
+  songs: '@advent_k_prijimani'
+  page: 18
+  position: 1812
+- when: {season: advent}
+  parts: [after_mass]
+  songs: '117'
+  page: 18
+  position: 1813
+- when: {season: advent}
+  parts: [after_mass]
+  strength: alternative
+  songs: 124, 140
+  page: 18
+  position: 1814
+- when: {season: advent}
+  kind: note
+  note: 'Varhanní hra má odpovídat charakteru adventu: výběrem skladeb, interpretací, improvizací i rejstříky.'
+  page: 18
+  position: 1815
+- when: {season: christmas}
+  parts: [mass]
+  songs: '#christmas'
+  page: 19
+  position: 1901
+- when: {season: christmas, min_rank: feast}
+  parts: [after_mass]
+  songs: '201'
+  note: O nedělích, slavnostech a svátcích většinou.
+  page: 19
+  position: 1902
+- when: {celebration: sv-stepana-prvomucednika}
+  parts: [mass, entrance, gospel, offertory, communion, recessional]
+  strength: avoid
+  songs: '#mary_saints'
+  note: Ve vánočním oktávu zpíváme vánoční repertoár.
+  page: 19
+  position: 1910
+- when: {celebration: sv-jana-apostola-a-evangelisty}
+  parts: [mass, entrance, gospel, offertory, communion, recessional]
+  strength: avoid
+  songs: '#mary_saints'
+  note: Ve vánočním oktávu zpíváme vánoční repertoár.
+  page: 19
+  position: 1911
+- when: {celebration: svatych-mladatek-mucedniku}
+  parts: [mass, entrance, gospel, offertory, communion, recessional]
+  strength: avoid
+  songs: '#mary_saints'
+  note: Ve vánočním oktávu zpíváme vánoční repertoár.
+  page: 19
+  position: 1912
+- when: {celebration: oktav-narozeni-pane-matky-bozi-panny-marie}
+  parts: [mass, entrance, gospel, offertory, communion, recessional]
+  strength: avoid
+  songs: '#mary_saints'
+  note: Ve vánočním oktávu zpíváme vánoční repertoár.
+  page: 19
+  position: 1913
+- when: {period: new_year}
+  parts: [recessional]
+  songs: '932'
+  note: Na přelomu roku.
+  page: 19
+  position: 1914
+- when: {celebration: zjeveni-pane}
+  parts: [mass]
+  songs: '202'
+  page: 19
+  position: 1920
+- when: {celebration: zjeveni-pane}
+  parts: [communion]
+  songs: 213, 219
+  page: 19
+  position: 1921
+- when: {celebration: zjeveni-pane}
+  parts: [psalm]
+  songs: '613'
+  page: 19
+  position: 1922
+- when: {season: lent}
+  parts: [mass]
+  songs: '@postni_kajicne'
+  note: V postní době upřednostňujeme písně kajícího charakteru.
+  page: 20
+  position: 2001
+- when: {season: lent}
+  parts: [mass]
+  strength: alternative
+  songs: 307, 301
+  page: 20
+  position: 2002
+- when: {season: lent}
+  parts: [mass]
+  strength: alternative
+  songs: '#lent'
+  internal: Obecně „301 ad.“; s. 20 upřednostňuje kající písně, proto zde „možno též“.
+  page: 19
+  position: 2003
+- when: {season: lent}
+  parts: [communion]
+  songs: '#jesus, @postni_o_utrpeni'
+  page: 20
+  position: 2004
+- when: {celebration: popelecni-streda}
+  parts: [mass]
+  songs: 322, 309
+  note: Výhradně kající písně.
+  page: 20
+  position: 2010
+- when: {celebration: popelecni-streda}
+  parts: [mass]
+  strength: alternative
+  songs: '321'
+  page: 20
+  position: 2011
+- when: {celebration: popelecni-streda}
+  parts: [ashes]
+  songs: 320, 319, 312
+  page: 20
+  position: 2012
+- when: {celebration: popelecni-streda}
+  parts: [ashes]
+  strength: alternative
+  songs: 665, 662, 669
+  note: Kající žalmy.
+  page: 20
+  position: 2013
+- when: {celebration: 1-nedele-postni}
+  parts: [mass]
+  songs: '307'
+  note: Viz 3. sloka.
+  page: 20
+  position: 2020
+- when: {celebration: 1-nedele-postni}
+  parts: [entrance]
+  strength: alternative
+  songs: 068
+  note: K případnému slavnostnímu vstupu.
+  page: 20
+  position: 2021
+- when: {celebration: kvetna-nedele}
+  parts: [procession]
+  songs: '318'
+  note: Zpívá-li se při úvodních obřadech pouze z Kancionálu.
+  page: 21
+  position: 2101
+- when: {celebration: kvetna-nedele}
+  parts: [mass]
+  songs: 303, 305, 308
+  note: Písně o utrpení Páně.
+  page: 21
+  position: 2102
+- when: {celebration: kvetna-nedele}
+  parts: [after_mass]
+  songs: '315'
+  page: 21
+  position: 2103
+- when: {celebration: kvetna-nedele}
+  parts: [after_mass]
+  strength: alternative
+  songs: '316'
+  page: 21
+  position: 2104
+- when: {period: holy_week_mon_wed}
+  parts: [mass]
+  songs: 303, 305, 306, 308
+  note: Písně o utrpení Páně.
+  page: 21
+  position: 2110
+- when: {period: holy_week_mon_wed}
+  parts: [after_mass]
+  songs: '315'
+  page: 21
+  position: 2111
+- when: {period: holy_week_mon_wed}
+  parts: [after_mass]
+  strength: alternative
+  songs: '316'
+  page: 21
+  position: 2112
+- when: {celebration: ctvrtek-svateho-tydne}
+  parts: [mass]
+  songs: 710, 717
+  note: Eucharistické písně.
+  page: 21
+  position: 2120
+- when: {celebration: ctvrtek-svateho-tydne}
+  kind: note
+  note: Ke chvalozpěvu Sláva na výsostech se tradičně váže krátké slavnostní preludium a následné umlknutí slavnostního zvuku varhan nebo varhan vůbec.
+  page: 21
+  position: 2121
+- when: {celebration: ctvrtek-svateho-tydne}
+  parts: [offertory]
+  strength: prescribed
+  songs: '681'
+  page: 21
+  position: 2122
+- when: {celebration: ctvrtek-svateho-tydne}
+  parts: [communion]
+  songs: 701, 712, 714, 721, 724, 725
+  note: Nebo antifona „Toto je moje tělo…“.
+  page: 22
+  position: 2201
+- when: {celebration: ctvrtek-svateho-tydne}
+  parts: [transfer]
+  songs: '704'
+  page: 22
+  position: 2202
+- when: {celebration: ctvrtek-svateho-tydne}
+  parts: [transfer]
+  strength: alternative
+  songs: '705'
+  page: 22
+  position: 2203
+- when: {celebration: velky-patek}
+  parts: [mass, offertory]
+  kind: silence
+  note: Mše se neslaví.
+  page: 22
+  position: 2210
+- when: {celebration: velky-patek}
+  parts: [entrance, recessional]
+  kind: silence
+  note: Při vstupu a na závěr se nic nezpívá.
+  page: 22
+  position: 2211
+- when: {celebration: velky-patek}
+  parts: [gospel]
+  songs: 696, 697
+  note: S příslušným veršem.
+  page: 22
+  position: 2212
+- when: {celebration: velky-patek}
+  parts: [veneration]
+  songs: 304, 315, 316, 317
+  page: 22
+  position: 2213
+- when: {celebration: velky-patek}
+  parts: [communion]
+  strength: alternative
+  songs: 302, 305, 306, 307
+  note: Žádný zpěv není předepsán; je-li nutné něco zpívat.
+  page: 22
+  position: 2214
+- when: {celebration: velky-patek}
+  kind: note
+  note: Pokud možno dnes varhany mlčí; jinak jen slabě doprovázejí zpěv lidu.
+  page: 22
+  position: 2215
+- when: {celebration: bila-sobota}
+  kind: note
+  note: Doporučení platí pro velikonoční vigilii.
+  page: 22
+  position: 2220
+- when: {celebration: bila-sobota}
+  parts: [gospel]
+  songs: '621'
+  page: 22
+  position: 2221
+- when: {celebration: bila-sobota}
+  parts: [litany]
+  songs: 068
+  note: Nutno přidat prosby určené pro křestní bohoslužbu.
+  page: 22
+  position: 2222
+- when: {celebration: bila-sobota}
+  parts: [baptismal_water]
+  songs: 511A
+  page: 22
+  position: 2223
+- when: {celebration: bila-sobota}
+  parts: [baptismal_water]
+  strength: alternative
+  songs: '401'
+  note: Nebo jiný zpěv velikonočního charakteru.
+  page: 22
+  position: 2224
+- when: {celebration: bila-sobota}
+  parts: [mass, offertory, communion]
+  songs: '401'
+  note: K přípravě darů a k přijímání je nejvhodnější pokračovat v písni 401.
+  page: 23
+  position: 2301
+- when: {celebration: bila-sobota}
+  parts: [recessional]
+  songs: '407'
+  page: 23
+  position: 2302
+- when: {celebration: bila-sobota}
+  parts: [mass, entrance, offertory, communion, recessional]
+  strength: avoid
+  songs: '#lent'
+  internal: Vigilie již patří k Velikonocům.
+  page: 22
+  position: 2303
+- when: {celebration: zmrtvychvstani-pane}
+  parts: [asperges]
+  songs: 511A
+  note: Koná-li se kropení; nebo jiný zpěv velikonočního charakteru.
+  page: 23
+  position: 2310
+- when: {celebration: zmrtvychvstani-pane}
+  parts: [psalm]
+  songs: '627'
+  page: 23
+  position: 2311
+- when: {celebration: zmrtvychvstani-pane}
+  parts: [sequence]
+  strength: prescribed
+  songs: '406'
+  note: Nezpívá-li sekvenci schola nebo sbor, zpíváme celou píseň (8 slok).
+  page: 23
+  position: 2312
+- when: {celebration: zmrtvychvstani-pane}
+  parts: [mass]
+  strength: avoid
+  songs: '406'
+  note: Ke mši píseň 406 nezpíváme.
+  page: 23
+  position: 2313
+- when: {season: easter}
+  parts: [mass]
+  songs: 401-413
+  page: 23
+  position: 2320
+- when: {season: easter}
+  parts: [mass]
+  strength: alternative
+  songs: 481-485
+  note: Olomoucká verze Kancionálu.
+  page: 23
+  position: 2321
+- when: {season: easter}
+  parts: [recessional]
+  songs: '407'
+  note: Zvl. kolem poledne a večer (místo Anděl Páně).
+  page: 24
+  position: 2401
+- when: {season: easter}
+  parts: [recessional]
+  strength: alternative
+  songs: '485'
+  note: Olomoucká verze Kancionálu.
+  page: 24
+  position: 2402
+- when: {period: easter_octave}
+  parts: [psalm]
+  strength: alternative
+  songs: '627'
+  page: 24
+  position: 2403
+- when: {period: easter_octave}
+  parts: [sequence]
+  strength: alternative
+  songs: '406'
+  note: Sekvence není povinná.
+  page: 24
+  position: 2404
+- when: {celebration: 3-nedele-velikonocni}
+  parts: [mass]
+  songs: '410'
+  page: 24
+  position: 2410
+- when: {celebration: 7-nedele-velikonocni}
+  parts: [mass]
+  songs: '415'
+  page: 24
+  position: 2411
+- when: {celebration: 7-nedele-velikonocni}
+  parts: [recessional]
+  songs: 422, 423
+  page: 24
+  position: 2412
+- when: {celebration: nanebevstoupeni-pane}
+  parts: [mass]
+  strength: prescribed
+  songs: '415'
+  page: 24
+  position: 2420
+- when: {period: pentecost_novena}
+  parts: [mass]
+  songs: '415'
+  note: Zpíváme ji častěji i ve dnech do slavnosti Seslání Ducha Svatého.
+  page: 24
+  position: 2421
+- when: {period: before_ascension}
+  parts: [mass, entrance, gospel, offertory, communion, recessional, after_mass]
+  strength: avoid
+  songs: '415'
+  note: Před slavností Nanebevstoupení Páně píseň 415 zásadně nezpíváme.
+  page: 24
+  position: 2422
+- when: {period: pentecost_novena}
+  parts: [recessional]
+  songs: 423, 422
+  note: Po domluvě s knězem.
+  page: 24
+  position: 2430
+- when: {celebration: seslani-ducha-svateho}
+  parts: [mass]
+  songs: '421'
+  page: 25
+  position: 2501
+- when: {celebration: seslani-ducha-svateho}
+  parts: [mass]
+  strength: alternative
+  songs: 424, 425
+  page: 25
+  position: 2502
+- when: {celebration: seslani-ducha-svateho}
+  parts: [sequence]
+  strength: prescribed
+  songs: 422A, 422B
+  note: Překlad sekvence Veni, Sancte Spiritus, všech 5 slok.
+  page: 25
+  position: 2503
+- when: {celebration: seslani-ducha-svateho}
+  parts: [communion]
+  songs: '#easter'
+  page: 25
+  position: 2504
+- when: {celebration: seslani-ducha-svateho}
+  parts: [recessional]
+  songs: '407'
+  page: 25
+  position: 2505
+- when: {season: ordinary}
+  parts: [mass]
+  songs: '@mesni_obecne, @k_panu_jezisi_mesni, @prilezitostne_mesni'
+  page: 25
+  position: 2510
+- when: {season: ordinary}
+  parts: [mass]
+  strength: alternative
+  songs: '425'
+  note: Pro svůj obecnější charakter.
+  page: 25
+  position: 2511
+- when: {season: ordinary}
+  parts: [mass]
+  strength: alternative
+  songs: 784, 785, 788, 789
+  note: Olomoucká verze Kancionálu.
+  page: 25
+  position: 2512
+- when: {season: ordinary}
+  parts: [communion]
+  songs: '@dekovne'
+  note: Děkovné písně při díkůvzdání po přijímání.
+  page: 25
+  position: 2513
+- when: {season: ordinary}
+  parts: [communion]
+  strength: alternative
+  songs: 631, 632, 633, 644, 649, 651, 652, 653, 656, 658, 659, 672, 681, 685
+  note: Responsoriální žalmy děkovného charakteru.
+  page: 25
+  position: 2514
+- when: {celebration: 5-nedele-v-mezidobi, cycles: C}
+  parts: [mass]
+  songs: '827'
+  note: Povolání apoštolů.
+  page: 26
+  position: 2601
+- when: {celebration: 16-nedele-v-mezidobi, cycles: A}
+  parts: [mass]
+  songs: '519'
+  note: Druhý příchod Krista.
+  page: 26
+  position: 2602
+- when: {celebration: 19-nedele-v-mezidobi, cycles: C}
+  parts: [mass]
+  songs: '519'
+  note: Druhý příchod Krista.
+  page: 26
+  position: 2603
+- when: {celebration: 32-nedele-v-mezidobi, cycles: A}
+  parts: [mass]
+  songs: '519'
+  note: Druhý příchod Krista.
+  page: 26
+  position: 2604
+- when: {celebration: 33-nedele-v-mezidobi}
+  parts: [mass]
+  songs: '519'
+  note: Druhý příchod Krista.
+  page: 26
+  position: 2605
+- when: {celebration: 18-nedele-v-mezidobi, cycles: AB}
+  parts: [mass]
+  songs: 710, 717
+  note: Eucharistie.
+  page: 26
+  position: 2606
+- when: {celebration: 18-nedele-v-mezidobi, cycles: AB}
+  parts: [mass]
+  strength: alternative
+  songs: 701, 725, 712
+  page: 26
+  position: 2607
+- when: {celebration: 19-nedele-v-mezidobi, cycles: B}
+  parts: [mass]
+  songs: 710, 717
+  note: Eucharistie.
+  page: 26
+  position: 2608
+- when: {celebration: 19-nedele-v-mezidobi, cycles: B}
+  parts: [mass]
+  strength: alternative
+  songs: 701, 725, 712
+  page: 26
+  position: 2609
+- when: {celebration: 20-nedele-v-mezidobi, cycles: B}
+  parts: [mass]
+  songs: 710, 717
+  note: Eucharistie.
+  page: 26
+  position: 2610
+- when: {celebration: 20-nedele-v-mezidobi, cycles: B}
+  parts: [mass]
+  strength: alternative
+  songs: 701, 725, 712
+  page: 26
+  position: 2611
+- when: {celebration: 21-nedele-v-mezidobi, cycles: A}
+  parts: [mass]
+  songs: '826'
+  note: Petr – Skála.
+  page: 26
+  position: 2612
+- when: {celebration: 16-nedele-v-mezidobi, cycles: B}
+  parts: [mass]
+  songs: '843'
+  note: Pastýři Božího lidu.
+  page: 26
+  position: 2613
+- when: {celebration: 2-nedele-v-mezidobi, cycles: C}
+  parts: [mass]
+  songs: '425'
+  note: Druhé čtení zaměřené k Duchu Svatému.
+  page: 26
+  position: 2614
+- when: {celebration: 14-nedele-v-mezidobi, cycles: A}
+  parts: [mass]
+  songs: '425'
+  note: Druhé čtení zaměřené k Duchu Svatému.
+  page: 26
+  position: 2615
+- when: {celebration: 16-nedele-v-mezidobi, cycles: A}
+  parts: [mass]
+  songs: '425'
+  note: Druhé čtení zaměřené k Duchu Svatému.
+  page: 26
+  position: 2616
+- when: {period: sunday_after_corpus_christi}
+  parts: [mass]
+  songs: 710, 717
+  page: 26
+  position: 2620
+- when: {period: sunday_after_corpus_christi}
+  parts: [mass]
+  strength: alternative
+  songs: 785, 789
+  note: Olomoucká verze Kancionálu.
+  page: 26
+  position: 2621
+- when: {period: sunday_after_sacred_heart}
+  parts: [mass]
+  songs: 702, 709, 715, 728
+  page: 26
+  position: 2622
+- when: {period: sunday_after_sacred_heart}
+  parts: [mass]
+  strength: alternative
+  songs: 784, 788
+  note: Olomoucká verze Kancionálu.
+  page: 26
+  position: 2623
+- when: {celebration: jezise-krista-krale}
+  parts: [mass]
+  songs: '707'
+  page: 26
+  position: 2630
+- when: {celebration: jezise-krista-krale}
+  parts: [adoration]
+  songs: 703, 631
+  note: K výstavu.
+  page: 26
+  position: 2631
+- when: {season: ordinary}
+  parts: [recessional]
+  songs: '930'
+  note: Zvláště 930.
+  page: 27
+  position: 2701
+- when: {season: ordinary}
+  parts: [recessional]
+  strength: alternative
+  songs: 905, 910
+  page: 27
+  position: 2702
+- when: {period: ordinary_week_34, day: weekday}
+  parts: [mass]
+  songs: '519'
+  note: Eschatologický charakter posledního týdne mezidobí.
+  page: 27
+  position: 2710
+- when: {celebration: nejsvetejsi-trojice}
+  parts: [mass]
+  songs: 514, 520
+  page: 27
+  position: 2720
+- when: {celebration: nejsvetejsi-trojice}
+  parts: [mass]
+  strength: alternative
+  songs: '@mesni_obecne, 911'
+  page: 27
+  position: 2721
+- when: {celebration: tela-a-krve-pane}
+  parts: [mass]
+  songs: 710, 717
+  page: 27
+  position: 2730
+- when: {celebration: tela-a-krve-pane}
+  parts: [adoration]
+  songs: '704'
+  page: 27
+  position: 2731
+- when: {celebration: tela-a-krve-pane}
+  parts: [adoration]
+  strength: alternative
+  songs: '705'
+  page: 27
+  position: 2732
+- when: {celebration: tela-a-krve-pane}
+  parts: [mass]
+  strength: alternative
+  songs: 781-798
+  note: Olomoucká verze Kancionálu.
+  page: 27
+  position: 2733
+- when: {celebration: nejsvetejsiho-srdce-jezisova}
+  parts: [mass]
+  songs: 702, 709, 715, 728
+  page: 27
+  position: 2740
+- when: {celebration: nejsvetejsiho-srdce-jezisova}
+  parts: [adoration]
+  songs: 722, 065
+  page: 27
+  position: 2741
+- when: {celebration: nejsvetejsiho-srdce-jezisova}
+  parts: [mass]
+  strength: alternative
+  songs: 781-798
+  note: Olomoucká verze Kancionálu.
+  page: 27
+  position: 2742
+- when: {season: advent}
+  parts: [mass, entrance, gospel, offertory, communion]
+  strength: avoid
+  songs: '#mary_saints, #occasional'
+  internal: V adventu písně z oddílů 800 a 900 jen tam, kde jsou výslovně doporučeny (▲/■ pravidla mají přednost).
+  position: 9001
+- when: {season: ordinary}
+  parts: [communion]
+  strength: avoid
+  songs: '813'
+  internal: Mariánská píseň; k přijímání na běžné mši se nehodí (o mariánských slavnostech ji ■ pravidlo s. 8 doporučuje).
+  position: 9002
+- when: {celebration: ctvrtek-svateho-tydne}
+  parts: [recessional]
+  kind: silence
+  note: 'Mše nekončí obvyklým závěrem: následuje přenesení Nejsvětější svátosti.'
+  internal: Liturgická norma (misál), v Direktáři výslovně neuvedeno.
+  position: 9003
