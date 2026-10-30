@@ -1,11 +1,13 @@
 # Directus Cantica
 
 Online direktář pro varhaníky: the liturgical calendar plus song recommendations from Kancionál,
-following *Direktář pro varhaníky*. Design: [docs/design-v2.md](docs/design-v2.md).
+following *Direktář pro varhaníky*.
 
-Status: **v2, milestone M3** — calendar (M1), song catalog (M2), rules + engine with recommendations on the
-day page (M3). The rules cover *Obecné zásady* and *Liturgické doby* (Direktář pp. 6–28); the kalendárium
-(pp. 29–46) follows in M4.
+- **How to run and manage it: [docs/manual.md](docs/manual.md)** (start here)
+- Design and decisions: [docs/design-v2.md](docs/design-v2.md)
+
+Status: **v2 launched (M5)** — calendar, song catalog, the whole Direktář transcribed as rules (pp. 6–48),
+occasions page, JSON API.
 
 ## Local development
 

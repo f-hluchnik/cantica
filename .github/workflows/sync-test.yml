@@ -1,0 +1,47 @@
+# Copy the curated data (songs, groups, rules) from production to the test instance (manual).
+# Calendar data comes from git and admin users are not copied.
+name: Copy production data to test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    concurrency: deploy-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Export from production (read-only, does not mark anything as exported)
+        shell: bash
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          flyctl ssh console --app directus-cantica \
+            -C "gosu appuser python /app/manage.py curation_export --print --no-mark" > export.yaml
+          tr -d '\r' < export.yaml | sed -n '/^# Curated data exported/,$p' > production.yaml
+      - name: Validate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from catalog.curation import Curation
+          curation = Curation.load(Path('production.yaml'))
+          curation.validate()
+          assert len(curation.songs) > 500, f'suspicious export: only {len(curation.songs)} songs'
+          print(f'version {curation.version}: {len(curation.songs)} songs, {len(curation.rules)} rules')
+          PY
+      - name: Import into test
+        shell: bash
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_TEST }}
+          APP: directus-cantica-test
+        run: |
+          flyctl machine start $(flyctl machine list -a "$APP" -q) -a "$APP" || true
+          flyctl ssh sftp put production.yaml /tmp/production.yaml -a "$APP"
+          flyctl ssh console -a "$APP" \
+            -C "gosu appuser python /app/manage.py curation_import --path /tmp/production.yaml --force"

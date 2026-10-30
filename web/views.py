@@ -136,6 +136,14 @@ def occasions_page(request: HttpRequest, key: str | None = None) -> HttpResponse
     return render(request, 'web/occasions.html', context)
 
 
+def robots_txt(request: HttpRequest) -> HttpResponse:
+    if settings.CANTICA_NOINDEX:
+        body = 'User-agent: *\nDisallow: /\n'
+    else:
+        body = 'User-agent: *\nDisallow: /admin/\nDisallow: /api/\nDisallow: /*?fragment=1\n'
+    return HttpResponse(body, content_type='text/plain; charset=utf-8')
+
+
 def about_page(request: HttpRequest) -> HttpResponse:
     return render(request, 'web/about.html')
 

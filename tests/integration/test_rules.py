@@ -95,6 +95,11 @@ class DayPageM5Tests(DataDirMixin, TestCase):
         self.assertContains(response, 'class="source">Direktář s. 26')
         self.assertContains(response, 'id="zdroje"')
 
+    def test_robots(self) -> None:
+        self.assertContains(self.client.get('/robots.txt'), 'Disallow: /admin/')
+        with self.settings(CANTICA_NOINDEX=True):
+            self.assertContains(self.client.get('/robots.txt'), 'Disallow: /\n')
+
     def test_json_api(self) -> None:
         response = self.client.get('/api/v1/days/2027-11-21.json?dieceze=czech')
         self.assertEqual(response.status_code, 200)

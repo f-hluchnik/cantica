@@ -14,6 +14,7 @@ console_command = 'gosu appuser python /app/manage.py shell'
   CANTICA_ENV = 'production'
   DATABASE_PATH = '/data/cantica.sqlite3'
   ALLOWED_HOSTS = 'test.directuscantica.cz,directus-cantica-test.fly.dev'
+  CANTICA_NOINDEX = '1'
 
 [mounts]
   source = 'cantica_test_data'
@@ -22,8 +23,10 @@ console_command = 'gosu appuser python /app/manage.py shell'
 [http_service]
   internal_port = 8000
   force_https = true
+  # Stops when idle and does NOT wake up on requests (no random wake-ups by bots):
+  # start it yourself:  fly machine start $(fly machine list -a directus-cantica-test -q) -a directus-cantica-test
   auto_stop_machines = 'stop'
-  auto_start_machines = true
+  auto_start_machines = false
   min_machines_running = 0
 
   [[http_service.checks]]

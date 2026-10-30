@@ -145,6 +145,8 @@ CANTICA_PERIODS_FILE = CANTICA_DATA_DIR / 'liturgy' / 'periods.yaml'
 # /health reports 'warn' when fewer days of calendar data remain.
 CANTICA_HEALTH_MIN_DAYS_AHEAD = 180
 CANTICA_DIOCESE_COOKIE = 'dieceze'
+# Test instance: ask search engines to stay away (robots.txt), so crawlers don't keep waking it up.
+CANTICA_NOINDEX = os.environ.get('CANTICA_NOINDEX', '0') == '1'
 UMAMI_WEBSITE_ID = os.environ.get('UMAMI_WEBSITE_ID', '')
 
 SENTRY_DSN = os.environ.get('SENTRY_DSN', '')

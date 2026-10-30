@@ -3,6 +3,11 @@ name: Deploy test instance
 
 on:
   workflow_dispatch:
+    inputs:
+      load_curation:
+        description: 'After the deploy, replace the test data with data/curated/curation.yaml of this branch'
+        type: boolean
+        default: false
 
 jobs:
   ci:
@@ -12,9 +17,15 @@ jobs:
     needs: ci
     runs-on: ubuntu-latest
     concurrency: deploy-test
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_TEST }}  # deploy token for directus-cantica-test
+      APP: directus-cantica-test
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only -c fly.test.toml
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_TEST }}  # deploy token for directus-cantica-test
+      # the test app does not wake up on requests (auto_start_machines = false): make sure it runs
+      - run: flyctl machine start $(flyctl machine list -a "$APP" -q) -a "$APP" || true
+      - name: Load curated data from this branch
+        if: ${{ inputs.load_curation }}
+        run: flyctl ssh console -a "$APP" -C "gosu appuser python /app/manage.py curation_import --force"

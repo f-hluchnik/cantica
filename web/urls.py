@@ -25,5 +25,6 @@ urlpatterns = [
     path('o-aplikaci/', views.about_page, name='about'),
     path('api/v1/days/<isodate:day>.json', api.day_json, name='api_day'),
     path('health', views.health_check, name='health'),
+    path('robots.txt', views.robots_txt, name='robots'),
     # /live is answered by web.middleware.LiveMiddleware
 ]
