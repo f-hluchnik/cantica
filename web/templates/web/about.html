@@ -1,0 +1,25 @@
+{% extends 'web/base.html' %}
+
+{% block title %}O aplikaci – Directus Cantica{% endblock %}
+
+{% block content %}
+<section class="about">
+    <h1>O aplikaci</h1>
+    <p>
+        Directus Cantica je online direktář vytvořený pro pomoc varhaníkům při výběru liturgických písní.
+        Doporučuje vhodné písně z Kancionálu podle konkrétních svátků, typu svátků a&nbsp;liturgického období,
+        a to podle pravidel uvedených v&nbsp;Direktáři pro varhaníky. U&nbsp;každého doporučení uvádíme, odkud pochází;
+        kde Direktář nic neuvádí, řekneme to otevřeně.
+    </p>
+    <p>Věříme, že tato aplikace usnadní vaši přípravu na liturgii a&nbsp;přispěje k&nbsp;obohacení liturgického slavení.</p>
+    <p>Liturgický kalendář přebíráme ze služby <a href="http://calapi.inadiutorium.cz/">Church Calendar API</a>; písně odkazují na <a href="https://kancional.cz/">kancional.cz</a>.</p>
+    <p class="small">Soukromí: pokud si vyberete diecézi, uložíme vaši volbu do cookie <code>dieceze</code>, abychom vám příště ukázali její kalendář. Nic jiného do vašeho prohlížeče neukládáme. Návštěvnost měříme službou Umami, která cookies nepoužívá.</p>
+    <p>Pokud se vám aplikace líbí a pomáhá vám, budu rád, když podpoříte její vývoj a provoz prostřednictvím služby Buy Me a Coffee.</p>
+    <div class="buy-me-a-coffee-button">
+        {# TODO(M5): serve the button image locally (design §9.5) #}
+        <a href="https://www.buymeacoffee.com/f.hluchnik" target="_blank" rel="noopener">
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 50px; width: auto;">
+        </a>
+    </div>
+</section>
+{% endblock %}

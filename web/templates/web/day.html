@@ -1,0 +1,82 @@
+{% extends 'web/base.html' %}
+
+{% block title %}{{ day|date:"j. n. Y" }} – Directus Cantica{% endblock %}
+
+{% block content %}
+<header>
+    <h1>Directus Cantica</h1>
+    <h4>online direktář pro varhaníky</h4>
+
+    <div class="date-picker-form">
+        <a href="{% url 'day' previous_day %}" class="calendar-arrow" aria-label="předchozí den"><button type="button">&#8592;</button></a>
+        <a href="{% url 'today' %}" class="calendar-today"><button type="button">dnes</button></a>
+        <a href="{% url 'day' next_day %}" class="calendar-arrow" aria-label="následující den"><button type="button">&#8594;</button></a>
+    </div>
+    <form method="get" class="date-picker-form" action="{% url 'today' %}">
+        <input type="date" name="datum" value="{{ day|date:'Y-m-d' }}" aria-label="datum">
+        <button type="submit">zobrazit</button>
+    </form>
+    <form method="get" class="date-picker-form diocese-form" action="{% url 'day' day %}">
+        <label for="dieceze" class="visually-hidden">diecéze</label>
+        <select name="dieceze" id="dieceze">
+            {% for d in dioceses %}
+                <option value="{{ d.code }}"{% if d.code == diocese.code %} selected{% endif %}>{{ d.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="js-hide">nastavit</button>
+    </form>
+</header>
+
+<main id="day">
+    <h2 class="day-heading">{{ day|date:"l j. E Y" }}{% if is_today %} <span class="today-mark">dnes</span>{% endif %}</h2>
+
+    {% if view %}
+        <p class="season-line">
+            {{ view.season_label }}{% if view.season_week %} · {{ view.season_week }}. týden{% endif %}
+            · cyklus {{ view.sunday_cycle }} / {% if view.ferial_cycle == 1 %}I{% else %}II{% endif %}
+        </p>
+
+        {% if view.masses|length > 1 %}
+            <p class="hint">Tento den lze slavit mši z kteréhokoli z uvedených formulářů.</p>
+        {% endif %}
+
+        {% for mass in view.masses %}
+            <article class="celebration-info colour-{{ mass.colour }}">
+                <h3>{{ mass.title }}</h3>
+                <p class="meta">
+                    {% if mass.rank_label %}<span class="rank">{{ mass.rank_label }}</span>{% endif %}
+                    <span class="colour-label">barva: {{ mass.colour_label }}</span>
+                </p>
+                <ul class="norms">
+                    {% if mass.norms.gloria is not None %}
+                        <li class="badge {% if mass.norms.gloria %}yes{% else %}no{% endif %}">Sláva na výsostech: {{ mass.norms.gloria|yesno:"ano,ne" }}</li>
+                    {% endif %}
+                    {% if mass.norms.credo is not None %}
+                        <li class="badge {% if mass.norms.credo %}yes{% else %}no{% endif %}">Věřím: {{ mass.norms.credo|yesno:"ano,ne" }}</li>
+                    {% endif %}
+                    {% if mass.norms.acclamation == 'aleluja' %}
+                        <li class="badge">Před evangeliem: Aleluja</li>
+                    {% elif mass.norms.acclamation == 'chvala' %}
+                        <li class="badge">Před evangeliem: Chvála tobě, Kriste</li>
+                    {% endif %}
+                </ul>
+                {% if mass.norms.note %}<p class="description-text">{{ mass.norms.note }}</p>{% endif %}
+                <p class="placeholder">Doporučení písní se připravuje.</p>
+            </article>
+        {% endfor %}
+
+        {% if view.commemorations %}
+            <p class="hint">Připomínka: {{ view.commemorations|join:", " }}</p>
+        {% endif %}
+
+        {% if is_saturday %}
+            <p class="hint"><a href="{% url 'day' next_day %}">Večerní mše z neděle &rarr;</a></p>
+        {% endif %}
+    {% else %}
+        <p class="empty-message">
+            Pro tento den zatím nemáme liturgický kalendář.
+            {% if data_first and data_last %}<br>Kalendář je k dispozici od {{ data_first|date:"j. n. Y" }} do {{ data_last|date:"j. n. Y" }}.{% endif %}
+        </p>
+    {% endif %}
+</main>
+{% endblock %}

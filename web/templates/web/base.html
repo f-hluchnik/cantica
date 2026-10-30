@@ -1,0 +1,37 @@
+{% load static %}<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Directus Cantica{% endblock %}</title>
+    <meta name="description" content="Online direktář pro varhaníky: liturgický kalendář a doporučení písní z Kancionálu podle Direktáře pro varhaníky.">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'web/favicons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'web/favicons/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'web/favicons/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'web/favicons/site.webmanifest' %}">
+    {# TODO(M5): self-host Fira Sans (design §9.5) #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'web/css/styles.css' %}">
+    {% if umami_website_id %}<script defer src="https://cloud.umami.is/script.js" data-website-id="{{ umami_website_id }}"></script>{% endif %}
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <a href="{% url 'today' %}" class="nav-link {% if request.resolver_match.url_name == 'today' or request.resolver_match.url_name == 'day' %}active{% endif %}">domů</a>
+            <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">o aplikaci</a>
+        </nav>
+
+        {% block content %}{% endblock %}
+
+        <footer class="footer">
+            <p>Aplikace je stále ve vývoji, a proto se mohou objevit nesrovnalosti – děkujeme za pochopení.<br>
+               Berte prosím v potaz, že doporučení aplikace nejsou závazná; konečné slovo ohledně výběru zpěvů má vždy kněz sloužící mši.</p>
+            <p class="footer-contact">Máte-li jakékoli dotazy nebo připomínky, neváhejte se ozvat na <a href="mailto:frantahluchnik@gmail.com">frantahluchnik@gmail.com</a>.</p>
+            <p>&copy; 2024–{% now "Y" %} František Hluchník</p>
+        </footer>
+    </div>
+    <script src="{% static 'web/js/app.js' %}" defer></script>
+</body>
+</html>

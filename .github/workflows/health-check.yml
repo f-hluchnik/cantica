@@ -1,0 +1,23 @@
+# Daily: fail (and notify) if the site is down or calendar data runs out within 180 days.
+name: Health check
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check https://directuscantica.cz/health
+        shell: bash
+        run: |
+          body=$(curl --fail-with-body --silent --show-error --max-time 30 https://directuscantica.cz/health) \
+            || { echo "$body"; exit 1; }
+          echo "$body"
+          status=$(echo "$body" | jq -r .status)
+          if [ "$status" != "ok" ]; then
+            echo "::error::health status is '$status' (calendar_days_ahead=$(echo "$body" | jq -r .calendar_days_ahead))"
+            exit 1
+          fi

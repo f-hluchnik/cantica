@@ -1,33 +1,39 @@
-# fly.toml app configuration file generated for directus-cantica on 2025-03-23T11:07:55+01:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+# Production: https://directuscantica.cz
+# Secrets (set once): fly secrets set SECRET_KEY=... [SENTRY_DSN=...]
+# Volume (create once): fly volumes create cantica_data --region fra --size 1
 
 app = 'directus-cantica'
 primary_region = 'fra'
-console_command = '/code/manage.py shell'
+console_command = 'python /app/manage.py shell'
 
 [build]
 
-[deploy]
-  release_command = 'python manage.py migrate --noinput'
-
 [env]
-  PORT = '8000'
+  CANTICA_ENV = 'production'
+  DATABASE_PATH = '/data/cantica.sqlite3'
+  ALLOWED_HOSTS = 'directuscantica.cz,www.directuscantica.cz,directus-cantica.fly.dev'
+  UMAMI_WEBSITE_ID = '614d4d38-94e7-400e-bd2f-3ae3bba28ab9'
+
+# SQLite lives on this volume, so exactly one machine runs (no release_command: it would not see the volume).
+[mounts]
+  source = 'cantica_data'
+  destination = '/data'
 
 [http_service]
   internal_port = 8000
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = 'off'
   auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = '30s'
+    interval = '30s'
+    method = 'GET'
+    path = '/live'
+    timeout = '5s'
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
-
-[[statics]]
-  guest_path = '/code/static'
-  url_prefix = '/static/'

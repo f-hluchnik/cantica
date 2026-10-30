@@ -169,3 +169,8 @@ cython_debug/
 .idea/
 .vscode/
 .DS_Store
+
+# Cantica v2
+db.sqlite3-wal
+db.sqlite3-shm
+staticfiles/

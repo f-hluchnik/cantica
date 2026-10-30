@@ -1,0 +1,70 @@
+# Monthly: fetch calendar data (last month .. +24 months) and open a PR if anything changed.
+# New celebration titles are added to data/liturgy/celebrations.yaml; review the PR for duplicates.
+#
+# Note: PRs opened with GITHUB_TOKEN do not trigger other workflows, so the data is validated here.
+name: Calendar sync
+
+on:
+  schedule:
+    - cron: '0 3 2 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Fetch months
+        id: fetch
+        # Keep what was fetched even if some months failed; the job still fails at the end.
+        continue-on-error: true
+        shell: bash
+        run: python manage.py calendar_sync 2>&1 | tee sync.log
+      - name: Register new celebrations
+        shell: bash
+        run: python manage.py calendar_catalog --register-new | tee catalog.log
+      - name: Validate
+        run: python manage.py calendar_build --check
+      - name: Prepare PR body
+        shell: bash
+        run: |
+          {
+            echo 'Automatic calendar sync.'
+            echo
+            echo 'Check new celebrations below. If one is a renamed or diocesan variant of an existing'
+            echo 'celebration, move its title into the aliases of the existing entry and delete the new entry.'
+            echo
+            echo '```'
+            cat catalog.log
+            echo '```'
+            echo
+            echo 'Sync log (tail):'
+            echo '```'
+            tail -n 40 sync.log
+            echo '```'
+          } > pr-body.md
+          rm catalog.log sync.log
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: calendar-sync
+          delete-branch: true
+          commit-message: 'calendar: sync calapi data'
+          title: 'Calendar sync'
+          body-path: pr-body.md
+          add-paths: |
+            data/calendar/raw
+            data/liturgy/celebrations.yaml
+      - name: Fail if some months could not be fetched
+        if: steps.fetch.outcome == 'failure'
+        run: |
+          echo "::error::calendar_sync could not fetch some months; see the step log"
+          exit 1
