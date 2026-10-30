@@ -56,10 +56,12 @@ class AdventTests(unittest.TestCase):
         for part in ('entrance', 'gospel', 'offertory', 'communion', 'recessional'):
             self.assertEqual(plan(m, part)[0], 'songs', part)
 
-    def test_marian_solemnity_beats_advent_avoid(self) -> None:  # p. 8 (■) vs author's Advent rule (●)
+    def test_marian_solemnity_beats_advent_avoid(self) -> None:  # p. 8, 46 vs author's Advent rule (●)
         m = mass(date(2026, 12, 8))
-        self.assertEqual(tier_of(m, 'mass'), '■')
-        self.assertIn('805', candidates(m, 'mass'))
+        self.assertEqual(tier_of(m, 'mass'), '▲')
+        self.assertIn(plan(m, 'mass')[1][0], ('130', '801'))
+        self.assertIn('805', candidates(m, 'mass'))  # @marianske, possible as well
+        self.assertEqual(plan(m, 'recessional')[1], ['117'])
 
     def test_no_occasional_songs_on_advent_weekday(self) -> None:  # author's rule
         m = mass(date(2026, 12, 2))
@@ -221,11 +223,152 @@ class OrdinaryTimeTests(unittest.TestCase):
         cm = mass(date(2027, 7, 5), 'olm')
         self.assertEqual(plan(cm, 'entrance')[1], ['838'])
         self.assertEqual(plan(cm, 'mass')[0], 'songs')  # mešní píseň + 838 ke vstupu (p. 8)
-        self.assertEqual(tier_of(cm, 'entrance'), '■')
+        self.assertEqual(tier_of(cm, 'entrance'), '▲')  # 838/1 (p. 38)
 
-    def test_marian_communion_only_on_marian_days(self) -> None:  # p. 8 + author's rule
-        self.assertNotIn('813A', candidates(mass(date(2027, 1, 27), title='Středa'), 'communion'))
-        self.assertIn('813A', candidates(mass(date(2027, 5, 31)), 'communion'))  # Navštívení Panny Marie
+    def test_813_is_for_thanksgiving_not_communion(self) -> None:  # p. 8, 25: "po přijímání", "při díkůvzdání"
+        weekday = mass(date(2027, 1, 27), title='Středa')
+        self.assertFalse(any(c.startswith(('8', '9')) for c in candidates(weekday, 'communion')))
+        self.assertTrue({'813A', '902'} <= set(candidates(weekday, 'thanksgiving')))
+        visitation = mass(date(2027, 5, 31))  # Navštívení Panny Marie: "po přijímání je vhodná 813" (p. 8)
+        self.assertNotIn('813A', candidates(visitation, 'communion'))
+        self.assertIn('813A', candidates(visitation, 'thanksgiving'))
+
+
+class CategoryTests(unittest.TestCase):
+    """■ songs by category (pp. 8-9), as decided in the M4 category review."""
+
+    def test_saint_without_own_song(self) -> None:  # p. 9: 840/841 by default, 845 for women
+        m = mass(date(2027, 8, 27))  # sv. Monika
+        self.assertEqual(tier_of(m, 'mass'), '■')
+        self.assertTrue({'840', '841', '845'} <= set(candidates(m, 'mass')))
+        self.assertIn(plan(m, 'mass')[1][0], ('840', '841', '845'))
+
+    def test_martyrs_always_get_842(self) -> None:  # p. 9
+        agatha = mass(date(2027, 2, 5))
+        self.assertTrue({'842', '845'} <= set(candidates(agatha, 'mass')))
+        wenceslas = mass(date(2027, 9, 28))  # own song 831: 842 stays, the general 840/841 go
+        self.assertIn('842', candidates(wenceslas, 'mass'))
+        self.assertFalse({'840', '841'} & set(candidates(wenceslas, 'mass')))
+
+    def test_own_song_replaces_dedication_songs(self) -> None:  # p. 40, 44, 45
+        lateran = mass(harness.date_of('posveceni-lateranske-baziliky', 2027))
+        self.assertTrue({'917', '918'} <= set(candidates(lateran, 'mass')))
+        basilicas = ('posveceni-rimske-baziliky-panny-marie', 'posveceni-rimskych-bazilik-svatych-apostolu-petra-a-pavla')
+        for key in basilicas:
+            m = mass(harness.date_of(key, 2027))
+            with self.subTest(key):
+                mass_part = next(p for p in m.parts if p.part == 'mass')
+                self.assertEqual(tier_of(m, 'mass'), '▲')
+                self.assertFalse([e.code for e in mass_part.entries if e.tier == '■'])  # no ■ 917/918
+
+    def test_christmas_octave(self) -> None:  # p. 19: Christmas repertoire, 201 at the end every day
+        for day in (date(2026, 12, 25), date(2026, 12, 29), date(2027, 1, 1)):
+            m = mass(day)
+            with self.subTest(day=day):
+                self.assertEqual(plan(m, 'recessional')[1], ['201'])
+                self.assertFalse(any(c.startswith('8') for c in candidates(m, 'mass')))
+
+    def test_pentecost_is_not_a_saints_day(self) -> None:
+        m = mass(date(2027, 5, 16))
+        self.assertFalse({'840', '841'} & set(candidates(m, 'mass')))
+
+
+class KalendariumTests(unittest.TestCase):
+    """Direktář pp. 29-46."""
+
+    def test_czech_patrons_get_their_verse_of_838(self) -> None:  # p. 33-45
+        cases = {
+            (date(2026, 7, 4), 'Prokopa'): '5',
+            (date(2027, 7, 5), 'Cyrila'): '1',
+            (date(2027, 9, 28), 'Václava'): '3',
+            (date(2027, 11, 13), 'Anežky'): '7',
+            (date(2027, 5, 16), None): None,  # Pentecost 2027 replaces Jan Nepomucký: no 838 at all
+        }
+        for (day, title), verses in cases.items():
+            m = mass(day, title=title)
+            with self.subTest(day=day):
+                entry = next((e for e in m.plan if e.part == 'entrance'), None)
+                if verses is None:
+                    self.assertIsNone(entry)
+                else:
+                    self.assertEqual((entry.songs[0].code, entry.songs[0].verses, entry.tier), ('838', verses, '▲'))
+
+    def test_cyril_and_methodius(self) -> None:  # p. 38
+        m = mass(date(2027, 7, 5), 'olm')
+        self.assertIn(plan(m, 'mass')[1][0], ('828', '829'))
+        self.assertEqual(tier_of(m, 'mass'), '▲')
+
+    def test_wenceslas(self) -> None:  # p. 41
+        m = mass(date(2027, 9, 28))
+        self.assertEqual(plan(m, 'mass')[1], ['831'])
+        self.assertEqual(plan(m, 'recessional')[1], ['830A'])
+        later = mass(date(2027, 9, 30))  # sv. Jeroným: závěr from a nearby feast, never the archangels' 512
+        self.assertNotIn('512', candidates(later, 'recessional'))
+        self.assertIn('830A', candidates(later, 'recessional'))
+
+    def test_unity_week(self) -> None:  # p. 30
+        m = mass(date(2027, 1, 19))
+        self.assertEqual(plan(m, 'recessional')[1], ['910'])
+        self.assertEqual(candidates(m, 'mass')[:2], ['706', '911'])
+
+    def test_may(self) -> None:  # p. 34
+        feria = mass(date(2027, 5, 12), title='Středa')
+        self.assertFalse(any(c.startswith('8') for c in candidates(feria, 'mass')))
+        fatima = mass(date(2027, 5, 13), title='Fatimské')
+        self.assertIn('805', candidates(fatima, 'mass'))  # Marian celebrations keep Marian songs
+
+    def test_annunciation_in_lent(self) -> None:  # p. 32
+        m = mass(date(2026, 3, 25))
+        self.assertIn(plan(m, 'mass')[1][0], ('130', '111'))
+        self.assertNotIn('817', candidates(m, 'mass'))
+        self.assertFalse(any(c.startswith('3') for c in candidates(m, 'mass')))
+        self.assertEqual(plan(m, 'recessional')[1], ['117'])
+
+    def test_immaculate_conception(self) -> None:  # p. 46
+        m = mass(date(2027, 12, 8))
+        self.assertIn(plan(m, 'mass')[1][0], ('130', '801'))
+        self.assertIn(plan(m, 'communion')[1][0], ('106', '107', '108', '114', '115', '116', '127'))
+
+    def test_seasonal_notes(self) -> None:  # p. 31, 44
+        self.assertIn('811', candidates(mass(date(2027, 2, 11)), 'after_mass'))
+        self.assertIn(plan(mass(date(2027, 11, 4)), 'after_mass')[1][0], ('922', '924'))
+
+    def test_authors_of_texts(self) -> None:  # p. 30, 39, 42
+        self.assertEqual(plan(mass(date(2027, 7, 31)), 'communion')[1], ['929'])
+        self.assertIn(plan(mass(date(2027, 10, 4)), 'communion')[1][0], ('909', '928'))
+
+
+class OccasionTests(unittest.TestCase):
+    """Direktář pp. 47-48."""
+
+    def _parts(self, key: str) -> dict:
+        from engine.occasion import occasion_result
+
+        result = occasion_result(harness.snapshot(), key)
+        return result, {p.part: [e.code for e in p.entries] for p in result.parts}
+
+    def test_funeral(self) -> None:
+        _, parts = self._parts('pohreb')
+        self.assertEqual(parts['mass'], ['921', '923', '925'])
+        self.assertEqual(parts['rite'], ['922', '924', '926'])
+
+    def test_confirmation_and_baptism(self) -> None:
+        result, parts = self._parts('birmovani')
+        self.assertEqual(parts['mass'], ['421', '424', '425'])
+        self.assertIn('422A', parts['chrismation'])
+        self.assertTrue(result.notes)
+        _, parts = self._parts('krest')
+        self.assertEqual(parts['rite'], ['906'])
+
+    def test_liturgy_of_the_word_is_notes_and_eucharistic_songs(self) -> None:
+        result, parts = self._parts('bohosluzba_slova')
+        self.assertEqual(len(result.notes), 2)
+        self.assertIn('712', parts['adoration'])
+
+    def test_occasion_rules_never_apply_to_days(self) -> None:
+        m = mass(date(2027, 2, 3))
+        self.assertNotIn('906', candidates(m, 'mass'))
+        self.assertNotIn('rite', [p.part for p in m.parts])
 
 
 class SmokeTests(unittest.TestCase):

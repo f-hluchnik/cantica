@@ -119,23 +119,26 @@ class RuleAdmin(admin.ModelAdmin):
     form = RuleForm
     list_display = ('position', 'scope', 'parts_display', 'kind', 'strength', 'songs', 'source', 'active')
     list_display_links = ('position', 'scope')
-    list_filter = ('kind', 'strength', 'season', 'category', 'active', ('page', admin.EmptyFieldListFilter))
+    list_filter = ('kind', 'strength', 'season', 'category', 'occasion', 'active', ('page', admin.EmptyFieldListFilter))
     search_fields = ('songs', 'celebration', 'period', 'note', 'internal')
     list_per_page = 100
     readonly_fields = ('preview',)
     fieldsets: ClassVar = (
         ('Kdy', {
-            'fields': ('celebration', 'category', 'period', 'season', 'cycles', 'day', 'min_rank', 'dioceses'),
+            'fields': ('celebration', 'category', 'period', 'season', 'cycles', 'day', 'min_rank', 'dioceses',
+                       'occasion'),
             'description': 'Nejkonkrétnější vyplněné pole určuje úroveň (▲ slavení, ■ kategorie, ● období/doba); '
                            'všechna vyplněná pole musí platit současně.',
         }),
-        ('Co', {'fields': ('parts', 'kind', 'strength', 'songs', 'window_days', 'note')}),
+        ('Co', {'fields': ('parts', 'kind', 'strength', 'songs', 'fallback', 'window_days', 'note')}),
         ('Zdroj', {'fields': ('page', 'position', 'active', 'internal')}),
         ('Náhled', {'fields': ('preview',)}),
     )
 
     @admin.display(description='kdy')
     def scope(self, obj: Rule) -> str:
+        if obj.occasion:
+            return f'příležitost: {obj.get_occasion_display()}'
         for name, prefix in (('celebration', '▲ '), ('category', '■ '), ('period', '● '), ('season', '● ')):
             value = getattr(obj, name)
             if value:
@@ -156,6 +159,9 @@ class RuleAdmin(admin.ModelAdmin):
     def preview(self, obj: Rule) -> str:
         if not obj or not obj.pk:
             return 'Náhled se zobrazí po uložení.'
+        if obj.occasion:
+            return format_html('Pravidlo pro příležitost – viz <a href="{}">stránku příležitosti</a>.',
+                               reverse('occasion', kwargs={'key': obj.occasion}))
         try:
             info = rule_info(obj.to_record(), obj.pk)
         except RefError as exc:

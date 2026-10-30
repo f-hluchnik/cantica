@@ -45,12 +45,13 @@ class DayResult:
 
 def _summary(parts: list[PartResult]) -> list[Item]:
     """Always-visible list: everything specific (▲/■) or prescribed, plus the general mass-song options
-    (without the 'možno též' ones, which stay in the details)."""
+    when the day has no specific mass song (without the 'možno též' ones, which stay in the details)."""
     items = []
     for result in parts:
+        has_specific = any(item.tier != TIER_GENERAL for item in result.items)
         for item in result.items:
             specific = item.tier != TIER_GENERAL or item.strength == 'prescribed'
-            general_mass_song = result.part == 'mass' and item.strength != 'alternative'
+            general_mass_song = result.part == 'mass' and item.strength != 'alternative' and not has_specific
             if specific or general_mass_song:
                 items.append(item)
     return items

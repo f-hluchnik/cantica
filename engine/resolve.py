@@ -109,6 +109,8 @@ class PartResult:
 
 
 def rule_applies(rule: RuleInfo, ctx: DayCtx, occ: OccurrenceCtx, periods: frozenset[str]) -> bool:
+    if rule.occasion:  # occasion rules only feed the occasions page
+        return False
     if rule.celebration and occ.celebration_key != rule.celebration:
         return False
     if rule.category and rule.category not in occ.categories:
@@ -233,6 +235,8 @@ def resolve_part(part: str, rules: list[RuleInfo], snap: Snapshot, ctx: DayCtx, 
     entries = [e for e in entries if avoided.get(e.code, 0) < e.specificity]
     if part == 'mass':
         entries = [e for e in entries if snap.songs[e.code].mass_song is not False]
+    own = max((e.specificity for e in entries if not e.rule.fallback), default=0)
+    entries = [e for e in entries if not e.rule.fallback or e.specificity >= own]
     ordered = _merge(entries)
     return PartResult(
         part=part,

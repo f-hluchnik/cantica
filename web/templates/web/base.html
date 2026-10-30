@@ -20,6 +20,7 @@
     <div class="container">
         <nav class="navbar">
             <a href="{% url 'today' %}" class="nav-link {% if request.resolver_match.url_name == 'today' or request.resolver_match.url_name == 'day' %}active{% endif %}">domů</a>
+            <a href="{% url 'occasions' %}" class="nav-link {% if request.resolver_match.url_name == 'occasions' or request.resolver_match.url_name == 'occasion' %}active{% endif %}">příležitosti</a>
             <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">o aplikaci</a>
         </nav>
 

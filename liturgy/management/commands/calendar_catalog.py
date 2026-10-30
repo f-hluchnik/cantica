@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from liturgy.catalog import Catalog
-from liturgy.categorize import suggest_categories
+from liturgy.categorize import review_listing, suggest_categories
 from liturgy.days import unknown_titles
 from liturgy.snapshot import read_snapshots
 
@@ -22,6 +22,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser: ArgumentParser) -> None:
         parser.add_argument('--register-new', action='store_true', help='add unknown titles to the catalog')
         parser.add_argument(
+            '--review-categories',
+            action='store_true',
+            help='print a Markdown listing of celebrations grouped by category, for review',
+        )
+        parser.add_argument(
             '--suggest-categories',
             action='store_true',
             help='fill in guessed categories for unreviewed entries that have none (review them afterwards)',
@@ -30,6 +35,11 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         path = settings.CANTICA_CELEBRATIONS_FILE
         catalog = Catalog.load(path)
+        if options['review_categories']:
+            self.stdout.write(review_listing(
+                (e.key, e.name, e.categories, e.categories_reviewed) for e in catalog.entries.values()
+            ))
+            return
         if options['suggest_categories']:
             filled = 0
             for entry in catalog.entries.values():

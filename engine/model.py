@@ -47,18 +47,20 @@ class RuleInfo:
     category: str = ''
     period: str = ''
     season: str = ''
+    occasion: str = ''
     cycles: frozenset[str] = frozenset()
     day_kind: str = ''
     min_rank: str = ''
     dioceses: frozenset[str] = frozenset()
     window_days: int = 7
+    fallback: bool = False  # dropped when a more specific rule gives the part a song (p. 9: "pokud … neznáme")
     note: str = ''
     page: int | None = None
     position: int = 0
 
     @property
     def scope(self) -> str:
-        for name in ('celebration', 'category', 'period', 'season'):
+        for name in ('occasion', 'celebration', 'category', 'period', 'season'):
             if getattr(self, name):
                 return name
         return 'global'
@@ -119,20 +121,27 @@ class Snapshot:
         return codes
 
     def celebration_mass_songs(self, celebration: str) -> tuple[tuple[str, str], ...]:
-        """(code, verses) the celebration's own (▲) rules give for the mass song; used by neighbour rules."""
+        """(code, verses) of the celebration's own songs, for neighbour rules (Direktář p. 27: "píseň ze slavnosti,
+        svátku či památky … pro kterou je v Kancionálu píseň").
+
+        Taken from the celebration's ▲ rules for the závěr first, then for the mešní píseň. Only songs named
+        for it count: not groups or sections, and not general mass songs (512 for the archangels is not
+        "their" song)."""
         if celebration not in self._celebration_mass_songs:
             result: list[tuple[str, str]] = []
-            for rule in self.rules:
-                if (
-                    rule.celebration == celebration
-                    and rule.kind == 'songs'
-                    and rule.strength in ('prescribed', 'recommended')
-                    and 'mass' in rule.parts
-                ):
-                    for target in rule.targets:
-                        for code in self.expand(target, 'mass'):
-                            if all(code != c for c, _ in result):
-                                result.append((code, target.verses))
+            for part in ('recessional', 'mass'):
+                for rule in self.rules:
+                    if not (
+                        rule.celebration == celebration
+                        and rule.kind == 'songs'
+                        and rule.strength in ('prescribed', 'recommended')
+                        and part in rule.parts
+                    ):
+                        continue
+                    for target in (t for t in rule.targets if t.kind in ('song', 'range')):
+                        for code in self.expand(target, part):
+                            if self.songs[code].section != 'mass_general' and all(code != c for c, _ in result):
+                                result.append((code, target.verses if part == 'mass' else ''))
             self._celebration_mass_songs[celebration] = tuple(result)
         return self._celebration_mass_songs[celebration]
 

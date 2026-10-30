@@ -1,7 +1,7 @@
 # Curated data exported from the DB (source of truth: the admin).
 # Import into an empty DB: python manage.py curation_import --if-empty
 # Song verse fields: null = not verified, "-" = none, "*" = as dedicated in Kancionál, "4,5" = these verses.
-version: 4
+version: 6
 groups:
 - key: advent_k_prijimani
   name: adventní písně k přijímání
@@ -618,9 +618,9 @@ rules:
   page: 8
   position: 811
 - when: {category: virgin_mary}
-  parts: [communion]
+  parts: [thanksgiving]
   songs: '813'
-  note: Po přijímání.
+  internal: „po přijímání je vhodná 813“ – díkůvzdání, ne zpěv k přijímání.
   page: 8
   position: 812
 - when: {category: apostle_evangelist}
@@ -637,6 +637,8 @@ rules:
 - when: {category: dedication}
   parts: [mass]
   songs: 917, 918
+  fallback: true
+  internal: Kde Direktář uvádí pro slavení vlastní píseň (posvěcení bazilik), platí ta.
   page: 8
   position: 815
 - when: {category: martyr}
@@ -651,11 +653,17 @@ rules:
   position: 902
 - when: {category: saint}
   parts: [mass]
-  strength: alternative
   songs: 840, 841
-  note: Nebo obecně ke svatým.
+  fallback: true
+  internal: Obecně ke svatým, jen nemá-li světec vlastní píseň (s. 9).
   page: 9
   position: 903
+- when: {category: woman}
+  parts: [mass]
+  songs: '845'
+  internal: S. 9 uvádí 842–845 jako písně ke skupinám svatých; 845 (Vždy žena budiž chválena) pro světice.
+  page: 9
+  position: 904
 - when: {season: christmas}
   parts: [communion]
   songs: '#christmas'
@@ -846,11 +854,17 @@ rules:
   page: 19
   position: 1901
 - when: {season: christmas, min_rank: feast}
-  parts: [after_mass]
+  parts: [recessional]
   songs: '201'
-  note: O nedělích, slavnostech a svátcích většinou.
+  internal: Direktář „po mši … většinou 201“ (o nedělích, slavnostech a svátcích).
   page: 19
   position: 1902
+- when: {period: christmas_octave}
+  parts: [recessional]
+  songs: '201'
+  note: Ve vánočním oktávu každý den.
+  internal: Rozšíření s. 19 (201 o nedělích, slavnostech a svátcích) na všechny dny oktávu.
+  position: 1903
 - when: {celebration: sv-stepana-prvomucednika}
   parts: [mass, entrance, gospel, offertory, communion, recessional]
   strength: avoid
@@ -948,6 +962,13 @@ rules:
   note: Kající žalmy.
   page: 20
   position: 2013
+- when: {celebration: popelecni-streda}
+  parts: [ashes]
+  strength: alternative
+  songs: '381'
+  note: Olomoucká verze Kancionálu.
+  page: 20
+  position: 2014
 - when: {celebration: 1-nedele-postni}
   parts: [mass]
   songs: '307'
@@ -1267,13 +1288,12 @@ rules:
   page: 25
   position: 2512
 - when: {season: ordinary}
-  parts: [communion]
+  parts: [thanksgiving]
   songs: '@dekovne'
-  note: Děkovné písně při díkůvzdání po přijímání.
   page: 25
   position: 2513
 - when: {season: ordinary}
-  parts: [communion]
+  parts: [thanksgiving]
   strength: alternative
   songs: 631, 632, 633, 644, 649, 651, 652, 653, 656, 658, 659, 672, 681, 685
   note: Responsoriální žalmy děkovného charakteru.
@@ -1479,18 +1499,831 @@ rules:
   note: Olomoucká verze Kancionálu.
   page: 27
   position: 2742
+- when: {celebration: oktav-narozeni-pane-matky-bozi-panny-marie}
+  parts: [mass]
+  songs: '#christmas'
+  note: Písně vánoční.
+  page: 30
+  position: 3001
+- when: {celebration: krtu-pane}
+  parts: [mass]
+  songs: '#christmas'
+  note: Písně vánoční; svátkem Křtu Páně končí doba vánoční.
+  page: 30
+  position: 3002
+- when: {celebration: panny-marie-matky-jednoty-krestanu}
+  parts: [mass]
+  songs: '@marianske'
+  page: 30
+  position: 3003
+- when: {celebration: panny-marie-matky-jednoty-krestanu}
+  parts: [recessional]
+  songs: '910'
+  page: 30
+  position: 3004
+- when: {period: unity_week}
+  parts: [mass]
+  songs: 706, 911
+  note: Týden modliteb za jednotu křesťanů.
+  page: 30
+  position: 3005
+- when: {period: unity_week}
+  parts: [mass]
+  strength: alternative
+  songs: '828'
+  page: 30
+  position: 3006
+- when: {period: unity_week}
+  parts: [recessional]
+  strength: prescribed
+  songs: '910'
+  note: V týdnu modliteb za jednotu křesťanů na závěr vždy 910.
+  page: 30
+  position: 3007
+- when: {celebration: obraceni-svateho-pavla-apostola}
+  parts: [mass]
+  songs: '827'
+  page: 30
+  position: 3008
+- when: {celebration: sv-tomase-akvinskeho-kneze-a-ucitele-cirkve}
+  parts: [mass]
+  songs: 710, 717
+  note: Písně, jejichž textů je autorem.
+  page: 30
+  position: 3009
+- when: {celebration: sv-tomase-akvinskeho-kneze-a-ucitele-cirkve}
+  parts: [communion]
+  songs: 712, 927
+  note: 927 po přijímání.
+  page: 30
+  position: 3010
+- when: {celebration: sv-tomase-akvinskeho-kneze-a-ucitele-cirkve}
+  parts: [recessional]
+  strength: alternative
+  songs: '927'
+  page: 30
+  position: 3011
+- when: {celebration: uvedeni-pane-do-chramu}
+  parts: [procession]
+  songs: '682'
+  note: Nebo jiný nápěv.
+  page: 31
+  position: 3101
+- when: {celebration: uvedeni-pane-do-chramu}
+  parts: [mass]
+  songs: '218'
+  page: 31
+  position: 3102
+- when: {celebration: uvedeni-pane-do-chramu}
+  parts: [communion]
+  strength: alternative
+  songs: '217'
+  note: K přijímání lze přidat.
+  page: 31
+  position: 3103
+- when: {celebration: uvedeni-pane-do-chramu}
+  parts: [entrance]
+  strength: alternative
+  songs: '293'
+  note: Olomoucká verze Kancionálu.
+  page: 31
+  position: 3104
+- when: {celebration: uvedeni-pane-do-chramu}
+  parts: [mass]
+  strength: alternative
+  songs: '292'
+  note: Olomoucká verze Kancionálu.
+  page: 31
+  position: 3105
+- when: {celebration: panny-marie-lurdske}
+  parts: [mass]
+  songs: '811'
+  page: 31
+  position: 3106
+- when: {celebration: panny-marie-lurdske}
+  parts: [mass]
+  strength: alternative
+  songs: '@marianske'
+  page: 31
+  position: 3107
+- when: {period: lourdes_day}
+  parts: [after_mass]
+  strength: alternative
+  songs: '811'
+  note: Neslaví-li se památka Panny Marie Lurdské, možno zahrát po mši několik slok písně 811.
+  page: 31
+  position: 3108
+- when: {celebration: stolce-svateho-petra-apostola}
+  parts: [mass]
+  songs: '826'
+  page: 31
+  position: 3109
+- when: {celebration: stolce-svateho-petra-apostola}
+  parts: [mass]
+  strength: alternative
+  songs: '827'
+  page: 31
+  position: 3110
+- when: {celebration: stolce-svateho-petra-apostola}
+  parts: [recessional]
+  songs: '931'
+  page: 31
+  position: 3111
+- when: {celebration: sv-josefa-snoubence-panny-marie}
+  parts: [mass]
+  songs: 821-823
+  page: 32
+  position: 3201
+- when: {celebration: zvestovani-pane}
+  parts: [mass]
+  songs: 130, 111
+  page: 32
+  position: 3202
+- when: {celebration: zvestovani-pane}
+  parts: [communion]
+  songs: 106, 108
+  page: 32
+  position: 3203
+- when: {celebration: zvestovani-pane}
+  parts: [recessional]
+  songs: '117'
+  page: 32
+  position: 3204
+- when: {celebration: zvestovani-pane}
+  kind: note
+  note: Je možno též ke mši zpívat roráty (v olomoucké verzi Kancionálu též 181–186).
+  page: 32
+  position: 3205
+- when: {celebration: zvestovani-pane}
+  parts: [mass]
+  strength: avoid
+  songs: '817'
+  note: Není vhodná 817 – je to slavnost Pána Ježíše, ne Panny Marie.
+  page: 32
+  position: 3206
+- when: {celebration: zvestovani-pane}
+  parts: [mass, entrance, gospel, offertory, communion, recessional]
+  strength: avoid
+  songs: '#lent'
+  internal: Slavnost obvykle připadá do postní doby; písně z doby postní nejsou vhodné.
+  page: 32
+  position: 3207
+- when: {period: st_mark_days}
+  parts: [after_mass]
+  songs: 912/1, 913
+  note: Ve dnech kolem svátku sv. Marka se tradičně konají prosby za úrodu.
+  page: 33
+  position: 3301
+- when: {celebration: sv-vojtecha-biskupa-a-mucednika-hlavniho-patrona-prazske-arcidieceze}
+  parts: [mass]
+  songs: '833'
+  page: 33
+  position: 3302
+- when: {celebration: sv-vojtecha-biskupa-a-mucednika-hlavniho-patrona-prazske-arcidieceze}
+  parts: [entrance]
+  songs: 838/4
+  page: 33
+  position: 3303
+- when: {celebration: sv-vojtecha-biskupa-a-mucednika-hlavniho-patrona-prazske-arcidieceze}
+  parts: [mass]
+  strength: alternative
+  songs: Z893
+  note: Královéhradecká verze Kancionálu.
+  page: 33
+  position: 3304
+- when: {celebration: sv-marka-evangelisty}
+  parts: [mass]
+  songs: '827'
+  page: 33
+  position: 3305
+- when: {period: may}
+  parts: [mass, entrance, gospel, offertory, communion]
+  strength: avoid
+  songs: '@marianske'
+  note: V květnu hrajeme při mši písně odpovídající mešnímu formuláři; mariánské písně se mohou hrát po mši nebo při májových pobožnostech.
+  page: 34
+  position: 3401
+- when: {celebration: sv-josefa-delnika}
+  parts: [mass]
+  songs: 821-823
+  page: 34
+  position: 3402
+- when: {celebration: sv-jana-sarkandra-kneze-a-mucednika}
+  parts: [entrance]
+  songs: 838/11
+  page: 34
+  position: 3403
+- when: {celebration: sv-jana-sarkandra-kneze-a-mucednika}
+  parts: [mass]
+  strength: alternative
+  songs: '892'
+  note: Olomoucká verze Kancionálu.
+  page: 34
+  position: 3404
+- when: {celebration: sv-jana-nepomuckeho-kneze-a-mucednika-hlavniho-patrona-cech}
+  parts: [mass]
+  songs: '835'
+  page: 35
+  position: 3501
+- when: {celebration: sv-jana-nepomuckeho-kneze-a-mucednika-hlavniho-patrona-cech}
+  parts: [entrance]
+  songs: 838/10
+  page: 35
+  position: 3502
+- when: {celebration: sv-jana-nepomuckeho-kneze-a-mucednika-hlavniho-patrona-cech}
+  parts: [mass]
+  strength: alternative
+  songs: Z895
+  note: Královéhradecká verze Kancionálu.
+  page: 35
+  position: 3503
+- when: {celebration: sv-klementa-marie-hofbauera-kneze}
+  parts: [entrance]
+  songs: 838/12
+  page: 35
+  position: 3504
+- when: {celebration: sv-zdislavy}
+  parts: [mass]
+  songs: '834'
+  page: 35
+  position: 3505
+- when: {celebration: sv-zdislavy}
+  parts: [entrance]
+  songs: 838/6
+  page: 35
+  position: 3506
+- when: {celebration: sv-zdislavy-hlavni-patronky-dieceze}
+  parts: [mass]
+  songs: '834'
+  page: 35
+  position: 3507
+- when: {celebration: sv-zdislavy-hlavni-patronky-dieceze}
+  parts: [entrance]
+  songs: 838/6
+  page: 35
+  position: 3508
+- when: {celebration: sv-norberta-biskupa}
+  parts: [entrance]
+  songs: 838/16
+  page: 36
+  position: 3601
+- when: {celebration: sv-vita-mucednika}
+  parts: [entrance]
+  songs: 838/15
+  page: 36
+  position: 3602
+- when: {celebration: sv-jana-nepomuckeho-neumanna-biskupa}
+  parts: [entrance]
+  songs: 838/13
+  page: 36
+  position: 3603
+- when: {celebration: narozeni-svateho-jana-krtitele}
+  parts: [mass]
+  songs: '121'
+  page: 36
+  position: 3604
+- when: {celebration: narozeni-svateho-jana-krtitele}
+  parts: [mass]
+  strength: alternative
+  songs: 893, 894
+  note: Olomoucká verze Kancionálu.
+  page: 36
+  position: 3605
+- when: {celebration: sv-petra-a-pavla-apostolu}
+  parts: [mass]
+  songs: '827'
+  page: 36
+  position: 3606
+- when: {celebration: sv-petra-a-pavla-apostolu}
+  parts: [recessional]
+  strength: alternative
+  songs: '931'
+  page: 36
+  position: 3607
+- when: {celebration: sv-petra-a-pavla-apostolu}
+  parts: [mass]
+  strength: alternative
+  songs: Z891
+  note: Královéhradecká verze Kancionálu.
+  page: 36
+  position: 3608
+- when: {celebration: sv-prokopa-opata}
+  parts: [entrance]
+  songs: 838/5
+  page: 38
+  position: 3801
+- when: {celebration: sv-cyrila-mnicha-a-metodeje-biskupa-patronu-evropy-hlavnich-patronu-moravy}
+  parts: [mass]
+  songs: 828, 829
+  page: 38
+  position: 3802
+- when: {celebration: sv-cyrila-mnicha-a-metodeje-biskupa-patronu-evropy-hlavnich-patronu-moravy}
+  parts: [entrance]
+  songs: 838/1
+  page: 38
+  position: 3803
+- when: {celebration: bl-hroznaty-mucednika}
+  parts: [entrance]
+  songs: 838/9
+  page: 38
+  position: 3804
+- when: {celebration: bl-hroznaty-mucednika-hlavniho-patrona-dieceze}
+  parts: [entrance]
+  songs: 838/9
+  page: 38
+  position: 3805
+- when: {celebration: sv-marie-magdaleny}
+  parts: [mass]
+  songs: '413'
+  note: Viz 3. sloka a celkově velikonoční charakter liturgických textů.
+  page: 38
+  position: 3806
+- when: {celebration: sv-jachyma-a-anny-rodicu-panny-marie}
+  parts: [mass]
+  songs: 824, 825
+  page: 38
+  position: 3807
+- when: {celebration: sv-gorazda-a-druhu}
+  parts: [entrance]
+  songs: 838/9
+  page: 39
+  position: 3901
+- when: {celebration: sv-gorazda-a-druhu}
+  parts: [mass]
+  strength: alternative
+  songs: 828, 829
+  page: 39
+  position: 3902
+- when: {celebration: sv-marty}
+  parts: [mass]
+  songs: '845'
+  note: Viz 5. sloka.
+  page: 39
+  position: 3903
+- when: {celebration: sv-ignace-z-loyoly-kneze}
+  parts: [communion, recessional]
+  songs: '929'
+  note: Autor textu.
+  internal: Část mše Direktář neuvádí; 929 je modlitba odevzdání, proto k přijímání / na závěr.
+  page: 39
+  position: 3904
+- when: {celebration: posveceni-rimske-baziliky-panny-marie}
+  parts: [mass]
+  songs: '@marianske'
+  page: 40
+  position: 4001
+- when: {celebration: promeneni-pane}
+  parts: [mass]
+  songs: '707'
+  page: 40
+  position: 4002
+- when: {celebration: promeneni-pane}
+  parts: [recessional]
+  songs: '703'
+  page: 40
+  position: 4003
+- when: {celebration: sv-klary-panny}
+  parts: [communion, recessional]
+  strength: alternative
+  songs: 909, 928
+  note: Možno hrát písně jako v den sv. Františka z Assisi.
+  page: 40
+  position: 4004
+- when: {celebration: panny-marie-kralovny}
+  parts: [mass]
+  songs: 802, 807
+  note: 807 – viz refrén.
+  page: 40
+  position: 4005
+- when: {celebration: panny-marie-kralovny}
+  parts: [mass]
+  strength: alternative
+  songs: '@marianske'
+  page: 40
+  position: 4006
+- when: {celebration: panny-marie-kralovny}
+  parts: [recessional]
+  songs: '815'
+  page: 40
+  position: 4007
+- when: {celebration: umuceni-sv-jana-krtitele}
+  parts: [mass]
+  songs: '121'
+  page: 40
+  position: 4008
+- when: {celebration: umuceni-sv-jana-krtitele}
+  parts: [mass]
+  strength: alternative
+  songs: 893, 894
+  note: Olomoucká verze Kancionálu.
+  page: 40
+  position: 4009
+- when: {celebration: narozeni-panny-marie}
+  parts: [mass]
+  songs: '801'
+  page: 41
+  position: 4101
+- when: {celebration: narozeni-panny-marie}
+  parts: [mass]
+  strength: alternative
+  songs: '@marianske'
+  page: 41
+  position: 4102
+- when: {celebration: jmena-panny-marie}
+  parts: [mass]
+  songs: '805'
+  page: 41
+  position: 4103
+- when: {celebration: jmena-panny-marie}
+  parts: [mass]
+  strength: alternative
+  songs: '@marianske'
+  page: 41
+  position: 4104
+- when: {celebration: povyseni-svateho-krize}
+  parts: [mass]
+  songs: 317, 306
+  page: 41
+  position: 4105
+- when: {celebration: povyseni-svateho-krize}
+  parts: [communion]
+  songs: '712'
+  page: 41
+  position: 4106
+- when: {celebration: povyseni-svateho-krize}
+  parts: [after_mass]
+  strength: alternative
+  songs: 317, 306, 304
+  note: 'Koná-li se po mši uctívání sv. kříže: další sloky z písně 317 a 306, nebo též 304.'
+  page: 41
+  position: 4107
+- when: {celebration: povyseni-svateho-krize}
+  parts: [mass]
+  strength: alternative
+  songs: '385'
+  note: Olomoucká verze Kancionálu.
+  page: 41
+  position: 4108
+- when: {celebration: povyseni-svateho-krize}
+  parts: [communion]
+  strength: alternative
+  songs: 782-789, 795
+  note: Olomoucká verze Kancionálu.
+  page: 41
+  position: 4109
+- when: {celebration: panny-marie-bolestne}
+  parts: [mass]
+  songs: 311, 314
+  note: 314, nezpívá-li se jako sekvence.
+  page: 41
+  position: 4110
+- when: {celebration: panny-marie-bolestne}
+  parts: [sequence]
+  strength: alternative
+  songs: '314'
+  page: 41
+  position: 4111
+- when: {celebration: sv-ludmily-mucednice}
+  parts: [mass]
+  songs: '832'
+  page: 41
+  position: 4112
+- when: {celebration: sv-ludmily-mucednice}
+  parts: [entrance]
+  songs: 838/2
+  page: 41
+  position: 4113
+- when: {celebration: sv-vaclava-mucednika-hlavniho-patrona-ceskeho-naroda}
+  parts: [mass]
+  songs: '831'
+  page: 41
+  position: 4114
+- when: {celebration: sv-vaclava-mucednika-hlavniho-patrona-ceskeho-naroda}
+  parts: [entrance]
+  songs: 838/3
+  page: 41
+  position: 4115
+- when: {celebration: sv-vaclava-mucednika-hlavniho-patrona-ceskeho-naroda}
+  parts: [recessional]
+  songs: '830'
+  page: 41
+  position: 4116
+- when: {celebration: sv-michaela-gabriela-a-rafaela-archandelu}
+  parts: [mass]
+  songs: '512'
+  note: Viz 1. a 5. sloka.
+  page: 41
+  position: 4117
+- when: {celebration: sv-michaela-gabriela-a-rafaela-archandelu}
+  parts: [recessional]
+  songs: '870'
+  page: 41
+  position: 4118
+- when: {celebration: sv-michaela-gabriela-a-rafaela-archandelu}
+  parts: [recessional]
+  strength: alternative
+  songs: '889'
+  note: Olomoucká verze Kancionálu.
+  page: 41
+  position: 4119
+- when: {celebration: svatych-andelu-straznych}
+  parts: [mass]
+  songs: '512'
+  note: Viz 1. a 5. sloka.
+  page: 42
+  position: 4201
+- when: {celebration: svatych-andelu-straznych}
+  parts: [recessional]
+  songs: '870'
+  page: 42
+  position: 4202
+- when: {celebration: svatych-andelu-straznych}
+  parts: [recessional]
+  strength: alternative
+  songs: '889'
+  note: Olomoucká verze Kancionálu.
+  page: 42
+  position: 4203
+- when: {celebration: sv-frantiska-z-assisi}
+  parts: [communion, recessional]
+  songs: 909, 928
+  note: Autor textu.
+  internal: Část mše Direktář neuvádí; 909 a 928 jsou děkovné písně (s. 25), proto k přijímání / na závěr.
+  page: 42
+  position: 4204
+- when: {celebration: panny-marie-ruzencove}
+  parts: [mass]
+  songs: '810'
+  page: 42
+  position: 4205
+- when: {celebration: panny-marie-ruzencove}
+  parts: [mass]
+  strength: alternative
+  songs: '@marianske'
+  page: 42
+  position: 4206
+- when: {celebration: panny-marie-ruzencove}
+  parts: [recessional]
+  songs: '814'
+  note: Úvodní sloka.
+  page: 42
+  position: 4207
+- when: {celebration: sv-radima-biskupa}
+  parts: [entrance]
+  songs: 838/9
+  page: 42
+  position: 4208
+- when: {celebration: sv-radima-biskupa}
+  parts: [mass]
+  strength: alternative
+  songs: '833'
+  note: Též možno písně k sv. Vojtěchovi.
+  page: 42
+  position: 4209
+- when: {celebration: sv-terezie-od-jezise-panny-a-ucitelky-cirkve}
+  parts: [mass]
+  songs: '312'
+  note: Autorka textu.
+  page: 43
+  position: 4301
+- when: {celebration: sv-hedviky-reholnice}
+  parts: [entrance]
+  songs: 838/8
+  page: 43
+  position: 4302
+- when: {celebration: sv-hedviky-reholnice}
+  parts: [mass]
+  strength: alternative
+  songs: '891'
+  note: Olomoucká verze Kancionálu.
+  page: 43
+  position: 4303
+- when: {celebration: sv-hedviky-reholnice-hlavni-patronky-slezska}
+  parts: [mass]
+  songs: '891'
+  page: 43
+  position: 4304
+- when: {celebration: sv-hedviky-reholnice-hlavni-patronky-slezska}
+  parts: [entrance]
+  songs: 838/8
+  page: 43
+  position: 4305
+- when: {celebration: sv-markety-marie-alacoque-panny}
+  parts: [mass]
+  songs: '844'
+  page: 43
+  position: 4306
+- when: {celebration: sv-markety-marie-alacoque-panny}
+  parts: [mass]
+  strength: alternative
+  songs: 702, 708, 709, 715, 723, 728
+  note: Písně k Nejsvětějšímu Srdci Ježíšovu.
+  page: 43
+  position: 4307
+- when: {celebration: sv-markety-marie-alacoque-panny}
+  parts: [mass]
+  strength: alternative
+  songs: '784'
+  note: Olomoucká verze Kancionálu.
+  page: 43
+  position: 4308
+- when: {celebration: sv-lukase-evangelisty}
+  parts: [mass]
+  songs: '827'
+  page: 43
+  position: 4309
+- when: {period: all_souls_days}
+  parts: [after_mass]
+  songs: 922, 924
+  note: Ve dnech modliteb za zemřelé.
+  page: 44
+  position: 4401
+- when: {celebration: vsech-svatych}
+  parts: [mass]
+  songs: 840, 841
+  page: 44
+  position: 4402
+- when: {celebration: vsech-svatych}
+  parts: [litany]
+  strength: alternative
+  songs: 068
+  page: 44
+  position: 4403
+- when: {celebration: vzpominka-na-vsechny-verne-zemrele}
+  parts: [mass]
+  songs: 921-925
+  page: 44
+  position: 4404
+- when: {celebration: posveceni-lateranske-baziliky}
+  parts: [mass]
+  songs: 917, 918
+  page: 44
+  position: 4405
+- when: {celebration: sv-josafata-biskupa-a-mucednika}
+  parts: [recessional]
+  songs: '910'
+  page: 44
+  position: 4406
+- when: {celebration: sv-anezky-ceske-panny}
+  parts: [mass]
+  songs: '836'
+  page: 44
+  position: 4407
+- when: {celebration: sv-anezky-ceske-panny}
+  parts: [entrance]
+  songs: 838/7
+  page: 44
+  position: 4408
+- when: {celebration: sv-anezky-ceske-panny}
+  parts: [mass]
+  strength: alternative
+  songs: Z894
+  note: Královéhradecká verze Kancionálu.
+  page: 44
+  position: 4409
+- when: {celebration: posveceni-rimskych-bazilik-svatych-apostolu-petra-a-pavla}
+  parts: [mass]
+  songs: 826, 827
+  page: 45
+  position: 4501
+- when: {celebration: posveceni-rimskych-bazilik-svatych-apostolu-petra-a-pavla}
+  parts: [mass]
+  strength: alternative
+  songs: Z891
+  note: Královéhradecká verze Kancionálu.
+  page: 45
+  position: 4502
+- when: {celebration: sv-klementa-i-papeze-a-mucednika}
+  parts: [entrance]
+  songs: 838/14
+  page: 45
+  position: 4503
+- when: {celebration: sv-klementa-i-papeze-a-mucednika}
+  parts: [mass]
+  strength: alternative
+  songs: Z892
+  note: Královéhradecká verze Kancionálu.
+  page: 45
+  position: 4504
+- when: {celebration: sv-klementa-i-papeze-a-mucednika-hlavniho-patrona-dieceze}
+  parts: [entrance]
+  songs: 838/14
+  page: 45
+  position: 4505
+- when: {celebration: sv-klementa-i-papeze-a-mucednika-hlavniho-patrona-dieceze}
+  parts: [mass]
+  strength: alternative
+  songs: Z892
+  note: Královéhradecká verze Kancionálu.
+  page: 45
+  position: 4506
+- when: {celebration: panny-marie-pocate-bez-poskvrny-prvotniho-hrichu}
+  parts: [mass]
+  songs: 130, 801
+  note: Nebo písně z odd. 801 ad. (zvl. 801).
+  page: 46
+  position: 4601
+- when: {celebration: panny-marie-pocate-bez-poskvrny-prvotniho-hrichu}
+  parts: [mass]
+  strength: alternative
+  songs: 111, 112, 124, @marianske
+  page: 46
+  position: 4602
+- when: {celebration: panny-marie-pocate-bez-poskvrny-prvotniho-hrichu}
+  parts: [communion]
+  songs: 106, 107, 108, 114, 115, 116, 127
+  note: Vhodná adventní píseň.
+  page: 46
+  position: 4603
+- when: {celebration: panny-marie-pocate-bez-poskvrny-prvotniho-hrichu}
+  parts: [recessional]
+  songs: '117'
+  page: 46
+  position: 4604
+- when: {celebration: panny-marie-pocate-bez-poskvrny-prvotniho-hrichu}
+  parts: [recessional]
+  strength: alternative
+  songs: 185, 186
+  note: Olomoucká verze Kancionálu.
+  page: 46
+  position: 4605
+- when: {occasion: krest}
+  parts: [rite]
+  songs: '906'
+  page: 47
+  position: 4701
+- when: {occasion: krest}
+  kind: note
+  note: Křest se koná obvykle mimo mši. Koná-li se při mši, je formulář a tedy i písně z příslušného dne (v neděli není Věřím); při vlastním mešním formuláři se vhodným způsobem použije 906.
+  page: 47
+  position: 4702
+- when: {occasion: birmovani}
+  parts: [mass]
+  songs: 421, 424, 425
+  note: Při vlastním formuláři.
+  page: 47
+  position: 4703
+- when: {occasion: birmovani}
+  parts: [chrismation]
+  songs: 422, 423
+  page: 47
+  position: 4704
+- when: {occasion: birmovani}
+  kind: note
+  note: V neděli a o slavnosti není Věřím, ve všední dny ani Sláva.
+  page: 47
+  position: 4705
+- when: {occasion: pomazani}
+  parts: [mass]
+  songs: '525'
+  note: Při hromadném udělování; jinak písně podle liturgické doby.
+  page: 47
+  position: 4706
+- when: {occasion: pomazani}
+  parts: [laying_on_hands]
+  songs: 422, 423
+  note: Vkládání rukou – symbol působení Ducha Svatého.
+  page: 47
+  position: 4707
+- when: {occasion: svatba}
+  parts: [mass]
+  songs: '916'
+  note: Dbáme na to, aby případné vložky nebyly vyloženě hudba světská.
+  page: 48
+  position: 4801
+- when: {occasion: pohreb}
+  parts: [mass]
+  songs: 921, 923, 925
+  page: 48
+  position: 4802
+- when: {occasion: pohreb}
+  parts: [rite]
+  songs: 922, 924, 926
+  note: Na vhodných místech pohřebního obřadu.
+  page: 48
+  position: 4803
+- when: {occasion: bohosluzba_slova}
+  kind: note
+  note: Při bohoslužbě slova zásadně nepoužíváme mešní písně. Používáme písně z liturgické doby, příležitostné a k svatým.
+  page: 48
+  position: 4804
+- when: {occasion: bohosluzba_slova}
+  parts: [adoration, communion]
+  songs: '#jesus'
+  note: K případné eucharistické adoraci resp. přijímání.
+  page: 48
+  position: 4805
+- when: {occasion: bohosluzba_slova}
+  kind: note
+  note: Od chvíle, kdy se svatostánek otevře, do chvíle, kdy se zavře, se nezpívá popř. na varhany nehraje nic jiného než eucharistické písně a zpěvy.
+  page: 48
+  position: 4806
 - when: {season: advent}
   parts: [mass, entrance, gospel, offertory, communion]
   strength: avoid
   songs: '#mary_saints, #occasional'
   internal: V adventu písně z oddílů 800 a 900 jen tam, kde jsou výslovně doporučeny (▲/■ pravidla mají přednost).
   position: 9001
-- when: {season: ordinary}
-  parts: [communion]
-  strength: avoid
-  songs: '813'
-  internal: Mariánská píseň; k přijímání na běžné mši se nehodí (o mariánských slavnostech ji ■ pravidlo s. 8 doporučuje).
-  position: 9002
 - when: {celebration: ctvrtek-svateho-tydne}
   parts: [recessional]
   kind: silence

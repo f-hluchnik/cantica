@@ -91,14 +91,21 @@ Song references: `523`, `813B`, `Z781`, `838/5` (verse), `838/1+3`, `691-695` (r
 (group), `#advent` (Kancionál section; for *mešní píseň* only songs marked as mass songs, for communion and
 závěr only songs with a verified verse).
 
+A rule marked *jen bez vlastní písně* (`fallback: true`) is dropped for a part when a more specific rule gives
+that part a song — e.g. 840/841 for saints apply only when the saint has no song of their own.
+
 The engine (`engine/`, pure Python) turns the day's calendar + rules into, per mass: candidates per part with
 their tier and source, the always-visible summary, and *detailní doporučení* (one deterministic combination
 that changes from week to week). Design: §7–8 of the design doc.
+
+Occasions (křest, svatba, pohřeb, …; Direktář pp. 47–48) are rules with the `occasion` scope. They never
+apply to a calendar day and are shown on `/prilezitosti/<key>/`.
 
 | command | what it does |
 |---|---|
 | `rules_lint [--file] [--coverage]` | check the rules against the calendar: unknown references, recommend/avoid contradictions, rules that never apply; `--coverage` lists celebrations without a ▲/■ mass song |
 | `calendar_catalog --suggest-categories` | guess categories for unreviewed celebrations (drive the ■ tier) |
+| `calendar_catalog --review-categories` | print a Markdown listing of celebrations by category, for review (then set `categories_reviewed: true` in `data/liturgy/celebrations.yaml`) |
 
 Calendar-side data used by rules: `data/liturgy/periods.yaml` (named date ranges) and the categories in
 `data/liturgy/celebrations.yaml` (pre-filled by a title heuristic, `categories_reviewed: false`).

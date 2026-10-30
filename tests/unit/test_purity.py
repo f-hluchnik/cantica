@@ -12,6 +12,7 @@ PURE_MODULES = (
     'engine/lint.py',
     'engine/load.py',
     'engine/model.py',
+    'engine/occasion.py',
     'engine/plan.py',
     'engine/recommend.py',
     'engine/refs.py',

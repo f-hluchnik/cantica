@@ -6,6 +6,7 @@ from decimal import Decimal
 # Mass parts in display order (design §3).
 PARTS: tuple[tuple[str, str], ...] = (
     ('before_mass', 'před mší'),
+    ('rite', 'při obřadu'),
     ('mass', 'mešní píseň'),
     ('entrance', 'ke vstupu'),
     ('procession', 'průvod'),
@@ -18,7 +19,10 @@ PARTS: tuple[tuple[str, str], ...] = (
     ('veneration', 'uctívání kříže'),
     ('baptismal_water', 'kropení křestní vodou'),
     ('litany', 'litanie'),
+    ('chrismation', 'při mazání křižmem'),
+    ('laying_on_hands', 'při vkládání rukou'),
     ('communion', 'k přijímání'),
+    ('thanksgiving', 'díkůvzdání po přijímání'),
     ('transfer', 'přenášení eucharistie'),
     ('adoration', 'adorace'),
     ('recessional', 'na závěr'),
@@ -73,7 +77,20 @@ NEIGHBOUR_MAX_RANK = Decimal('3.11')
 # Gap message when a celebration of at least this rank has no specific (▲/■) recommendation.
 GAP_MAX_RANK = Decimal('3.11')
 
-SPECIFICITY = {'celebration': 5, 'category': 4, 'period': 3, 'season': 2, 'global': 1}
+SPECIFICITY = {'occasion': 5, 'celebration': 5, 'category': 4, 'period': 3, 'season': 2, 'global': 1}
+
+# Occasions (Direktář pp. 47-48): rules with an occasion never apply to calendar days; they feed /prilezitosti/.
+OCCASIONS: tuple[tuple[str, str], ...] = (
+    ('krest', 'Křest'),
+    ('birmovani', 'Biřmování'),
+    ('pomazani', 'Pomazání nemocných'),
+    ('svatba', 'Svatba'),
+    ('pohreb', 'Pohřeb'),
+    ('bohosluzba_slova', 'Bohoslužba slova'),
+)
+OCCASION_KEYS = tuple(key for key, _ in OCCASIONS)
+OCCASION_LABELS = dict(OCCASIONS)
+
 TIER_CELEBRATION, TIER_CATEGORY, TIER_GENERAL = '▲', '■', '●'
 
 

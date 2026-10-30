@@ -67,3 +67,33 @@
   season: ordinary
   weeks: [34]
   source_page: 26
+- key: unity_week
+  name: týden modliteb za jednotu křesťanů
+  kind: fixed
+  from: 01-18
+  to: 01-25
+  source_page: 30
+- key: lourdes_day
+  name: 11. února (Panny Marie Lurdské)
+  kind: fixed
+  from: 02-11
+  to: 02-11
+  source_page: 31
+- key: st_mark_days
+  name: dny kolem svátku sv. Marka (prosby za úrodu)
+  kind: fixed
+  from: 04-23
+  to: 04-27
+  source_page: 33
+- key: may
+  name: květen
+  kind: fixed
+  from: 05-01
+  to: 05-31
+  source_page: 34
+- key: all_souls_days
+  name: dny modliteb za zemřelé (2.–8. listopadu)
+  kind: fixed
+  from: 11-02
+  to: 11-08
+  source_page: 44

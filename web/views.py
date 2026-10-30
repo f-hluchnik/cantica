@@ -4,16 +4,17 @@ from datetime import date, timedelta
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
+from engine.vocab import OCCASION_LABELS, OCCASIONS
 from liturgy.constants import DEFAULT_DIOCESE, SEASON_LABELS
 from liturgy.dbbuild import latest_build
 from liturgy.models import Diocese
 from liturgy.services import health
-from rules.services import day_result
+from rules.services import day_result, occasion_page
 
 COOKIE_MAX_AGE = 365 * 24 * 3600
 
@@ -76,6 +77,17 @@ def day_page(request: HttpRequest, day: date | None = None) -> HttpResponse:
             secure=request.is_secure(),
         )
     return response
+
+
+def occasions_page(request: HttpRequest, key: str | None = None) -> HttpResponse:
+    if key is not None and key not in OCCASION_LABELS:
+        raise Http404('Neznámá příležitost')
+    context = {
+        'occasions': OCCASIONS,
+        'selected': key,
+        'result': occasion_page(key) if key else None,
+    }
+    return render(request, 'web/occasions.html', context)
 
 
 def about_page(request: HttpRequest) -> HttpResponse:

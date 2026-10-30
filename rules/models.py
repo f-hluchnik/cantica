@@ -9,7 +9,7 @@ from __future__ import annotations
 from django.db import models
 
 from catalog.rulerecords import RuleRecord
-from engine.vocab import DAY_KINDS, KINDS, MIN_RANKS, STRENGTHS
+from engine.vocab import DAY_KINDS, KINDS, MIN_RANKS, OCCASIONS, STRENGTHS
 from liturgy.constants import CATEGORIES, SEASONS
 
 MIN_RANK_CHOICES = [(key, label) for key, label, _ in MIN_RANKS]
@@ -29,6 +29,13 @@ class Rule(models.Model):
     category = models.CharField(max_length=32, blank=True, choices=CATEGORIES, verbose_name='kategorie slavení')
     period = models.CharField(max_length=48, blank=True, verbose_name='období')
     season = models.CharField(max_length=16, blank=True, choices=SEASONS, verbose_name='liturgická doba')
+    occasion = models.CharField(
+        max_length=24,
+        blank=True,
+        choices=OCCASIONS,
+        verbose_name='příležitost',
+        help_text='pravidlo pro příležitost (křest, pohřeb, …) se nikdy neuplatní na kalendářní den',
+    )
     # filters
     cycles = models.CharField(max_length=3, blank=True, verbose_name='nedělní cykly')
     day = models.CharField(max_length=8, blank=True, choices=DAY_KINDS, verbose_name='den')
@@ -40,6 +47,11 @@ class Rule(models.Model):
     strength = models.CharField(max_length=12, choices=STRENGTHS, default='recommended', verbose_name='síla')
     songs = models.CharField(max_length=500, blank=True, verbose_name='písně', help_text=SONGS_HELP)
     window_days = models.PositiveSmallIntegerField(default=7, verbose_name='okno (dny)')
+    fallback = models.BooleanField(
+        default=False,
+        verbose_name='jen bez vlastní písně',
+        help_text='neuplatní se, má-li den pro tuto část konkrétnější píseň (např. ▲ píseň světce)',
+    )
     note = models.TextField(blank=True, verbose_name='poznámka pro uživatele')
     internal = models.TextField(blank=True, verbose_name='interní poznámka')
     # source
@@ -70,11 +82,13 @@ class Rule(models.Model):
             category=self.category,
             period=self.period,
             season=self.season,
+            occasion=self.occasion,
             cycles=self.cycles,
             day=self.day,
             min_rank=self.min_rank,
             dioceses=_split(self.dioceses),
             window_days=self.window_days,
+            fallback=self.fallback,
             note=self.note,
             internal=self.internal,
             page=self.page,
@@ -90,6 +104,7 @@ class Rule(models.Model):
             category=record.category,
             period=record.period,
             season=record.season,
+            occasion=record.occasion,
             cycles=record.cycles,
             day=record.day,
             min_rank=record.min_rank,
@@ -99,6 +114,7 @@ class Rule(models.Model):
             strength=record.strength,
             songs=record.songs,
             window_days=record.window_days,
+            fallback=record.fallback,
             note=record.note,
             internal=record.internal,
             page=record.page,

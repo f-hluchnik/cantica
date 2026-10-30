@@ -628,7 +628,7 @@ Where the implementation deviates from §3–§8, this section wins.
   - *either* a mešní píseň (with single parts replaced where a rule says so, e.g. 838 ke vstupu) *or*, when every part the mass song would cover has its own song (late Advent), one song per part and no mešní píseň (review round 2).
 - **Minimal UI (review round 2):** groups are shown as one label without listing their songs; no "možno též" labels (alternatives are only styled lighter); the detailní doporučení shows one line per part with its source, without "další možnosti" or the list of parts the mass song covers. The engine still computes the alternatives, for a possible "jiná sestava" button later.
 - **Maundy Thursday has no závěr** (author rule, liturgical norm): the Mass ends with the transfer of the Blessed Sacrament.
-- **The summary** shows ▲/■ items, prescribed items, and the general *mešní píseň* options (without the *možno též* ones). The gap message appears for catalogued celebrations and Sundays (memorial or higher) with no ▲/■ recommendation.
+- **The summary** shows ▲/■ items, prescribed items, and the general *mešní píseň* options (without the *možno též* ones; since M4 only when the day has no ▲/■ mass song). The gap message appears for catalogued celebrations and Sundays (memorial or higher) with no ▲/■ recommendation.
 - **Categories** were pre-filled by a title heuristic (`calendar_catalog --suggest-categories`), all `categories_reviewed: false`. Apostles and evangelists don't get the generic `saint` category (the Direktář gives them 827 separately); *Svaté rodiny* and the Holy Week days get none.
 - **Caching:** one snapshot per process, keyed by (curation version, calendar build); day results are kept in an LRU of 512 entries. An admin save shows on the next request.
 
@@ -636,5 +636,28 @@ Where the implementation deviates from §3–§8, this section wins.
 1. Lent: *upřednostňovat kající písně* (p. 20) is encoded as "doporučeno" for 322, 321, 320, 319, 312, 309 and "možno též" for the rest of 301 ad.
 2. Late Advent (p. 17): the list 102–117 is split into parts following the Kancionál structure (vstup 102, 110; před evangeliem 103, 104, 111, 112; obětní průvod 105, 113; přijímání 106–108, 114–116; závěr 109, 117), as in v1.
 3. Saints (p. 9): martyrs → 842, duchovní pastýři → 843 (doporučeno), all saints → 840, 841 (možno též). 844 and 845 have no category mapping yet.
-4. *OL též 381* (p. 20) is not transcribed: kancional.cz has both 381 and Z381, and it isn't clear which one the footnote means. The other OL footnotes (481–485, 485, 784–789, 781 ad.) have only one candidate and are in as "možno též" with the note *olomoucká verze Kancionálu*.
+4. ~~*OL též 381* (p. 20) is not transcribed~~ — resolved in M4: the kalendárium footnotes show that OL songs are the plain numbers (891, 892, 381, …) and HK songs the Z numbers (Z891–Z895), so 381 is in as "možno též" on Ash Wednesday. The other OL footnotes (481–485, 485, 784–789, 781 ad.) are in as "možno též" with the note *olomoucká verze Kancionálu*.
 5. The Easter Vigil rules hang on *Bílá sobota* (the calendar has no separate vigil), with a note that they apply to the vigil.
+
+## 16. Changes made in M4
+
+- **Kalendárium (pp. 29–46) transcribed** as celebration rules (▲), with a few period rules for the book's date ranges: `unity_week` (18.–25. 1., p. 30), `lourdes_day` (11. 2., p. 31), `st_mark_days` (23.–27. 4., p. 33), `may` (p. 34), `all_souls_days` (2.–8. 11., p. 44). Diocesan feasts carry their dioceses. HK-only songs (Z891–Z895) are "možno též" with the note *královéhradecká verze Kancionálu*.
+- **Occasions (pp. 47–48)** are a sixth scope, `occasion` (křest, biřmování, pomazání nemocných, svatba, pohřeb, bohoslužba slova), specificity like a celebration (▲). An occasion rule never applies to a calendar day; it is shown only on `/prilezitosti/<key>/`, which lists per part what the Direktář gives, plus its notes. There is no plan there (no date, no variety). New parts for the rites: `rite` (při obřadu), `chrismation` (při mazání křižmem), `laying_on_hands` (při vkládání rukou).
+- **Neighbour songs** (závěr from nearby celebrations) now take only explicit songs from ▲ závěr / mešní píseň rules, never sections or the general mass-song list, so a feast doesn't spread e.g. the whole Christmas section to its neighbours.
+- **Categories:** the heuristic no longer gives *Seslání Ducha svatého* the `saint` category ("svatého"), and *Panny Marie Královny andělů* is Marian only (not `angel`). A unit test keeps unreviewed catalog entries equal to the heuristic, so a heuristic fix must be applied to the YAML. `calendar_catalog --review-categories` prints a Markdown listing grouped by category combination for the review; reviewed entries get `categories_reviewed: true` and are then left alone.
+- **Coverage report** (`rules_lint --coverage`): after M4 the remaining celebrations without a ▲/■ mass song are Sundays in Ordinary Time and of the strong seasons, the Christmas/Easter octaves and Holy Week days — there the Direktář gives only the season's songs (●), which the page says honestly.
+
+- **Category review (M4, by the author):**
+  - new part `thanksgiving` (*díkůvzdání po přijímání*, M5): the děkovné písně of p. 25 and the Marian 813 (p. 8: "po přijímání") moved there from *k přijímání*; the author's "no 813 at communion" avoid rule is no longer needed;
+  - new rule flag `fallback` (*jen bez vlastní písně*): the rule is dropped for a part when a more specific rule gives that part a song. Used for 840/841 (now *doporučeno*, the default for saints without their own song, p. 9) and 917/918 (posvěcení chrámu; the Roman basilicas have their own songs, pp. 40, 45);
+  - new category `woman` (*světice*, heuristic: feminine descriptor or a first name in -y/-ie) → 845; 842 for martyrs and 843 for pastors stay regardless of own songs;
+  - *Oktáv Narození Páně* (1. 1.) has no category (Christmas repertoire, p. 19); the two Roman basilica dedications are `dedication` only;
+  - 201 is a *závěr* song: on Sundays/solemnities/feasts of the Christmas season (p. 19 "po mši") and, as an author rule, every day of the octave;
+  - all catalog entries are `categories_reviewed: true` except the 37 that gained `woman`.
+
+**Transcription decisions to review (M4):**
+1. Where the Direktář names a song without a part (sv. Ignác 929, sv. František 909/928, both *autor textu*), it is offered k přijímání / na závěr, not as mešní píseň.
+2. *Zvěstování Páně* avoids the Lent section (it usually falls in Lent, the book says Lenten songs don't fit) and 817 (p. 32: a feast of the Lord, not of Mary).
+3. Gorazd, Hroznata and Radim all get 838/9 ke vstupu — worth a check against the Kancionál.
+4. ~~Ordinary-Time communion: 813 avoided as an author rule~~ — superseded by the `thanksgiving` part.
+

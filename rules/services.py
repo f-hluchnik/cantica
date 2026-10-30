@@ -12,6 +12,7 @@ from catalog.models import CurationState
 from engine.context import context_range, day_ctx
 from engine.load import snapshot_from_curation
 from engine.model import Snapshot
+from engine.occasion import OccasionResult, occasion_result
 from engine.recommend import DayResult, recommend
 from liturgy.days import BuiltDay, BuiltOccurrence
 from liturgy.dbbuild import latest_build
@@ -94,6 +95,11 @@ def day_result(diocese_code: str, day: date) -> DayResult | None:
         while len(_results) > RESULT_CACHE_SIZE:
             _results.popitem(last=False)
     return result
+
+
+def occasion_page(key: str) -> OccasionResult:
+    snap, _ = current_snapshot()
+    return occasion_result(snap, key)
 
 
 def reset_caches() -> None:

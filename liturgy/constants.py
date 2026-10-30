@@ -40,6 +40,7 @@ CATEGORIES: tuple[tuple[str, str], ...] = (
     ('pastor', 'duchovní pastýři'),
     ('doctor', 'učitelé církve'),
     ('virgin', 'panny'),
+    ('woman', 'světice'),
     ('religious', 'řeholníci a řeholnice'),
     ('saint', 'svatí a světice (obecně)'),
     ('czech_patron', 'čeští patroni'),

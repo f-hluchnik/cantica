@@ -20,6 +20,8 @@ register_converter(IsoDateConverter, 'isodate')
 urlpatterns = [
     path('', views.day_page, name='today'),
     path('<isodate:day>/', views.day_page, name='day'),
+    path('prilezitosti/', views.occasions_page, name='occasions'),
+    path('prilezitosti/<slug:key>/', views.occasions_page, name='occasion'),
     path('o-aplikaci/', views.about_page, name='about'),
     path('health', views.health_check, name='health'),
     # /live is answered by web.middleware.LiveMiddleware

@@ -1,0 +1,42 @@
+{% extends 'web/base.html' %}
+
+{% block title %}{% if result %}{{ result.label }} – {% endif %}Příležitosti – Directus Cantica{% endblock %}
+
+{% block content %}
+<header>
+    <h1>Directus Cantica</h1>
+    <h4>písně pro svátosti a další bohoslužby</h4>
+    <nav class="occasion-list">
+        {% for key, label in occasions %}
+            <a href="{% url 'occasion' key %}" class="occasion-link{% if key == selected %} active{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </nav>
+</header>
+
+<main id="occasion">
+    {% if result %}
+        <article class="celebration-info">
+            <h3>{{ result.label }}</h3>
+            {% for note in result.notes %}<p class="description-text">{{ note }}</p>{% endfor %}
+            {% if result.parts %}
+                <ul class="plan">
+                    {% for part in result.parts %}
+                        <li class="plan-entry">
+                            <span class="plan-part">{{ part.label }}:</span>
+                            {% for item in part.items %}
+                                {% include 'web/_item.html' with item=item show_part=False %}
+                            {% endfor %}
+                            {% for note in part.notes %}<div class="part-note">{{ note }}</div>{% endfor %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="hint gap">Direktář pro tuto příležitost žádnou konkrétní píseň neuvádí.</p>
+            {% endif %}
+        </article>
+        <p class="hint">Podle Direktáře pro varhaníky, s. 47–48. V neděle adventní, postní a velikonoční, o slavnostech, na Popeleční středu a ve Svatém týdnu se slaví mše z daného dne – pak platí doporučení pro tento den.</p>
+    {% else %}
+        <p class="empty-message">Vyberte příležitost.</p>
+    {% endif %}
+</main>
+{% endblock %}

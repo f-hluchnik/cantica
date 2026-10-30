@@ -63,6 +63,32 @@ class RecommendationPageTests(DataDirMixin, TestCase):
         self.assertTrue(CurationState.current().has_unexported_changes)
 
 
+class OccasionPageTests(DataDirMixin, TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.build()
+        import_curation(Curation.load(COMMITTED))
+        reset_caches()
+
+    def test_list(self) -> None:
+        response = self.client.get('/prilezitosti/')
+        self.assertContains(response, 'href="/prilezitosti/pohreb/"')
+        self.assertContains(response, 'Vyberte příležitost')
+
+    def test_funeral(self) -> None:  # Direktář p. 48
+        response = self.client.get('/prilezitosti/pohreb/')
+        self.assertContains(response, '921:')
+        self.assertContains(response, 'při obřadu')
+        self.assertContains(response, 'Direktář s. 48')
+
+    def test_unknown_occasion(self) -> None:
+        self.assertEqual(self.client.get('/prilezitosti/neco/').status_code, 404)
+
+    def test_occasion_rules_never_reach_days(self) -> None:
+        response = self.client.get('/2027-11-21/')
+        self.assertNotContains(response, '921:')
+
+
 class RuleAdminTests(DataDirMixin, TestCase):
     def setUp(self) -> None:
         super().setUp()
@@ -74,7 +100,8 @@ class RuleAdminTests(DataDirMixin, TestCase):
 
     def _form(self, **overrides: str) -> dict:
         data = {
-            'celebration': '', 'category': '', 'period': '', 'season': 'ordinary', 'day': '', 'min_rank': '',
+            'celebration': '', 'category': '', 'period': '', 'season': 'ordinary', 'occasion': '',
+            'day': '', 'min_rank': '',
             'parts': ['mass'], 'kind': 'songs', 'strength': 'recommended', 'songs': '523, 838/5, @mesni_obecne',
             'window_days': '7', 'note': '', 'internal': '', 'page': '', 'position': '5000', 'active': 'on',
         }
@@ -97,6 +124,15 @@ class RuleAdminTests(DataDirMixin, TestCase):
         self.assertEqual(Rule.objects.count(), count + 1)
         rule = Rule.objects.order_by('-pk').first()
         self.assertEqual((rule.parts, rule.songs, rule.cycles), ('mass', '523, 838/5, @mesni_obecne', ''))
+
+    def test_add_occasion_rule(self) -> None:
+        response = self.client.post('/admin/rules/rule/add/', self._form(season='', occasion='svatba', songs='904'))
+        self.assertEqual(response.status_code, 302)
+        rule = Rule.objects.order_by('-pk').first()
+        self.assertEqual(rule.occasion, 'svatba')
+        reset_caches()
+        self.assertContains(self.client.get('/prilezitosti/svatba/'), '904:')
+        self.assertEqual(self.client.get(f'/admin/rules/rule/{rule.pk}/change/').status_code, 200)
 
     def test_invalid_rules_are_rejected(self) -> None:
         for overrides in ({'songs': '999'}, {'songs': '82'}, {'songs': '@no_group'}, {'parts': []},

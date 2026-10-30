@@ -9,7 +9,7 @@ from tests.book import harness
 
 
 def _days() -> dict:
-    return {'czech': harness.calendar_days('czech').values(), 'olm': harness.calendar_days('czech-olm').values()}
+    return {code: harness.calendar_days(calendar).values() for code, calendar in harness.CALENDAR_OF.items()}
 
 
 class CommittedRulesetTests(unittest.TestCase):
@@ -23,7 +23,7 @@ class CommittedRulesetTests(unittest.TestCase):
         # sv. Cyril a Metoděj, 20.B in 2027 by Nanebevzetí Panny Marie); anything else is a real warning.
         self.assertTrue(all('never applies' in w for w in report.warnings), report.warnings)
         self.assertLessEqual(len(report.warnings), 5, report.warnings)
-        self.assertTrue(all('813' in o for o in report.overrides), report.overrides)  # the one intended override
+        self.assertEqual(report.overrides, [])
 
 
 class LintDetectsProblemsTests(unittest.TestCase):

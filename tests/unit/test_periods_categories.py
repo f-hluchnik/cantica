@@ -3,7 +3,7 @@ from datetime import date
 from pathlib import Path
 
 from liturgy.catalog import Catalog
-from liturgy.categorize import suggest_categories
+from liturgy.categorize import review_listing, suggest_categories
 from liturgy.periods import PeriodError, Periods
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -56,10 +56,12 @@ class CategoryTests(unittest.TestCase):
     CASES = {
         'Sv. Jana Nepomuckého, kněze a mučedníka, hlavního patrona Čech':
             ['martyr', 'pastor', 'czech_patron', 'saint'],
-        'Sv. Lucie, panny a mučednice': ['martyr', 'virgin', 'saint'],
+        'Sv. Lucie, panny a mučednice': ['martyr', 'virgin', 'woman', 'saint'],
         'Sv. Petra a Pavla, apoštolů': ['apostle_evangelist'],
         'Svaté rodiny Ježíše, Marie a Josefa': [],
         'Čtvrtek Svatého týdne': [],
+        'Seslání Ducha svatého': [],
+        'Panny Marie Královny andělů': ['virgin_mary'],
         'Panny Marie Růžencové': ['virgin_mary'],
         'Sobotní památka Panny Marie': ['virgin_mary'],
         'Sv. Jáchyma a Anny, rodičů Panny Marie': ['saint'],  # not Marian
@@ -72,7 +74,12 @@ class CategoryTests(unittest.TestCase):
         'Svatých andělů strážných': ['angel'],
         'Umučení sv. Jana Křtitele': ['martyr', 'saint'],
         'Sv. Prokopa, opata': ['religious', 'czech_patron', 'saint'],
-        'Sv. Kateřiny Sienské, panny a učitelky církve, patronky Evropy': ['doctor', 'virgin', 'saint'],
+        'Sv. Kateřiny Sienské, panny a učitelky církve, patronky Evropy': ['doctor', 'virgin', 'woman', 'saint'],
+        'Sv. Moniky': ['woman', 'saint'],
+        'Sv. Josefa, Snoubence Panny Marie': ['saint'],
+        'Bl. Hroznaty, mučedníka': ['martyr', 'czech_patron', 'saint'],
+        'Sv. Bonaventury, biskupa a učitele církve': ['pastor', 'doctor', 'saint'],
+        'Sv. Perpetuy a Felicity, mučednic': ['martyr', 'woman', 'saint'],
     }
 
     def test_suggestions(self) -> None:
@@ -83,6 +90,25 @@ class CategoryTests(unittest.TestCase):
     def test_committed_catalog_is_valid(self) -> None:
         catalog = Catalog.load(ROOT / 'data' / 'liturgy' / 'celebrations.yaml')
         self.assertGreater(len(catalog), 300)
+
+    def test_review_listing(self) -> None:
+        text = review_listing([
+            ('a', 'Sv. Anny', ['saint'], False),
+            ('b', 'Sv. Bonifáce', ['martyr', 'saint'], True),
+            ('c', 'Sv. Cyrila', ['saint'], False),
+            ('d', 'Den', [], False),
+        ])
+        self.assertIn('## svatí a světice (obecně) (2)\n\n- [ ] Sv. Anny (`a`)\n- [ ] Sv. Cyrila (`c`)', text)
+        self.assertIn('## mučedníci + svatí a světice (obecně) (1)\n\n- [x] Sv. Bonifáce (`b`)', text)
+        self.assertTrue(text.rstrip().endswith('## bez kategorie (1)\n\n- [ ] Den (`d`)'))
+
+    def test_unreviewed_entries_follow_the_heuristic(self) -> None:
+        # a fix in suggest_categories must reach the catalog (calendar_catalog --suggest-categories)
+        catalog = Catalog.load(ROOT / 'data' / 'liturgy' / 'celebrations.yaml')
+        for entry in catalog.entries.values():
+            if not entry.categories_reviewed:
+                with self.subTest(celebration=entry.key):
+                    self.assertEqual(entry.categories, suggest_categories(entry.name))
 
 
 if __name__ == '__main__':

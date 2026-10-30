@@ -95,7 +95,7 @@ def lint(  # noqa: C901
     report.errors.extend(sorted(contradictions))
     report.overrides.extend(sorted(overrides))
     for rule in snap.rules:
-        if rule.id not in fired:
+        if rule.id not in fired and not rule.occasion:
             report.warnings.append(f'{records[rule.id].label}: never applies in the checked days')
     report.gaps = sorted(gaps.values(), key=lambda g: g.first_date)
     return report

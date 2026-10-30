@@ -156,6 +156,19 @@ class ResolutionTests(unittest.TestCase):
         self.assertEqual([r.source for r in first.reasons], ['Direktář s. 38', 'Direktář s. 25'])
         self.assertEqual(codes(parts[0]), ['523', '512'])
 
+    def test_fallback_gives_way_to_a_more_specific_song(self) -> None:
+        rules = [
+            RuleInfo('saints', ('mass',), targets=parse_targets('828, 829'), category='saint', fallback=True),
+            RuleInfo('group', ('mass',), targets=parse_targets('827'), category='martyr'),
+            RuleInfo('own', ('mass',), targets=parse_targets('805'), celebration='c'),
+        ]
+        plain = occ('Sv. X', 'x', '3.1', 'památka', frozenset({'saint', 'martyr'}))
+        parts, _ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), plain), plain)
+        self.assertEqual(sorted(codes(parts[0])), ['827', '828', '829'])  # same tier: the fallback stays
+        own = occ('Sv. C', 'c', '3.1', 'památka', frozenset({'saint', 'martyr'}))
+        parts, _ = resolve_mass(snap(*rules), ctx(date(2027, 1, 27), own), own)
+        self.assertEqual(codes(parts[0]), ['805', '827'])  # own ▲ song: 828/829 dropped, the martyr song stays
+
     def test_silence(self) -> None:
         rules = [
             RuleInfo('season', ('entrance', 'mass'), targets=parse_targets('523'), season='lent'),

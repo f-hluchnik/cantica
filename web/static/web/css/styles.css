@@ -143,6 +143,26 @@ h4 {
 
 .js .js-hide { display: none; }
 
+/* Occasions */
+.occasion-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.occasion-link {
+    text-decoration: none;
+    color: white;
+    background-color: var(--btn-bg-color);
+    padding: 5px 12px;
+    border-radius: 3px;
+    font-size: 15px;
+}
+
+.occasion-link:hover, .occasion-link.active { background-color: var(--btn-bg-hover); }
+
 /* Day */
 .day-heading {
     text-align: center;

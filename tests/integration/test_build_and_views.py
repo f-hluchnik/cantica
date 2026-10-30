@@ -15,7 +15,7 @@ from django.test import TestCase, override_settings
 from liturgy.catalog import Catalog
 from liturgy.constants import CATEGORIES, DIOCESES
 from liturgy.days import unknown_titles
-from liturgy.models import CalendarBuild, CalendarDay, Celebration, Diocese, Occurrence
+from liturgy.models import CalendarBuild, CalendarDay, Category, Celebration, Diocese, Occurrence
 from liturgy.snapshot import write_snapshot
 from rules.services import reset_caches
 from tests.helpers import fixture_snapshot
@@ -62,7 +62,7 @@ class SeedTests(TestCase):
     def test_seed_matches_constants(self) -> None:
         seed = importlib.import_module('liturgy.migrations.0002_seed_dioceses_categories')
         self.assertEqual(seed.DIOCESES, tuple((d.code, d.name, d.calapi_calendar) for d in DIOCESES))
-        self.assertEqual(seed.CATEGORIES, CATEGORIES)
+        self.assertEqual(tuple(Category.objects.order_by('position').values_list('key', 'name')), CATEGORIES)
         self.assertEqual(Diocese.objects.count(), len(DIOCESES))
 
 

@@ -8,6 +8,7 @@ YAML shape (only non-default fields are written):
       kind: songs                                # songs (default) | neighbours | note | silence
       strength: recommended                      # prescribed | recommended (default) | alternative | avoid
       songs: 838/5                               # engine.refs syntax
+      fallback: true                             # only when the day has no more specific song for the part
       note: …                                    # shown to users
       internal: …                                # admin only
       page: 38                                   # Direktář page; omitted = doporučení autora
@@ -19,11 +20,11 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from engine.refs import RefError, parse_targets, unknown_references
-from engine.vocab import DAY_KIND_KEYS, KIND_KEYS, MIN_RANK_KEYS, PART_KEYS, STRENGTH_KEYS
+from engine.vocab import DAY_KIND_KEYS, KIND_KEYS, MIN_RANK_KEYS, OCCASION_KEYS, PART_KEYS, STRENGTH_KEYS
 from liturgy.constants import CATEGORY_KEYS, DIOCESES, SEASON_KEYS
 
 DIOCESE_CODES = frozenset(d.code for d in DIOCESES)
-SCOPE_FIELDS = ('celebration', 'category', 'period', 'season')
+SCOPE_FIELDS = ('occasion', 'celebration', 'category', 'period', 'season')
 
 
 @dataclass
@@ -36,11 +37,13 @@ class RuleRecord:
     category: str = ''
     period: str = ''
     season: str = ''
+    occasion: str = ''
     cycles: str = ''
     day: str = ''
     min_rank: str = ''
     dioceses: list[str] = field(default_factory=list)
     window_days: int = 7
+    fallback: bool = False
     note: str = ''
     internal: str = ''
     page: int | None = None
@@ -49,7 +52,7 @@ class RuleRecord:
     id: int | None = None  # DB id; never written to YAML
 
     def sort_key(self) -> tuple:
-        return (self.position, self.celebration, self.category, self.period, self.season, self.songs)
+        return (self.position, self.occasion, self.celebration, self.category, self.period, self.season, self.songs)
 
     def to_dict(self) -> dict:  # noqa: C901
         names = (*SCOPE_FIELDS, 'cycles', 'day', 'min_rank')
@@ -69,6 +72,8 @@ class RuleRecord:
             data['songs'] = self.songs
         if self.kind == 'neighbours' and self.window_days != 7:
             data['window_days'] = self.window_days
+        if self.fallback:
+            data['fallback'] = True
         for name in ('note', 'internal'):
             if getattr(self, name):
                 data[name] = getattr(self, name)
@@ -93,11 +98,13 @@ class RuleRecord:
             category=str(when.get('category') or ''),
             period=str(when.get('period') or ''),
             season=str(when.get('season') or ''),
+            occasion=str(when.get('occasion') or ''),
             cycles=str(when.get('cycles') or ''),
             day=str(when.get('day') or ''),
             min_rank=str(when.get('min_rank') or ''),
             dioceses=[str(d) for d in when.get('dioceses') or []],
             window_days=int(data.get('window_days') or 7),
+            fallback=bool(data.get('fallback', False)),
             note=str(data.get('note') or ''),
             internal=str(data.get('internal') or ''),
             page=int(data['page']) if data.get('page') is not None else None,
@@ -136,6 +143,8 @@ class RuleRecord:
             problems.append(f'{where}: only kind=songs takes songs')
         if self.category and self.category not in CATEGORY_KEYS:
             problems.append(f'{where}: unknown category {self.category!r}')
+        if self.occasion and self.occasion not in OCCASION_KEYS:
+            problems.append(f'{where}: unknown occasion {self.occasion!r}')
         if self.season and self.season not in SEASON_KEYS:
             problems.append(f'{where}: unknown season {self.season!r}')
         if self.cycles and (set(self.cycles) - set('ABC') or len(set(self.cycles)) != len(self.cycles)):
@@ -147,6 +156,8 @@ class RuleRecord:
         unknown_dioceses = sorted(set(self.dioceses) - DIOCESE_CODES)
         if unknown_dioceses:
             problems.append(f'{where}: unknown dioceses {unknown_dioceses}')
+        if self.fallback and (self.kind != 'songs' or self.strength == 'avoid'):
+            problems.append(f'{where}: fallback only applies to recommending songs rules')
         if self.window_days < 1:
             problems.append(f'{where}: window_days must be positive')
         return problems
