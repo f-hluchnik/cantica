@@ -323,6 +323,9 @@ This is a rule with `action=neighbours`:
 2. It takes their ▲ `mass` candidates and offers them for `recessional`.
 3. The reason reads "ze svátku sv. Cyrila a Metoděje (ne 5. 7.)".
 4. The candidates' tier is the rule's own (●), and neighbour rules never chain.
+5. Coming celebrations come before past ones (nearest first): the plan takes a song from a coming celebration
+   whenever there is one in the window, so the week before Christ the King looks ahead to it, not back to the
+   saints of the previous week. Past celebrations stay among the alternatives.
 
 ### 7.5 Examples (transcribed from the book)
 
@@ -439,7 +442,7 @@ For each mass option we build **one** combination, part by part, using only the 
    - a prescribed or higher-tier communion candidate is used first;
    - otherwise, if the mass song has a communion verse (`'*'` / verses), *Variety* decides between that verse and a separate communion candidate (e.g. a 700 song). Both are valid, and alternating them is how the app promotes non-trivial combinations;
    - otherwise a separate communion candidate is used.
-4. **Závěr:** prescribed or ▲/■ candidates first; then neighbour candidates (§7.4), if any; then *Variety* between the mass song's závěr verse (if any) and ● candidates.
+4. **Závěr:** prescribed or ▲/■ candidates first; then neighbour candidates (§7.4), if any, from coming celebrations before past ones; then *Variety* between the mass song's závěr verse (if any) and ● candidates.
 5. **Special parts** (kropení, sekvence, popelec, průvod, …) appear only when they have a candidate.
 6. **No duplicates:** a song appears only once in the plan, except the mass song across the parts it covers.
 7. **Gaps stay visible:** a part with no candidate shows "—" and "Direktář neuvádí".

@@ -224,13 +224,15 @@ class _Planner:
 
     def recessional(self) -> None:
         """Prescribed or period-level (and more specific) songs first; then songs from nearby celebrations
-        (Direktář p. 27), which beat the general seasonal list; then the general list."""
+        (Direktář p. 27), which beat the general seasonal list - coming celebrations before past ones; then the
+        general list."""
         if self.silenced('recessional'):
             return
         cands = self.candidates('recessional')
         strong = [e for e in cands if e.strength == 'prescribed' or e.specificity >= SPECIFICITY['period']]
         neighbours = [e for e in cands if e.neighbour]
-        for group in (strong, neighbours, cands):
+        upcoming = [e for e in neighbours if e.upcoming]
+        for group in (strong, upcoming, neighbours, cands):
             if group:
                 self.add_songs('recessional', _choose(group, self.seed('recessional')))
                 return
