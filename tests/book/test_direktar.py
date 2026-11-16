@@ -256,9 +256,16 @@ class CategoryTests(unittest.TestCase):
     def test_martyrs_always_get_842(self) -> None:  # p. 9
         agatha = mass(date(2027, 2, 5))
         self.assertTrue({'842', '845'} <= set(candidates(agatha, 'mass')))
-        wenceslas = mass(date(2027, 9, 28))  # own song 831: 842 stays, the general 840/841 go
-        self.assertIn('842', candidates(wenceslas, 'mass'))
-        self.assertFalse({'840', '841'} & set(candidates(wenceslas, 'mass')))
+        wenceslas = mass(date(2027, 9, 28))  # own song 831 first; 842 and the general 840/841 stay
+        self.assertEqual(candidates(wenceslas, 'mass')[0], '831')
+        self.assertTrue({'840', '841', '842'} <= set(candidates(wenceslas, 'mass')))
+
+    def test_general_saints_songs_next_to_own_song(self) -> None:  # p. 9: 840/841 weigh the same as 845
+        agnes = mass(date(2026, 11, 13))  # own song 836
+        mass_part = next(p for p in agnes.parts if p.part == 'mass')
+        self.assertEqual([e.code for e in mass_part.entries][:4], ['836', '840', '841', '845'])
+        self.assertEqual({e.tier for e in mass_part.entries if e.code in ('840', '841', '845')}, {'■'})
+        self.assertEqual(plan(agnes, 'mass')[1], ['836'])
 
     def test_own_song_replaces_dedication_songs(self) -> None:  # p. 40, 44, 45
         lateran = mass(harness.date_of('posveceni-lateranske-baziliky', 2027))
@@ -318,7 +325,7 @@ class ReviewM5Tests(unittest.TestCase):
                 self.assertFalse(any(e.neighbour for p in m.parts for e in p.entries))
 
     def test_short_ranges_are_songs_long_ones_a_label(self) -> None:
-        self.assertEqual(summary(mass(date(2027, 5, 1), title='Josefa'))['mass'], ['821', '822', '823', 'velikonoční písně'])
+        self.assertEqual(summary(mass(date(2027, 5, 1), title='Josefa'))['mass'], ['821', '822', '823', '840', '841', 'velikonoční písně'])
         self.assertEqual(summary(mass(date(2027, 11, 2)))['mass'], ['921', '922', '923', '924', '925'])
         self.assertEqual(summary(mass(date(2027, 4, 14), title='Středa')), {'mass': ['velikonoční písně']})
 

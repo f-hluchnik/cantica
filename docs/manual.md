@@ -127,7 +127,7 @@ autora*).
 | **druh** | *písně* (songs), *písně ze svátků okolních dnů* (songs from nearby feasts), *poznámka* (note), *nic se nezpívá* (silence) |
 | **síla** | *předepsáno* (prescribed) > *doporučeno* (recommended) > *možno též* (also possible) — and *nevhodné* (avoid), which removes songs. An avoid rule only wins against rules at the same or a lower tier. |
 | **písně** | `523` · `813B` · `Z781` (HK appendix) · `838/5` (verse) · `838/1+3` · `691-695` (range) · `@mesni_obecne` (group) · `#advent` (Kancionál section) |
-| **jen bez vlastní písně** | (*fallback*) the rule drops out when a more specific rule gives the same part a song; for example 840/841 apply only to saints without a song of their own |
+| **jen bez vlastní písně** | (*fallback*) the rule drops out when a more specific rule gives the same part a song; for example 917/918 apply only to dedications without a song of their own |
 | strana Direktáře | the page; leave it empty for an author rule |
 
 The rule's change form shows the next dates it applies to, with links, so you can check a change right away.

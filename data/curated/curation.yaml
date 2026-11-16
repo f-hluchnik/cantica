@@ -659,8 +659,7 @@ rules:
 - when: {category: saint}
   parts: [mass]
   songs: 840, 841
-  fallback: true
-  internal: Obecně ke svatým, jen nemá-li světec vlastní píseň (s. 9).
+  internal: Obecně ke svatým (s. 9), stejně jako 845 pro světice.
   page: 9
   position: 903
 - when: {category: woman}
