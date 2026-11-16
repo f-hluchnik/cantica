@@ -1435,6 +1435,10 @@ rules:
   note: K výstavu.
   page: 26
   position: 2631
+- when: {celebration: jezise-krista-krale}
+  parts: [recessional]
+  songs: '631'
+  position: 2632
 - when: {season: ordinary}
   parts: [recessional]
   songs: '930'

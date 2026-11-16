@@ -157,8 +157,8 @@ Special cases worth knowing:
 - **First Friday** in Ordinary Time, with no obligatory memorial or higher, adds a votive-mass card (celebration
   key `prvni-patek`).
 - **Neighbour songs** (*písně ze svátků okolních dnů*, p. 27) are not used on feasts, solemnities and All
-  Souls. A coming celebration is preferred to a past one; a celebration lends its ▲ *na závěr* songs, then its
-  ▲ *mešní píseň* songs.
+  Souls. A coming celebration is preferred to a past one; a celebration lends its ▲ *na závěr* songs, or —
+  only when it has none — its ▲ *mešní píseň* songs (Christ the King lends 631, not 707).
 
 ### 4.3 Checking the whole ruleset
 

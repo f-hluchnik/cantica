@@ -320,7 +320,8 @@ Filters narrow when a rule applies; they never change its tier.
 
 This is a rule with `action=neighbours`:
 1. It collects celebrations within ±`window_days` with rank ≥ `min_rank`.
-2. It takes their ▲ `mass` candidates and offers them for `recessional`.
+2. It takes their ▲ `recessional` songs, or, when a celebration has none, its ▲ `mass` songs, and offers them
+   for `recessional` (Christ the King: 631, not its mass song 707).
 3. The reason reads "ze svátku sv. Cyrila a Metoděje (ne 5. 7.)".
 4. The candidates' tier is the rule's own (●), and neighbour rules never chain.
 5. Coming celebrations come before past ones (nearest first): the plan takes a song from a coming celebration

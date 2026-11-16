@@ -217,6 +217,12 @@ class OrdinaryTimeTests(unittest.TestCase):
         self.assertIn(plan(king, 'adoration')[1][0], ('703', '631'))
         self.assertEqual(candidates(mass(date(2027, 11, 23), title='Úterý'), 'mass')[0], '519')
 
+    def test_week_before_christ_the_king_ends_with_631(self) -> None:  # p. 27 + author's rule
+        # 631 on the day itself and on every day of the week before: the coming feast, not sv. Josafat (12. 11.)
+        for day in (date(2026, 11, 15), date(2026, 11, 19), date(2026, 11, 21), date(2026, 11, 22)):
+            for m in harness.day(day).masses:
+                self.assertEqual(plan(m, 'recessional')[1], ['631'], (day, m.title))
+
     def test_categories(self) -> None:  # p. 8–9
         apostles = mass(date(2027, 5, 3))  # sv. Filip a Jakub
         self.assertEqual(plan(apostles, 'mass')[1], ['827'])

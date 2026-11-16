@@ -124,12 +124,14 @@ class Snapshot:
         """(code, verses) of the celebration's own songs, for neighbour rules (Direktář p. 27: "píseň ze slavnosti,
         svátku či památky … pro kterou je v Kancionálu píseň").
 
-        Taken from the celebration's ▲ rules for the závěr first, then for the mešní píseň. Only songs named
-        for it count: not groups or sections, and not general mass songs (512 for the archangels is not
-        "their" song)."""
+        Taken from the celebration's ▲ rules for the závěr; only when it has none, from those for the mešní píseň
+        (Christ the King lends 631, not its mass song 707). Only songs named for it count: not groups or
+        sections, and not general mass songs (512 for the archangels is not "their" song)."""
         if celebration not in self._celebration_mass_songs:
             result: list[tuple[str, str]] = []
             for part in ('recessional', 'mass'):
+                if result:
+                    break
                 for rule in self.rules:
                     if not (
                         rule.celebration == celebration
