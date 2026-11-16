@@ -71,6 +71,7 @@ class Entry:
     target: Target | None
     neighbour: str = ''
     reasons: list[Reason] = field(default_factory=list)
+    upcoming: bool = False  # a neighbour song from a celebration still to come
 
     @property
     def sort_key(self) -> tuple:
@@ -223,13 +224,15 @@ def _neighbour_entries(rule: RuleInfo, ctx: DayCtx, occ: OccurrenceCtx, snap: Sn
     if not _takes_neighbours(ctx, occ):
         return []
     entries = []
-    for nb in ctx.neighbours:
+    # Coming celebrations first (nearest first), then past ones (most recent first): the závěr looks ahead.
+    nearby = sorted(ctx.neighbours, key=lambda nb: (nb.date < ctx.date, abs((nb.date - ctx.date).days)))
+    for nb in nearby:
         if not _is_neighbour(rule, nb, ctx, occ):
             continue
         label = _neighbour_label(ctx, nb.title, nb.date)
         for code, verses in snap.celebration_mass_songs(nb.celebration_key):
             entries.append(Entry(code, verses, rule.strength, rule.specificity, rule, 0, None, label,
-                                 reasons=[Reason(rule.source_label, rule.note, label)]))
+                                 reasons=[Reason(rule.source_label, rule.note, label)], upcoming=nb.date > ctx.date))
     return entries
 
 

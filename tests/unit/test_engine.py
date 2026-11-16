@@ -245,6 +245,21 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(recessional.songs[0].code, '828')
         self.assertIn('ze svátku', recessional.reasons[0].text())
 
+    def test_recessional_prefers_coming_celebrations(self) -> None:
+        # 33rd Sunday 2026: Christ the King (coming) beats sv. Josafat (past), whatever the variety seed
+        rules = [*ORDINARY_RULES, RuleInfo('cm', ('mass',), targets=parse_targets('828, 829'), celebration='cm'),
+                 RuleInfo('j', ('recessional',), targets=parse_targets('910'), celebration='j')]
+        for week in range(8):
+            day = date(2027, 7, 8) + timedelta(weeks=week)
+            nb = (NeighbourCtx(day - timedelta(days=3), 'Sv. Josafata', 'j', Decimal('3.10')),
+                  NeighbourCtx(day + timedelta(days=4), 'Sv. Cyrila a Metoděje', 'cm', Decimal('1.4')))
+            plan = self._plan(rules, day=day, week=14 + week, neighbours=nb)
+            recessional = next(e for e in plan if e.part == 'recessional')
+            self.assertIn(recessional.songs[0].code, ('828', '829'))
+            # the past celebration stays among the alternatives, after the coming one
+            parts, *_ = resolve_mass(snap(*rules), ctx(day, week=14 + week, neighbours=nb), occ())
+            self.assertEqual(codes({p.part: p for p in parts}['recessional']), ['828', '829', '910', '930A'])
+
     def test_no_song_twice(self) -> None:
         rules = [RuleInfo('m', ('mass', 'recessional'), targets=parse_targets('523, 910'), season='ordinary')]
         plan = self._plan(rules)
