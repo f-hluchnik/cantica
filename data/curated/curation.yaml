@@ -1,7 +1,7 @@
 # Curated data exported from the DB (source of truth: the admin).
 # Import into an empty DB: python manage.py curation_import --if-empty
 # Song verse fields: null = not verified, "-" = none, "*" = as dedicated in Kancionál, "4,5" = these verses.
-version: 7
+version: 9
 groups:
 - key: advent_k_prijimani
   name: adventní písně k přijímání
